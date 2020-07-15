@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:connect_plus/Navbar.dart';
 
 class emergencyContact extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: NavDrawer(),
       appBar: AppBar(
         centerTitle: true,
         title: Text(
