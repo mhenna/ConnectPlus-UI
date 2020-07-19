@@ -150,6 +150,7 @@ class _registrationState extends State<registration> {
                         width: 250,
                         child: Padding(
                           padding: EdgeInsets.only(bottom: 20),
+                          child: registerButton
                         ),
                       ),
                     ],
