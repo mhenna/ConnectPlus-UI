@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
+import 'package:connect_plus/emergencyContact.dart';
 
 class NavDrawer extends StatelessWidget {
   @override
@@ -58,6 +59,16 @@ class NavDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => dummyPage()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.call),
+            title: Text('Emergency Contacts'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => emergencyContact()),
               )
             },
           ),
