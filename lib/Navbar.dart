@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
 import 'package:connect_plus/emergencyContact.dart';
+import 'package:connect_plus/registration.dart';
 
 class NavDrawer extends StatelessWidget {
   @override
@@ -13,14 +14,14 @@ class NavDrawer extends StatelessWidget {
           DrawerHeader(
             child: Text(
               '',
-              style: TextStyle(color: Colors.white, fontSize: 25),
+              style: TextStyle(color: Color(0xFFE15F5F), fontSize: 25),
             ),
             decoration: BoxDecoration(
-                color: Colors.green,
+                color: Colors.white,
                 image: DecorationImage(
                     fit: BoxFit.fitWidth,
-                    image: NetworkImage(
-                        'http://www.emc2movecar.com/connectplus/wp-content/uploads/2018/01/logo.png'))),
+                    image: AssetImage(
+                        "assets/logo.png"))),
           ),
           ListTile(
             leading: Icon(Icons.input),

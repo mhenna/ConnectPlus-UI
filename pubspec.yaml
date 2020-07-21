@@ -33,6 +33,7 @@ dependencies:
   flutter_localized_locales: ^1.1.1
   password: ^1.0.0
   progress_hud: ^1.1.0
+  splashscreen: ^1.2.0
 
 
 
@@ -52,6 +53,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/logo2.png
+    - assets/splash.png
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
