@@ -73,16 +73,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -97,14 +88,23 @@ class _MyHomePageState extends State<MyHomePage> {
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
+        flexibleSpace: Image(
+          image: AssetImage('assets/background.png'),
+          fit: BoxFit.cover,
+        ),
+        backgroundColor: Colors.transparent,
       ),
 
       drawer: NavDrawer(),
       body: Container(
 
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-
+        //background image
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage("assets/meetERGs.png"),
+              fit: BoxFit.cover,
+            ),
+          ),
           child: Column(children: <Widget>[
             CarouselSlider(
               options: CarouselOptions(
@@ -114,14 +114,44 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               items: imageSliders,
             ),
+            Padding(
+              padding: const EdgeInsets.all(80.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/WIAlogo.png'),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/Glogo.png'),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/WIAlogo.png'),
+                  ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset('assets/Glogo.png'),
+                  ),
+                ],
+              ),
+            ),
           ],)
 
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+// This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+
+

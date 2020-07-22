@@ -140,6 +140,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.1"
+  password:
+    dependency: "direct main"
+    description:
+      name: password
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.0"
   path:
     dependency: transitive
     description:
@@ -168,6 +175,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.2"
+  pointycastle:
+    dependency: transitive
+    description:
+      name: pointycastle
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.2"
+  progress_hud:
+    dependency: "direct main"
+    description:
+      name: progress_hud
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   pub_semver:
     dependency: transitive
     description:
