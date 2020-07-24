@@ -33,6 +33,8 @@ dependencies:
   flutter_localized_locales: ^1.1.1
   password: ^1.0.0
   progress_hud: ^1.1.0
+  http: ^0.12.0+2
+  flutter_dotenv: ^2.0.1
 
 
 
