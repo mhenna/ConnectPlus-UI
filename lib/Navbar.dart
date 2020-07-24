@@ -20,7 +20,6 @@ class NavDrawer extends StatelessWidget {
                 colors: [
                   Colors.deepOrange,
                   Color.fromARGB(0, 0, 0, 0),
-
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -28,24 +27,23 @@ class NavDrawer extends StatelessWidget {
             ),
           ),
           ExpansionTile(
-            leading: Icon(Icons.local_offer),
-            title: Text('Offer Categories'),
-            children: List.generate(3, (index) {
-              return ListTile(
-                leading: Icon(Icons.album),
-                title: Text('Offer name'),
-                subtitle: Text('Offer Details.'),
-              );
-            })
-          ),
+              leading: Icon(Icons.local_offer),
+              title: Text('Offer Categories'),
+              children: List.generate(3, (index) {
+                return ListTile(
+                  leading: Icon(Icons.album),
+                  title: Text('Offer name'),
+                  subtitle: Text('Offer Details.'),
+                );
+              })),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offer Categories ver 2'),
             onTap: () => {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => MyOffersPage()),
-            )
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyOffersPage()),
+              )
             },
           ),
           ListTile(

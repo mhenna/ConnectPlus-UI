@@ -4,6 +4,7 @@ import 'package:connect_plus/Carousel.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connect_plus/Navbar.dart';
+import 'package:splashscreen/splashscreen.dart';
 
 
 void main() {
@@ -32,7 +33,21 @@ class MyApp extends StatelessWidget {
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Connect Plus Home Page'),
+      home: Splash(),
+    );
+  }
+}
+
+class Splash extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new SplashScreen(
+      seconds: 5,
+      navigateAfterSeconds: new MyHomePage(title: "home",),
+      imageBackground: AssetImage('assets/splash.png'),
+      styleTextUnderTheLoader: new TextStyle(),
+      photoSize: 100.0,
+      loaderColor: Colors.white,
     );
   }
 }

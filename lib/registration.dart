@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
 import 'dart:convert';
-import 'package:progress_hud/progress_hud.dart';
+import 'package:http/http.dart' as http;
+import 'package:load/load.dart';
+import 'package:flutter/gestures.dart';
+import 'package:connect_plus/login.dart';
 
 class registration extends StatefulWidget {
   registration({Key key, this.title}) : super(key: key);
@@ -18,16 +21,7 @@ class _registrationState extends State<registration> {
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
-  ProgressHUD _progressHUD;
   void initState() {
-    _progressHUD = new ProgressHUD(
-      backgroundColor: Colors.black12,
-      color: Colors.white,
-      containerColor: Colors.blue,
-      borderRadius: 5.0,
-      loading: false,
-      text: 'Loading...',
-    );
     super.initState();
   }
 
@@ -96,9 +90,9 @@ class _registrationState extends State<registration> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-//          _progressHUD.state.show();
+          showLoadingDialog();
           register();
-//          _progressHUD.state.dismiss();
+          hideLoadingDialog();
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -106,6 +100,32 @@ class _registrationState extends State<registration> {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+
+//    final login = Text.rich(
+//      TextSpan(children: <TextSpan>[
+//        TextSpan(
+//            text: ' Already a user? ',
+//            style: TextStyle(
+//                color: Colors.black,
+//                fontSize: 15.0,
+//                fontFamily: "Arial")),
+//        TextSpan(
+//            text: ' Login ',
+//            style: TextStyle(
+//                fontWeight: FontWeight.bold,
+//                color: Color(0xfff7501e),
+//                fontSize: 15.0,
+//                fontFamily: "Arial"),
+//            recognizer: TapGestureRecognizer()
+//              ..onTap = () {
+//                Navigator.push(
+//                  context,
+//                  MaterialPageRoute(builder: (context) => login()),
+//                );
+//              }
+//        )
+//      ]),
+//    );
 
     return Scaffold(
       body: Center(
@@ -165,14 +185,14 @@ class _registrationState extends State<registration> {
   }
 
   void register() async {
-//    var url = 'http://' + ip + ':' + port +'/users';
+    var url = 'http://10.0.2.2:5400/user/register';
     final msg = jsonEncode({
-      'firstName': fnController.text,
+      'name': fnController.text,
       'email': emController.text,
       'password': hashPassword(),
     });
-//    var response = await http.post(url,
-//        headers: {"Content-Type": "application/json"}, body: msg);
+    var response = await http.post(url,
+        headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
 //    if(response.statusCode == 200)
 //      Navigator.push(
@@ -180,7 +200,7 @@ class _registrationState extends State<registration> {
 //        MaterialPageRoute(builder: (context) => myVerificationPage(email: emController.text)),
 //      );
 //
-//    print('Response status: ${response.statusCode}');
-//    print('Response body: ${response.body}');
+    print('Response status: ${response.statusCode}');
+    print('Response body: ${response.body}');
   }
 }
