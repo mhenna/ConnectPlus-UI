@@ -32,6 +32,8 @@ dependencies:
   flutter_gallery_assets: ^0.2.2
   flutter_localized_locales: ^1.1.1
   password: ^1.0.0
+  progress_hud: ^1.1.0
+  flutter_dotenv: ^2.0.1
   splashscreen: ^1.2.0
   http: ^0.12.2
   load: ^0.1.6

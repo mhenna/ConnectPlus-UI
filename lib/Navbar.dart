@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
 import 'package:connect_plus/emergencyContact.dart';
-import 'package:connect_plus/registration.dart';
+import 'package:connect_plus/offersPage.dart';
 
 class NavDrawer extends StatelessWidget {
   @override
@@ -12,24 +12,37 @@ class NavDrawer extends StatelessWidget {
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Text(
-              '',
-              style: TextStyle(color: Color(0xFFE15F5F), fontSize: 25),
+            child: Image.network(
+              'http://www.emc2movecar.com/connectplus/wp-content/uploads/2018/01/logo.png',
             ),
             decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                    fit: BoxFit.fitWidth,
-                    image: AssetImage(
-                        "assets/logo.png"))),
+              gradient: LinearGradient(
+                colors: [
+                  Colors.deepOrange,
+                  Color.fromARGB(0, 0, 0, 0),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
           ),
+          ExpansionTile(
+              leading: Icon(Icons.local_offer),
+              title: Text('Offer Categories'),
+              children: List.generate(3, (index) {
+                return ListTile(
+                  leading: Icon(Icons.album),
+                  title: Text('Offer name'),
+                  subtitle: Text('Offer Details.'),
+                );
+              })),
           ListTile(
-            leading: Icon(Icons.input),
-            title: Text('Welcome'),
+            leading: Icon(Icons.local_offer),
+            title: Text('Offer Categories ver 2'),
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BottomNavPreview()),
+                MaterialPageRoute(builder: (context) => MyOffersPage()),
               )
             },
           ),

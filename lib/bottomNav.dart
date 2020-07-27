@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:connect_plus/dummyPage.dart';
+import 'package:connect_plus/offersPage.dart';
 
 
 class BottomNavPreview extends StatelessWidget {
@@ -11,7 +12,7 @@ class BottomNavPreview extends StatelessWidget {
       child: new AppScaffold(
         body: TabBarView(
           children: [
-            dummyPage(),
+            MyOffersPage(),
             dummyPage(),
             dummyPage(),
           ],
