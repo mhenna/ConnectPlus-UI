@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
 import 'package:connect_plus/emergencyContact.dart';
+import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -40,8 +41,8 @@ class NavDrawerState extends State<NavDrawer>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-//    ip = "10.0.2.2";
-//    port = '3300';
+    ip = "10.0.2.2";
+    port = '3300';
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
     print(url);
     var response =
@@ -51,10 +52,6 @@ class NavDrawerState extends State<NavDrawer>
       setState(() {
         offerCategories = json.decode(response.body)['offerCategories'];
       });
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    print(offerCategories);
   }
 
   Widget build(BuildContext context) {
@@ -140,7 +137,7 @@ class NavDrawerState extends State<NavDrawer>
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
-            onTap: () => {Navigator.of(context).pop()},
+            onTap: () => {Navigator.of(context).push(MaterialPageRoute(builder: (context) => login()))},
           ),
         ],
       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
+import 'package:connect_plus/homepage.dart';
 import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class login extends StatefulWidget {
   login({Key key, this.title}) : super(key: key);
@@ -19,9 +21,18 @@ class _loginState extends State<login> {
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  var ip;
+  var port;
 
   void initState() {
     super.initState();
+    setEnv();
+  }
+
+  Future setEnv() async {
+    await DotEnv().load('.env');
+    port = DotEnv().env['PORT'];
+    ip = DotEnv().env['SERVER_IP'];
   }
 
   String hashPassword(){
@@ -160,21 +171,48 @@ class _loginState extends State<login> {
     );
   }
   void loginPressed() async {
-    var url = 'http://10.0.2.2:5400/user/login';
+    //use these values in .env for android simulator, actual ip for iOS and physical devices
+    ip = "10.0.2.2";
+    port = '3300';
+    var url = 'http://' + ip + ':' + port + '/user/login';
     final msg = jsonEncode({
       'email': emController.text,
-      'password': hashPassword(),
+      'password': pwController.text,
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
-//    if(response.statusCode == 200)
-//      Navigator.push(
-//        context,
-//        MaterialPageRoute(builder: (context) => myVerificationPage(email: emController.text)),
-//      );
-//
+    if(response.statusCode == 200)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MyHomePage()),
+      );
+    else
+      _showDialog(response.body);
+
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
+  }
+  void _showDialog(err) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Oops!"),
+          content: new Text(err),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }
