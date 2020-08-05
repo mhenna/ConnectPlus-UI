@@ -194,12 +194,12 @@ class _registrationState extends State<registration> {
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
-//    if(response.statusCode == 200)
-//      Navigator.push(
-//        context,
-//        MaterialPageRoute(builder: (context) => myVerificationPage(email: emController.text)),
-//      );
-//
+    if(response.statusCode == 200)
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => login()),
+      );
+
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
