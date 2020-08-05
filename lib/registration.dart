@@ -20,12 +20,12 @@ class _registrationState extends State<registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
   void initState() {
     super.initState();
   }
 
-  String hashPassword(){
+  String hashPassword() {
     final hash = Password.hash(pwController.text, algorithm);
     return hash;
   }
@@ -82,10 +82,16 @@ class _registrationState extends State<registration> {
                 fontFamily: "Arial"))
       ]),
     );
-    final registerButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Color(0xFFE15F5F),
+    final registerButton = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30.0),
+        gradient: LinearGradient(
+          begin: Alignment(-1.0, 1.0),
+          end: Alignment(1.0, -1.0),
+          colors: [const Color(0xfff7501e), const Color(0xffed136e)],
+          stops: [0.0, 1.0],
+        ),
+      ),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -97,7 +103,7 @@ class _registrationState extends State<registration> {
         child: Text("Register",
             textAlign: TextAlign.center,
             style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
 
@@ -131,54 +137,68 @@ class _registrationState extends State<registration> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xfffafafa),
-                image: DecorationImage(
-                  image: AssetImage("assets/logo2.png"),
-                  fit: BoxFit.fitWidth,
-                  alignment: Alignment.topCenter,
-                ),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
-                child: Card(
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 20.0),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          child: registerTitle),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: firstNameField,
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Column(
+                children: <Widget>[
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xfffafafa),
+                      image: DecorationImage(
+                        image: AssetImage("assets/logo2.png"),
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
                       ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: emailField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: passwordField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: 20),
-                          child: registerButton
+                    ),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.fromLTRB(25.0, 220.0, 25.0, 50.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              offset: Offset(0, 1),
+                              blurRadius: 6,
+                            ),
+                          ],
+                        ),
+                        child: Card(
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(height: 20.0),
+                              Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: registerTitle),
+                              SizedBox(height: 20.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.70,
+                                child: firstNameField,
+                              ),
+                              SizedBox(height: 20.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.70,
+                                child: emailField,
+                              ),
+                              SizedBox(height: 20.0),
+                              Container(
+                                width: MediaQuery.of(context).size.width * 0.70,
+                                child: passwordField,
+                              ),
+                              SizedBox(height: 20.0),
+                            ],
+                          ),
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ),
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.55,
+                    child: Padding(
+                        padding: EdgeInsets.only(bottom: 20),
+                        child: registerButton),
+                  ),
+                ],
+              )),
         ),
       ),
     );
@@ -194,7 +214,7 @@ class _registrationState extends State<registration> {
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
-    if(response.statusCode == 200)
+    if (response.statusCode == 200)
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => login()),

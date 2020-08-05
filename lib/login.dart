@@ -20,7 +20,7 @@ class _loginState extends State<login> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
   var ip;
   var port;
 
@@ -35,7 +35,7 @@ class _loginState extends State<login> {
     ip = DotEnv().env['SERVER_IP'];
   }
 
-  String hashPassword(){
+  String hashPassword() {
     final hash = Password.hash(pwController.text, algorithm);
     return hash;
   }
@@ -50,7 +50,7 @@ class _loginState extends State<login> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Email",
           border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))),
     );
     final passwordField = TextField(
       controller: pwController,
@@ -60,7 +60,7 @@ class _loginState extends State<login> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Password",
           border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(20.0))),
     );
     final loginTitle = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -78,9 +78,7 @@ class _loginState extends State<login> {
         TextSpan(
             text: ' Not a user? ',
             style: TextStyle(
-                color: Colors.black,
-                fontSize: 15.0,
-                fontFamily: "Arial")),
+                color: Colors.black, fontSize: 15.0, fontFamily: "Arial")),
         TextSpan(
             text: ' Register now ',
             style: TextStyle(
@@ -94,14 +92,19 @@ class _loginState extends State<login> {
                   context,
                   MaterialPageRoute(builder: (context) => registration()),
                 );
-              }
-        )
+              })
       ]),
     );
-    final loginButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Color(0xFFE15F5F),
+    final loginButton = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30.0),
+        gradient: LinearGradient(
+          begin: Alignment(-1.0, 1.0),
+          end: Alignment(1.0, -1.0),
+          colors: [const Color(0xfff7501e), const Color(0xffed136e)],
+          stops: [0.0, 1.0],
+        ),
+      ),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -111,7 +114,7 @@ class _loginState extends State<login> {
         child: Text("Login",
             textAlign: TextAlign.center,
             style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
 
@@ -119,7 +122,7 @@ class _loginState extends State<login> {
       body: Center(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
+            padding: const EdgeInsets.only(top: 5.0),
             child: Container(
               decoration: BoxDecoration(
                 color: Color(0xfffafafa),
@@ -132,32 +135,43 @@ class _loginState extends State<login> {
               child: Column(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 30.0),
-                    child: Card(
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(height: 20.0),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              child: loginTitle),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: emailField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: passwordField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: loginButton),
+                    padding: const EdgeInsets.fromLTRB(25.0, 220.0, 25.0, 30.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.shade200,
+                            offset: Offset(0, 1),
+                            blurRadius: 6,
                           ),
                         ],
+                      ),
+                      child: Card(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: 20.0),
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                child: loginTitle),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.70,
+                              child: emailField,
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.70,
+                              child: passwordField,
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: MediaQuery.of(context).size.width * 0.55,
+                              child: Padding(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  child: loginButton),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -170,6 +184,7 @@ class _loginState extends State<login> {
       ),
     );
   }
+
   void loginPressed() async {
     //use these values in .env for android simulator, actual ip for iOS and physical devices
     ip = "10.0.2.2";
@@ -182,7 +197,7 @@ class _loginState extends State<login> {
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
-    if(response.statusCode == 200)
+    if (response.statusCode == 200)
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
@@ -193,6 +208,7 @@ class _loginState extends State<login> {
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
+
   void _showDialog(err) {
     // flutter defined function
     showDialog(
