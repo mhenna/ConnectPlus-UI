@@ -177,7 +177,7 @@ class _loginState extends State<login> {
     var url = 'http://' + ip + ':' + port + '/user/login';
     final msg = jsonEncode({
       'email': emController.text,
-      'password': pwController.text,
+      'password': hashPassword(),
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
