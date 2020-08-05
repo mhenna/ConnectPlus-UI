@@ -11,73 +11,118 @@ class MyOffersPage extends StatefulWidget {
   @override
   MyOffersPageState createState() => MyOffersPageState();
 }
-class MyOffersPageState extends State<MyOffersPage> {
+
+class MyOffersPageState extends State<MyOffersPage>
+    with AutomaticKeepAliveClientMixin<MyOffersPage> {
+  @override
+  bool get wantKeepAlive => true;
 //  String token;
   var ip;
   var port;
+  var offerCategories = [];
 
-  void initState(){
+  void initState() {
     super.initState();
-    setEnv();
     getCategories();
-
+    setEnv();
   }
 
   Future setEnv() async {
     await DotEnv().load('.env');
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
-
   }
+
   void getCategories() async {
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
+//    Working for android emulator -- set to actual ip for use with physical device
+//    ip = "10.0.2.2";
+//    port = '3300';
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
-    var oc;
     print(url);
-    var response = await http.get(url,
-        headers: {"Content-Type": "application/json"});
+    var response =
+        await http.get(url, headers: {"Content-Type": "application/json"});
     print(response.statusCode);
-    if(response.statusCode == 200)
-      oc = json.decode(response.body)['offerCategories'];
-
+    if (response.statusCode == 200)
+      setState(() {
+        offerCategories = json.decode(response.body)['offerCategories'];
+      });
 
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
+    print(offerCategories);
   }
+
   @override
   Widget build(BuildContext context) {
     return AppScaffold(
         body: GridView.count(
-          // Create a grid with 2 columns. If you change the scrollDirection to
-          // horizontal, this produces 2 rows.
-          crossAxisCount: 2,
-          // Generate 100 widgets that display their index in the List.
-          children: List.generate(10, (index) {
-            return Center(
-              child: Card(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
+      // Create a grid with 2 columns. If you change the scrollDirection to
+      // horizontal, this produces 2 rows.
+      crossAxisCount: 2,
+      addAutomaticKeepAlives: true,
+      // Generate 100 widgets that display their index in the List.
+      children: List.generate(offerCategories.length, (index) {
+        return Center(
+          child: Card(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new ListTile(
+                  leading: Icon(Icons.album),
+                  title:
+                      Text(offerCategories.elementAt(index)['name'].toString()),
+                  subtitle: Text(
+                      "Logo would be here"),
+                ),
+                ButtonBar(
                   children: <Widget>[
-                    const ListTile(
-                      leading: Icon(Icons.album),
-                      title: Text('Offer name'),
-                      subtitle: Text('Offer Details.'),
-                    ),
-                    ButtonBar(
-                      children: <Widget>[
-                        FlatButton(
-                          child: const Text('Learn more.'),
-                          onPressed: () {/* ... */},
-                        )
-                      ],
-                    ),
+                    FlatButton(
+                      child: const Text('Learn more.'),
+                      onPressed: () {/* ... */},
+                    )
                   ],
                 ),
-              ),
-            );
-          }),
-
+              ],
+            ),
+          ),
+        );
+      }),
     ));
+
+    //IF YOU WANT VERTICAL SLOTS
+    //        body: Container(
+    //      child: ListView.builder(
+    //        addAutomaticKeepAlives: true,
+    //        itemBuilder: (context, index) {
+    //          return Center(
+    //              child: Card(
+    //            child: Column(
+    //              mainAxisSize: MainAxisSize.min,
+    //              children: <Widget>[
+    //                new ListTile(
+    //                  leading: Icon(Icons.album),
+    //                  title:
+    //                      Text(offerCategories.elementAt(index)['name'].toString()),
+    //                  subtitle: Text(
+    //                      offerCategories.elementAt(index)['details'].toString()),
+    //                ),
+    //                ButtonBar(
+    //                  children: <Widget>[
+    //                    FlatButton(
+    //                      child: const Text('Learn more.'),
+    //                      onPressed: () {/* ... */},
+    //                    )
+    //                  ],
+    //                ),
+    //              ],
+    //            ),
+    //          ));
+    //        },
+    //        itemCount: offerCategories.length,
+    //        scrollDirection: Axis.vertical,
+    //      ),
+    //    )
   }
 }
