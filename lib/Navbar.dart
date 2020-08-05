@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
 import 'package:connect_plus/emergencyContact.dart';
+import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
 import 'package:http/http.dart' as http;
@@ -105,12 +106,12 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Settings'),
+            leading: Icon(Icons.home),
+            title: Text('Home'),
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => dummyPage()),
+                MaterialPageRoute(builder: (context) => MyHomePage()),
               )
             },
           ),
