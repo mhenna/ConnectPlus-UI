@@ -1,3 +1,4 @@
+import 'package:connect_plus/events.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/bottomNav.dart';
@@ -102,6 +103,16 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => BottomNavPreview()),
+              )
+            },
+          ),
+           ListTile(
+            leading: Icon(Icons.event),
+            title: Text('Events'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Events()),
               )
             },
           ),
