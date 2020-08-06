@@ -52,6 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     ;
+    final resWidth = MediaQuery.of(context).size.width;
+    final resHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: const Color(0xfffafafa),
       appBar: PreferredSize(
@@ -60,8 +63,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: AppBar(
           backgroundColor: const Color(0xfffafafa),
           flexibleSpace: Container(
-            width: MediaQuery.of(context).size.width * 1,
-            height: MediaQuery.of(context).size.height * 0.17,
+            width: resWidth * 1,
+            height: resHeight * 0.17,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
                 bottomRight: Radius.circular(30.0),
@@ -82,7 +85,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ],
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, resHeight * 0.08, 0, 0),
               child: Text('Home',
                   style: TextStyle(
                     fontFamily: 'Arial',
@@ -97,11 +100,13 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       drawer: NavDrawer(),
-      body: Container(
+      body: SingleChildScrollView(
+         scrollDirection: Axis.vertical, 
+       child: Container(
           child: Column(
         children: <Widget>[
           Container(
-            width: MediaQuery.of(context).size.width * 1,
+            width: resWidth * 1,
             child: CarouselSlider(
               options: CarouselOptions(
                 autoPlay: true,
@@ -112,7 +117,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, resWidth * 0.08, 0, 0),
             child: Text('Meet our ERGs',
                 style: TextStyle(
                   fontFamily: 'Arial',
@@ -130,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
             endIndent: 80,
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(70, 40, 70, 20),
+            padding: EdgeInsets.fromLTRB(resWidth*0.17, resHeight * 0.07, resWidth*0.17, resHeight * 0.04),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -140,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(70, 30, 70, 0),
+            padding: EdgeInsets.fromLTRB(resWidth*0.17, resHeight * 0.04, resWidth*0.17, resHeight * 0.04),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
@@ -151,6 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ],
       )),
+      ),
 // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

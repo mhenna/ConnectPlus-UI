@@ -6,6 +6,9 @@ import 'package:connect_plus/Navbar.dart';
 class emergencyContact extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final resWidth = MediaQuery.of(context).size.width;
+    final resHeight = MediaQuery.of(context).size.height;
+
     return DefaultTabController(
       length: 3,
       child: new Scaffold(
@@ -18,7 +21,7 @@ class emergencyContact extends StatelessWidget {
             backgroundColor: const Color(0xfffafafa),
             flexibleSpace: Container(
               width: MediaQuery.of(context).size.width * 1,
-              height: MediaQuery.of(context).size.height * 0.24,
+              height: MediaQuery.of(context).size.height * 0.23,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                   bottomRight: Radius.circular(30.0),
@@ -39,7 +42,7 @@ class emergencyContact extends StatelessWidget {
                 ],
               ),
               child: Padding(
-                padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
+                padding: EdgeInsets.fromLTRB(0, resHeight * 0.1, 0, 0),
                 child: Text('Emergency Contacts',
                     style: TextStyle(
                       fontFamily: 'Arial',
@@ -67,7 +70,7 @@ class emergencyContact extends StatelessWidget {
           ),
         ),
         body: Padding(
-          padding: EdgeInsets.fromLTRB(0, 40, 0, 0),
+          padding: EdgeInsets.fromLTRB(0, resHeight * 0.04, 0, 0),
           child: TabBarView(children: [
             new ListView(
               children: <Widget>[

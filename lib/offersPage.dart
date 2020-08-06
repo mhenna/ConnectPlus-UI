@@ -57,6 +57,8 @@ class MyOffersPageState extends State<MyOffersPage>
 
   @override
   Widget build(BuildContext context) {
+    final resWidth = MediaQuery.of(context).size.width;
+    final resHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: PreferredSize(
         preferredSize:
@@ -86,7 +88,7 @@ class MyOffersPageState extends State<MyOffersPage>
               ],
             ),
             child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, resHeight * 0.08, 0, 0),
               child: Text('Offers',
                   style: TextStyle(
                     fontFamily: 'Arial',
