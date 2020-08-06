@@ -31,30 +31,78 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-//        title: Text(widget.title),
-        flexibleSpace: Image(
-          image: AssetImage('assets/background.png'),
-          fit: BoxFit.cover,
+
+    erg(path) {
+      return Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0x29000000),
+              offset: Offset(0, 3),
+              blurRadius: 6,
+            ),
+          ],
         ),
-        backgroundColor: Colors.transparent,
-      ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10),
+          child: Image.asset(path),
+        ),
+      );
+    }
 
-      drawer: NavDrawer(),
-      body: Container(
-
-        //background image
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/meetERGs.png"),
-              fit: BoxFit.cover,
+    ;
+    return Scaffold(
+      backgroundColor: const Color(0xfffafafa),
+      appBar: PreferredSize(
+        preferredSize:
+            MediaQuery.of(context).size * 0.14, // here the desired height
+        child: AppBar(
+          backgroundColor: const Color(0xfffafafa),
+          flexibleSpace: Container(
+            width: MediaQuery.of(context).size.width * 1,
+            height: MediaQuery.of(context).size.height * 0.17,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(30.0),
+                bottomLeft: Radius.circular(30.0),
+              ),
+              gradient: LinearGradient(
+                begin: Alignment(-1.0, 1.0),
+                end: Alignment(1.0, -1.0),
+                colors: [const Color(0xfff7501e), const Color(0xffed136e)],
+                stops: [0.0, 1.0],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0x29000000),
+                  offset: Offset(0, 3),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 80, 0, 0),
+              child: Text('Home',
+                  style: TextStyle(
+                    fontFamily: 'Arial',
+                    fontSize: 28,
+                    color: const Color(0xffffffff),
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.center),
             ),
           ),
-          child: Column(children: <Widget>[
-            CarouselSlider(
+          elevation: 0.0,
+        ),
+      ),
+      drawer: NavDrawer(),
+      body: Container(
+          child: Column(
+        children: <Widget>[
+          Container(
+            width: MediaQuery.of(context).size.width * 1,
+            child: CarouselSlider(
               options: CarouselOptions(
                 autoPlay: true,
                 aspectRatio: 2.0,
@@ -62,41 +110,47 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               items: imageSliders,
             ),
-            Padding(
-              padding: const EdgeInsets.all(80.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/WIAlogo.png'),
-                  ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/Glogo.png'),
-                  ),
-                ],
-              ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+            child: Text('Meet our ERGs',
+                style: TextStyle(
+                  fontFamily: 'Arial',
+                  fontSize: 28,
+                  color: Colors.deepOrange.shade600,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center),
+          ),
+          const Divider(
+            color: Colors.deepOrange,
+            height: 20,
+            thickness: 3,
+            indent: 80,
+            endIndent: 80,
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(70, 40, 70, 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                erg('assets/WIAlogo.png'),
+                erg('assets/Glogo.png')
+              ],
             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/WIAlogo.png'),
-                  ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/Glogo.png'),
-                  ),
-                ],
-              ),
+          ),
+          Padding(
+            padding: EdgeInsets.fromLTRB(70, 30, 70, 0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                erg('assets/Glogo.png'),
+                erg('assets/WIAlogo.png'),
+              ],
             ),
-          ],)
-
-      ),
+          ),
+        ],
+      )),
 // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
