@@ -37,6 +37,7 @@ dependencies:
   splashscreen: ^1.2.0
   http: ^0.12.2
   load: ^0.1.6
+  localstorage: ^3.0.2+5
 
 
 
@@ -61,7 +62,8 @@ flutter:
     - assets/meetERGs.png
     - assets/Glogo.png
     - assets/background.png
-
+    - assets/sale.png
+    - .env
 
 
   # The following line ensures that the Material Icons font is
