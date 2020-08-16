@@ -37,7 +37,7 @@ dependencies:
   splashscreen: ^1.2.0
   http: ^0.12.2
   load: ^0.1.6
-
+  flutter_typeahead: ^1.8.7
 
 
   # The following adds the Cupertino Icons font to your application.
