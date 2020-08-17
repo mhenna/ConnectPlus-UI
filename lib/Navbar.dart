@@ -6,6 +6,7 @@ import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
+import 'package:connect_plus/Offers.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -75,17 +76,16 @@ class NavDrawerState extends State<NavDrawer>
               ),
             ),
           ),
-          ExpansionTile(
-              leading: Icon(Icons.local_offer),
-              title: Text('Offer Categories'),
-              children: List.generate(offerCategories.length, (index) {
-                return ListTile(
-                  leading: Icon(Icons.album),
-                  title:
-                      Text(offerCategories.elementAt(index)['name'].toString()),
-                  subtitle: Text('Offer Details.'),
-                );
-              })),
+          ListTile(
+            leading: Icon(Icons.local_offer),
+            title: Text('Offers'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Offers()),
+              )
+            },
+          ),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offer Categories ver 2'),

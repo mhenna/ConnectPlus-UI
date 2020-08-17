@@ -29,7 +29,9 @@ class _OffersState extends State<Offers> {
   var ip;
   var port;
   var offers = [];
-  var randIndex;
+  var categoriesAndOffers = [];
+  var randIndexCat;
+  var randIndexOffer;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -47,7 +49,7 @@ class _OffersState extends State<Offers> {
   Future getOffers() async {
     String name = widget.offerCategory;
     String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/offers/getByCategory/$name';
+    var url = 'http://' + ip + ':' + port + '/offers';
 
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
@@ -56,8 +58,10 @@ class _OffersState extends State<Offers> {
 
     if (response.statusCode == 200)
       setState(() {
-        offers = json.decode(response.body);
-        randIndex = Offers._random.nextInt(offers.length);
+        categoriesAndOffers = json.decode(response.body);
+        randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
+        randIndexOffer = Offers._random.nextInt(
+            categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
       });
   }
 
@@ -86,8 +90,9 @@ class _OffersState extends State<Offers> {
 
   Widget base64ToImageFeatured() {
     try {
-      Uint8List bytes =
-          base64Decode(offers.elementAt(randIndex)['logo']['fileData']);
+      Uint8List bytes = base64Decode(categoriesAndOffers
+          .elementAt(randIndexCat)['offers']
+          .elementAt(randIndexOffer)['logo']['fileData']);
       return FittedBox(
         fit: BoxFit.contain,
         child: Image.memory(bytes),
@@ -123,54 +128,88 @@ class _OffersState extends State<Offers> {
                         ),
                       ));
                 } else {
-                  return GridView.count(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    // Create a grid with 2 columns. If you change the scrollDirection to
-                    // horizontal, this produces 2 rows.
-                    crossAxisCount: 2,
-                    addAutomaticKeepAlives: true,
-                    // Generate 100 widgets that display their index in the List.
-                    children: List.generate(offers.length, (index) {
-                      return Center(
-                        child: Card(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-//                            new ListTile(
-//                              leading: Icon(Icons.album),
-//                              title: Text(offers
-//                                  .elementAt(index)['offer']['name']
-//                                  .toString()),
-//                              subtitle: base64ToImage(offers
-//                                  .elementAt(index)['logo']['fileData']
-//                                  .toString()),
-//                            )
-                              base64ToImage(offers
-                                  .elementAt(index)['logo']['fileData']
-                                  .toString()),
-                              ButtonBar(
-                                alignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  FlatButton(
-                                    child: Text(
-                                      offers
-                                          .elementAt(index)['offer']['name']
-                                          .toString(),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 22),
+                  return ListView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      itemCount: categoriesAndOffers.length,
+                      itemBuilder: (BuildContext catContext, int cat) {
+                        return Column(
+                          children: <Widget>[
+                            if (cat == 0)
+                              Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 12.0, 0, 8.0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      child: Text(
+                                        categoriesAndOffers
+                                            .elementAt(cat)['name'],
+                                        style: TextStyle(fontSize: 28),
+                                      ),
                                     ),
-                                    onPressed: () {},
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }),
-                  );
+                                  ))
+                            else
+                              Padding(
+                                  padding: EdgeInsets.fromLTRB(0, 55.0, 0, 8.0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Container(
+                                      child: Text(
+                                        categoriesAndOffers
+                                            .elementAt(cat)['name'],
+                                        style: TextStyle(fontSize: 28),
+                                      ),
+                                    ),
+                                  )),
+                            GridView.count(
+                              shrinkWrap: true,
+                              physics: ScrollPhysics(),
+                              // Create a grid with 2 columns. If you change the scrollDirection to
+                              // horizontal, this produces 2 rows.
+                              crossAxisCount: 2,
+                              addAutomaticKeepAlives: true,
+                              // Generate 100 widgets that display their index in the List.
+                              children: List.generate(
+                                  categoriesAndOffers
+                                      .elementAt(cat)['offers']
+                                      .length, (index) {
+                                return Center(
+                                  child: Card(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        base64ToImage(categoriesAndOffers
+                                            .elementAt(cat)['offers']
+                                            .elementAt(index)['logo']
+                                                ['fileData']
+                                            .toString()),
+                                        ButtonBar(
+                                          alignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            FlatButton(
+                                              child: Text(
+                                                categoriesAndOffers
+                                                    .elementAt(cat)['offers']
+                                                    .elementAt(index)['name']
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(fontSize: 22),
+                                              ),
+                                              onPressed: () {},
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }),
+                            )
+                          ],
+                        );
+                      });
                 }
               }));
     } catch (Exception) {
