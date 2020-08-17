@@ -6,10 +6,10 @@ import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
+import 'package:connect_plus/Offers.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -48,7 +48,7 @@ class NavDrawerState extends State<NavDrawer>
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
     print(url);
     var response =
-    await http.get(url, headers: {"Content-Type": "application/json"});
+        await http.get(url, headers: {"Content-Type": "application/json"});
     print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {
@@ -76,16 +76,16 @@ class NavDrawerState extends State<NavDrawer>
               ),
             ),
           ),
-          ExpansionTile(
-              leading: Icon(Icons.local_offer),
-              title: Text('Offer Categories'),
-              children: List.generate(offerCategories.length, (index) {
-                return ListTile(
-                  leading: Icon(Icons.album),
-                  title: Text(offerCategories.elementAt(index)['name'].toString()),
-                  subtitle: Text('Offer Details.'),
-                );
-              })),
+          ListTile(
+            leading: Icon(Icons.local_offer),
+            title: Text('Offers'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Offers()),
+              )
+            },
+          ),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offer Categories ver 2'),
@@ -106,7 +106,7 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-           ListTile(
+          ListTile(
             leading: Icon(Icons.event),
             title: Text('Events'),
             onTap: () => {
@@ -149,7 +149,10 @@ class NavDrawerState extends State<NavDrawer>
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
-            onTap: () => {Navigator.of(context).push(MaterialPageRoute(builder: (context) => login()))},
+            onTap: () => {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => login()))
+            },
           ),
         ],
       ),

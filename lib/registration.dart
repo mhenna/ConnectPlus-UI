@@ -25,7 +25,7 @@ class _registrationState extends State<registration> {
     super.initState();
   }
 
-  String hashPassword(){
+  String hashPassword() {
     final hash = Password.hash(pwController.text, algorithm);
     return hash;
   }
@@ -169,9 +169,8 @@ class _registrationState extends State<registration> {
                       Container(
                         width: 250,
                         child: Padding(
-                          padding: EdgeInsets.only(bottom: 20),
-                          child: registerButton
-                        ),
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: registerButton),
                       ),
                     ],
                   ),

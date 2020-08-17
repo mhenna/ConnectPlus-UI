@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
+import 'package:localstorage/localstorage.dart';
 import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -17,6 +18,8 @@ class login extends StatefulWidget {
 }
 
 class _loginState extends State<login> {
+  final LocalStorage localStorage = new LocalStorage('Connect+');
+
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
@@ -172,8 +175,6 @@ class _loginState extends State<login> {
   }
   void loginPressed() async {
     //use these values in .env for android simulator, actual ip for iOS and physical devices
-    ip = "10.0.2.2";
-    port = '3300';
     var url = 'http://' + ip + ':' + port + '/user/login';
     final msg = jsonEncode({
       'email': emController.text,
@@ -182,11 +183,14 @@ class _loginState extends State<login> {
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     print(msg);
-    if(response.statusCode == 200)
+    if(response.statusCode == 200) {
+      print ("TOKEN " + json.decode(response.body)["token"]);
+      localStorage.setItem("token", json.decode(response.body)["token"]);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
+    }
     else
       _showDialog(response.body);
 
