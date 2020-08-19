@@ -77,15 +77,64 @@ class NavDrawerState extends State<NavDrawer>
             ),
           ),
           ExpansionTile(
-              leading: Icon(Icons.local_offer),
-              title: Text('Offer Categories'),
-              children: List.generate(offerCategories.length, (index) {
-                return ListTile(
-                  leading: Icon(Icons.album),
-                  title: Text(offerCategories.elementAt(index)['name'].toString()),
-                  subtitle: Text('Offer Details.'),
-                );
-              })),
+              leading: Icon(Icons.person),
+              title: Text('Committees'),
+              children: <Widget>[
+                ExpansionTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text("ERGs"),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('GENNEXT',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('DT Belmasry',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('WIA',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('MOSAIC',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    )
+                  ],
+                ),
+                ListTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text('Internal Comms',
+                      style: TextStyle(color: Color(0xFFE15F5F))),
+                  onTap: () => print(""),
+                ),
+                ExpansionTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text("Engagement Teams"),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('Wezaret ELSAADA (Deploy)',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('FUN CREW (CS)',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                  ],
+                ),
+              ]),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offer Categories ver 2'),
@@ -106,7 +155,7 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-           ListTile(
+          ListTile(
             leading: Icon(Icons.event),
             title: Text('Events'),
             onTap: () => {
@@ -149,7 +198,10 @@ class NavDrawerState extends State<NavDrawer>
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
-            onTap: () => {Navigator.of(context).push(MaterialPageRoute(builder: (context) => login()))},
+            onTap: () => {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => login()))
+            },
           ),
         ],
       ),
