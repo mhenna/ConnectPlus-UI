@@ -4,11 +4,12 @@ import 'dart:math';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
+import 'package:connect_plus/Offer.dart';
 import 'dart:convert';
 import 'dart:typed_data';
 
 class Offers extends StatefulWidget {
-  Offers({Key key, @required this.offerCategory}) : super(key: key);
+  Offers({Key key, this.offerCategory}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -36,12 +37,11 @@ class _OffersState extends State<Offers> {
 
   void initState() {
     super.initState();
-    setEnv().then((value) => getOffers());
-//    getOffers();
+    setEnv();
+    getOffers();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -197,7 +197,24 @@ class _OffersState extends State<Offers> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(fontSize: 22),
                                               ),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) => Offer(
+                                                                category: categoriesAndOffers
+                                                                        .elementAt(
+                                                                            cat)[
+                                                                    'name'],
+                                                                offer: categoriesAndOffers
+                                                                    .elementAt(cat)[
+                                                                        'offers']
+                                                                    .elementAt(
+                                                                        index),
+                                                              )),
+                                                );
+                                              },
                                             )
                                           ],
                                         ),

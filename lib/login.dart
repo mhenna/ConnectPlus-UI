@@ -32,13 +32,12 @@ class _loginState extends State<login> {
     setEnv();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
 
-  String hashPassword(){
+  String hashPassword() {
     final hash = Password.hash(pwController.text, algorithm);
     return hash;
   }
@@ -81,9 +80,7 @@ class _loginState extends State<login> {
         TextSpan(
             text: ' Not a user? ',
             style: TextStyle(
-                color: Colors.black,
-                fontSize: 15.0,
-                fontFamily: "Arial")),
+                color: Colors.black, fontSize: 15.0, fontFamily: "Arial")),
         TextSpan(
             text: ' Register now ',
             style: TextStyle(
@@ -97,8 +94,7 @@ class _loginState extends State<login> {
                   context,
                   MaterialPageRoute(builder: (context) => registration()),
                 );
-              }
-        )
+              })
       ]),
     );
     final loginButton = Material(
@@ -173,6 +169,7 @@ class _loginState extends State<login> {
       ),
     );
   }
+
   void loginPressed() async {
     //use these values in .env for android simulator, actual ip for iOS and physical devices
     var url = 'http://' + ip + ':' + port + '/user/login';
@@ -182,21 +179,19 @@ class _loginState extends State<login> {
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
-    print(msg);
-    if(response.statusCode == 200) {
-      print ("TOKEN " + json.decode(response.body)["token"]);
+    if (response.statusCode == 200) {
       localStorage.setItem("token", json.decode(response.body)["token"]);
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
-    }
-    else
+    } else
       _showDialog(response.body);
 
     print('Response status: ${response.statusCode}');
     print('Response body: ${response.body}');
   }
+
   void _showDialog(err) {
     // flutter defined function
     showDialog(
