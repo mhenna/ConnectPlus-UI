@@ -7,6 +7,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/Offer.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class Offers extends StatefulWidget {
   Offers({Key key, this.offerCategory}) : super(key: key);
@@ -33,6 +34,7 @@ class _OffersState extends State<Offers> {
   var categoriesAndOffers = [];
   var randIndexCat;
   var randIndexOffer;
+  var searchData = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -63,6 +65,22 @@ class _OffersState extends State<Offers> {
         randIndexOffer = Offers._random.nextInt(
             categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
       });
+    getSearchData();
+  }
+
+  Future getSearchData() async {
+    String name = widget.offerCategory;
+    String token = localStorage.getItem("token");
+    var url = 'http://' + ip + ':' + port + '/offers/getOffersNames';
+
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
+
+    if (response.statusCode == 200) {
+      searchData = json.decode(response.body);
+    }
   }
 
   Widget base64ToImage(String base64) {
@@ -78,14 +96,14 @@ class _OffersState extends State<Offers> {
   Widget LoadingWidget() {
     return Scaffold(
         body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              new CircularProgressIndicator(),
+              new Text("Loading"),
+            ],
+          ),
+        ));
   }
 
   Widget base64ToImageFeatured() {
@@ -112,11 +130,32 @@ class _OffersState extends State<Offers> {
               itemCount: 3,
               itemBuilder: (BuildContext context, int elem) {
                 if (elem == 0) {
-                  return Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    width: MediaQuery.of(context).size.width,
-                    child: base64ToImageFeatured(),
-                  );
+                  return Column(children: <Widget>[
+                    TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: "Search")),
+                      suggestionsCallback: (pattern) async {
+                        return await getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          leading: Icon(Icons.shopping_cart),
+                          title: Text(suggestion['name']),
+//                subtitle: Text(suggestion['category']),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        print(suggestion);
+                      },
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      width: MediaQuery.of(context).size.width,
+                      child: base64ToImageFeatured(),
+                    )
+                  ]);
                 } else if (elem == 1) {
                   return Padding(
                       padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
@@ -178,12 +217,12 @@ class _OffersState extends State<Offers> {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      CrossAxisAlignment.center,
                                       children: <Widget>[
                                         base64ToImage(categoriesAndOffers
                                             .elementAt(cat)['offers']
                                             .elementAt(index)['logo']
-                                                ['fileData']
+                                        ['fileData']
                                             .toString()),
                                         ButtonBar(
                                           alignment: MainAxisAlignment.center,
@@ -203,16 +242,16 @@ class _OffersState extends State<Offers> {
                                                   MaterialPageRoute(
                                                       builder:
                                                           (context) => Offer(
-                                                                category: categoriesAndOffers
-                                                                        .elementAt(
-                                                                            cat)[
-                                                                    'name'],
-                                                                offer: categoriesAndOffers
-                                                                    .elementAt(cat)[
-                                                                        'offers']
-                                                                    .elementAt(
-                                                                        index),
-                                                              )),
+                                                        category: categoriesAndOffers
+                                                            .elementAt(
+                                                            cat)[
+                                                        'name'],
+                                                        offer: categoriesAndOffers
+                                                            .elementAt(cat)[
+                                                        'offers']
+                                                            .elementAt(
+                                                            index),
+                                                      )),
                                                 );
                                               },
                                             )
@@ -232,5 +271,12 @@ class _OffersState extends State<Offers> {
     } catch (Exception) {
       return LoadingWidget();
     }
+  }
+
+  getSuggestions(pattern) {
+    if (pattern == "") return null;
+    var filter = List.from(searchData.where((entry) =>
+    entry["name"].toLowerCase().startsWith(pattern.toLowerCase()) as bool));
+    return filter;
   }
 }

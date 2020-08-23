@@ -38,7 +38,7 @@ dependencies:
   http: ^0.12.2
   load: ^0.1.6
   localstorage: ^3.0.2+5
-
+  flutter_typeahead: ^1.8.7
 
 
   # The following adds the Cupertino Icons font to your application.
