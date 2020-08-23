@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class Offers extends StatefulWidget {
   Offers({Key key, @required this.offerCategory}) : super(key: key);
@@ -32,6 +33,7 @@ class _OffersState extends State<Offers> {
   var categoriesAndOffers = [];
   var randIndexCat;
   var randIndexOffer;
+  var searchData = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -63,6 +65,21 @@ class _OffersState extends State<Offers> {
         randIndexOffer = Offers._random.nextInt(
             categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
       });
+    getSearchData();
+  }
+  Future getSearchData() async {
+    String name = widget.offerCategory;
+    String token = localStorage.getItem("token");
+    var url = 'http://' + ip + ':' + port + '/offers/getOffersNames';
+
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
+
+    if (response.statusCode == 200) {
+     searchData = json.decode(response.body);
+    }
   }
 
   Widget base64ToImage(String base64) {
@@ -106,114 +123,143 @@ class _OffersState extends State<Offers> {
   Widget build(BuildContext context) {
     try {
       return AppScaffold(
-          body: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(10),
-              itemCount: 3,
-              itemBuilder: (BuildContext context, int elem) {
-                if (elem == 0) {
-                  return Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    width: MediaQuery.of(context).size.width,
-                    child: base64ToImageFeatured(),
-                  );
-                } else if (elem == 1) {
-                  return Padding(
-                      padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
-                      child: Text(
-                        "OFFERS",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                        ),
-                      ));
-                } else {
-                  return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: categoriesAndOffers.length,
-                      itemBuilder: (BuildContext catContext, int cat) {
-                        return Column(
-                          children: <Widget>[
-                            if (cat == 0)
-                              Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 12.0, 0, 8.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: Text(
-                                        categoriesAndOffers
-                                            .elementAt(cat)['name'],
-                                        style: TextStyle(fontSize: 28),
-                                      ),
-                                    ),
-                                  ))
-                            else
-                              Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 55.0, 0, 8.0),
-                                  child: Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: Container(
-                                      child: Text(
-                                        categoriesAndOffers
-                                            .elementAt(cat)['name'],
-                                        style: TextStyle(fontSize: 28),
-                                      ),
-                                    ),
-                                  )),
-                            GridView.count(
-                              shrinkWrap: true,
-                              physics: ScrollPhysics(),
-                              // Create a grid with 2 columns. If you change the scrollDirection to
-                              // horizontal, this produces 2 rows.
-                              crossAxisCount: 2,
-                              addAutomaticKeepAlives: true,
-                              // Generate 100 widgets that display their index in the List.
-                              children: List.generate(
-                                  categoriesAndOffers
-                                      .elementAt(cat)['offers']
-                                      .length, (index) {
-                                return Center(
-                                  child: Card(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        base64ToImage(categoriesAndOffers
-                                            .elementAt(cat)['offers']
-                                            .elementAt(index)['logo']
-                                                ['fileData']
-                                            .toString()),
-                                        ButtonBar(
-                                          alignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            FlatButton(
-                                              child: Text(
-                                                categoriesAndOffers
-                                                    .elementAt(cat)['offers']
-                                                    .elementAt(index)['name']
-                                                    .toString(),
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 22),
-                                              ),
-                                              onPressed: () {},
-                                            )
-                                          ],
-                                        ),
-                                      ],
+          body:ListView.builder(
+            shrinkWrap: true,
+            padding: const EdgeInsets.all(10),
+            itemCount: 3,
+            itemBuilder: (BuildContext context, int elem) {
+              if (elem == 0) {
+                return Column( children:<Widget>[
+                  TypeAheadField(
+                    textFieldConfiguration: TextFieldConfiguration(
+                        decoration: InputDecoration(border: OutlineInputBorder(),hintText:"Search")
+                    ),
+                    suggestionsCallback: (pattern) async {
+                      return await getSuggestions(pattern);
+                    },
+                    itemBuilder: (context, suggestion) {
+                      return ListTile(
+                        leading: Icon(Icons.shopping_cart),
+                        title: Text(suggestion['name']),
+//                subtitle: Text(suggestion['category']),
+                      );
+                    },
+                    onSuggestionSelected: (suggestion) {
+                      print(suggestion);
+//                Navigator.of(context).push(MaterialPageRoute(
+//                    builder: (context) =>
+//                ));
+                    },
+                  ),
+                  Container(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  width: MediaQuery.of(context).size.width,
+                  child: base64ToImageFeatured(),
+                )]);
+              } else if (elem == 1) {
+                return Padding(
+                    padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
+                    child: Text(
+                      "OFFERS",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 32,
+                      ),
+                    ));
+              } else {
+                return ListView.builder(
+                    shrinkWrap: true,
+                    physics: ScrollPhysics(),
+                    itemCount: categoriesAndOffers.length,
+                    itemBuilder: (BuildContext catContext, int cat) {
+                      return Column(
+                        children: <Widget>[
+                          if (cat == 0)
+                            Padding(
+                                padding: EdgeInsets.fromLTRB(0, 12.0, 0, 8.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: Text(
+                                      categoriesAndOffers
+                                          .elementAt(cat)['name'],
+                                      style: TextStyle(fontSize: 28),
                                     ),
                                   ),
-                                );
-                              }),
-                            )
-                          ],
-                        );
-                      });
-                }
-              }));
+                                ))
+                          else
+                            Padding(
+                                padding: EdgeInsets.fromLTRB(0, 55.0, 0, 8.0),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: Text(
+                                      categoriesAndOffers
+                                          .elementAt(cat)['name'],
+                                      style: TextStyle(fontSize: 28),
+                                    ),
+                                  ),
+                                )),
+                          GridView.count(
+                            shrinkWrap: true,
+                            physics: ScrollPhysics(),
+                            // Create a grid with 2 columns. If you change the scrollDirection to
+                            // horizontal, this produces 2 rows.
+                            crossAxisCount: 2,
+                            addAutomaticKeepAlives: true,
+                            // Generate 100 widgets that display their index in the List.
+                            children: List.generate(
+                                categoriesAndOffers
+                                    .elementAt(cat)['offers']
+                                    .length, (index) {
+                              return Center(
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      base64ToImage(categoriesAndOffers
+                                          .elementAt(cat)['offers']
+                                          .elementAt(index)['logo']['fileData']
+                                          .toString()),
+                                      ButtonBar(
+                                        alignment: MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          FlatButton(
+                                            child: Text(
+                                              categoriesAndOffers
+                                                  .elementAt(cat)['offers']
+                                                  .elementAt(index)['name']
+                                                  .toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(fontSize: 22),
+                                            ),
+                                            onPressed: () {},
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }),
+                          )
+                        ],
+                      );
+                    });
+              }
+            })
+    );
     } catch (Exception) {
       return LoadingWidget();
     }
+  }
+  getSuggestions(pattern) {
+    if(pattern == "")
+      return null;
+    var filter = List.from(searchData
+        .where((entry) => entry["name"].toLowerCase().startsWith(pattern.toLowerCase()) as bool));
+    return filter;
   }
 }
