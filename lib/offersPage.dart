@@ -3,6 +3,8 @@ import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:localstorage/localstorage.dart';
+import 'package:connect_plus/Offers.dart';
 
 class MyOffersPage extends StatefulWidget {
   MyOffersPage({Key key, this.title}) : super(key: key);
@@ -14,21 +16,23 @@ class MyOffersPage extends StatefulWidget {
 
 class MyOffersPageState extends State<MyOffersPage>
     with AutomaticKeepAliveClientMixin<MyOffersPage> {
+  final LocalStorage localStorage = new LocalStorage("Connect+");
+
   @override
   bool get wantKeepAlive => true;
 //  String token;
   var ip;
   var port;
   var offerCategories = [];
+  var offers = [];
 
   void initState() {
     super.initState();
-    getCategories();
     setEnv();
+    getCategories();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -37,21 +41,22 @@ class MyOffersPageState extends State<MyOffersPage>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-//    ip = "10.0.2.2";
-//    port = '3300';
+    String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
-    print(url);
-    var response =
-        await http.get(url, headers: {"Content-Type": "application/json"});
-    print(response.statusCode);
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
     if (response.statusCode == 200)
       setState(() {
         offerCategories = json.decode(response.body)['offerCategories'];
+        offers = json.decode(response.body)['offers'];
       });
+  }
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    print(offerCategories);
+  void getOffer() async {
+    String token = localStorage.getItem("token");
+    var url = 'http://' + ip + ':' + port + '/offer/getOffer';
   }
 
   @override
@@ -73,14 +78,22 @@ class MyOffersPageState extends State<MyOffersPage>
                   leading: Icon(Icons.album),
                   title:
                       Text(offerCategories.elementAt(index)['name'].toString()),
-                  subtitle: Text(
-                      "Logo would be here"),
+                  subtitle: Text("Logo would be here"),
                 ),
                 ButtonBar(
                   children: <Widget>[
                     FlatButton(
                       child: const Text('Learn more.'),
-                      onPressed: () {/* ... */},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Offers(
+                                    offerCategory: offerCategories
+                                        .elementAt(index)['name'],
+                                  )),
+                        );
+                      },
                     )
                   ],
                 ),
