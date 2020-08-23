@@ -28,11 +28,11 @@ class MyOffersPageState extends State<MyOffersPage>
 
   void initState() {
     super.initState();
-    setEnv().then((value) => {getCategories()});
+    setEnv();
+    getCategories();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -41,26 +41,17 @@ class MyOffersPageState extends State<MyOffersPage>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-//    ip = "10.0.2.2";
-//    port = '3300';
-    print(ip.toString() + port.toString());
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
-    print(url);
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
     });
-    print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {
         offerCategories = json.decode(response.body)['offerCategories'];
         offers = json.decode(response.body)['offers'];
       });
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    print(offerCategories);
   }
 
   void getOffer() async {
@@ -98,7 +89,8 @@ class MyOffersPageState extends State<MyOffersPage>
                           context,
                           MaterialPageRoute(
                               builder: (context) => Offers(
-                                    offerCategory: offerCategories.elementAt(index)['name'],
+                                    offerCategory: offerCategories
+                                        .elementAt(index)['name'],
                                   )),
                         );
                       },

@@ -34,11 +34,11 @@ class _OfferState extends State<Offer> {
 
   void initState() {
     super.initState();
-    setEnv().then((value) => getOffers());
+    setEnv();
+    getOffers();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
