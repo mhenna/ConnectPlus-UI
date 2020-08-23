@@ -179,9 +179,7 @@ class _loginState extends State<login> {
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
-    print(msg);
     if (response.statusCode == 200) {
-      print("TOKEN " + json.decode(response.body)["token"]);
       localStorage.setItem("token", json.decode(response.body)["token"]);
       Navigator.push(
         context,
