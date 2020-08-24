@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Carousel.dart';
 import 'package:carousel_slider/carousel_options.dart';
@@ -46,57 +47,59 @@ class _MyHomePageState extends State<MyHomePage> {
       drawer: NavDrawer(),
       body: Container(
 
-        //background image
+          //background image
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage("assets/meetERGs.png"),
               fit: BoxFit.cover,
             ),
           ),
-          child: Column(children: <Widget>[
-            CarouselSlider(
-              options: CarouselOptions(
-                autoPlay: true,
-                aspectRatio: 2.0,
-                enlargeCenterPage: true,
-              ),
-              items: imageSliders,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(80.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              child: Column(
                 children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/WIAlogo.png'),
+                  CarouselSlider(
+                    options: CarouselOptions(
+                      autoPlay: true,
+                      aspectRatio: 2.0,
+                      enlargeCenterPage: true,
+                    ),
+                    items: imageSliders,
                   ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/Glogo.png'),
+                  Padding(
+                    padding: const EdgeInsets.all(80.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset('assets/WIAlogo.png'),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset('assets/Glogo.png'),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset('assets/WIAlogo.png'),
+                        ),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset('assets/Glogo.png'),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/WIAlogo.png'),
-                  ),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(20),
-                    child: Image.asset('assets/Glogo.png'),
-                  ),
-                ],
-              ),
-            ),
-          ],)
-
-      ),
+              ))),
 // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
