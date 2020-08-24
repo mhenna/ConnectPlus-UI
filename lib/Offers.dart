@@ -68,19 +68,13 @@ class _OffersState extends State<Offers> {
     getSearchData();
   }
 
-  Future getSearchData() async {
-    String name = widget.offerCategory;
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/offers/getOffersNames';
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
+  getSearchData() {
+    categoriesAndOffers.forEach((category) {
+      category['offers'].forEach((offer) {
+        offer['category'] = category['name'];
+        searchData.add(offer);
+      });
     });
-
-    if (response.statusCode == 200) {
-      searchData = json.decode(response.body);
-    }
   }
 
   Widget base64ToImage(String base64) {
@@ -96,14 +90,14 @@ class _OffersState extends State<Offers> {
   Widget LoadingWidget() {
     return Scaffold(
         body: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              new CircularProgressIndicator(),
-              new Text("Loading"),
-            ],
-          ),
-        ));
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          new CircularProgressIndicator(),
+          new Text("Loading"),
+        ],
+      ),
+    ));
   }
 
   Widget base64ToImageFeatured() {
@@ -147,7 +141,13 @@ class _OffersState extends State<Offers> {
                         );
                       },
                       onSuggestionSelected: (suggestion) {
-                        print(suggestion);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Offer(
+                                      offer: suggestion,
+                                      category: suggestion['category'],
+                                    )));
                       },
                     ),
                     Container(
@@ -217,12 +217,12 @@ class _OffersState extends State<Offers> {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.center,
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
                                         base64ToImage(categoriesAndOffers
                                             .elementAt(cat)['offers']
                                             .elementAt(index)['logo']
-                                        ['fileData']
+                                                ['fileData']
                                             .toString()),
                                         ButtonBar(
                                           alignment: MainAxisAlignment.center,
@@ -242,16 +242,16 @@ class _OffersState extends State<Offers> {
                                                   MaterialPageRoute(
                                                       builder:
                                                           (context) => Offer(
-                                                        category: categoriesAndOffers
-                                                            .elementAt(
-                                                            cat)[
-                                                        'name'],
-                                                        offer: categoriesAndOffers
-                                                            .elementAt(cat)[
-                                                        'offers']
-                                                            .elementAt(
-                                                            index),
-                                                      )),
+                                                                category: categoriesAndOffers
+                                                                        .elementAt(
+                                                                            cat)[
+                                                                    'name'],
+                                                                offer: categoriesAndOffers
+                                                                    .elementAt(cat)[
+                                                                        'offers']
+                                                                    .elementAt(
+                                                                        index),
+                                                              )),
                                                 );
                                               },
                                             )
@@ -276,7 +276,7 @@ class _OffersState extends State<Offers> {
   getSuggestions(pattern) {
     if (pattern == "") return null;
     var filter = List.from(searchData.where((entry) =>
-    entry["name"].toLowerCase().startsWith(pattern.toLowerCase()) as bool));
+        entry["name"].toLowerCase().startsWith(pattern.toLowerCase()) as bool));
     return filter;
   }
 }
