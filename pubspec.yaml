@@ -38,6 +38,7 @@ dependencies:
   http: ^0.12.2
   load: ^0.1.6
   localstorage: ^3.0.2+5
+  google_fonts: ^0.3.9
 
 
 
@@ -64,6 +65,7 @@ flutter:
     - assets/background.png
     - assets/sale.png
     - .env
+    - assets/Event1.jpg
 
 
   # The following line ensures that the Material Icons font is
