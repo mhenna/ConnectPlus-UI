@@ -45,61 +45,61 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
 
       drawer: NavDrawer(),
-      body: Container(
-
-          //background image
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/meetERGs.png"),
-              fit: BoxFit.cover,
-            ),
-          ),
-          child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Column(
-                children: <Widget>[
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      autoPlay: true,
-                      aspectRatio: 2.0,
-                      enlargeCenterPage: true,
-                    ),
-                    items: imageSliders,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(80.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
+      body: SingleChildScrollView(
+          child: Container(
+              //background image
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage("assets/meetERGs.png"),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                  child: Column(
+                    children: <Widget>[
+                      CarouselSlider(
+                        options: CarouselOptions(
+                          autoPlay: true,
+                          aspectRatio: 2.0,
+                          enlargeCenterPage: true,
                         ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
+                        items: imageSliders,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(80.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset('assets/WIAlogo.png'),
+                            ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset('assets/Glogo.png'),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset('assets/WIAlogo.png'),
+                            ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.asset('assets/Glogo.png'),
+                            ),
+                          ],
                         ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ))),
+                      ),
+                    ],
+                  )))),
 // This trailing comma makes auto-formatting nicer for build methods.
     );
   }

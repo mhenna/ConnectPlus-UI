@@ -87,7 +87,7 @@ class Events extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Container(
                       width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.18,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         color: const Color(0xffffffff),
@@ -225,7 +225,7 @@ class Events extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Container(
                       width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.18,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         color: const Color(0xffffffff),
@@ -362,7 +362,7 @@ class Events extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Container(
                       width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.18,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         color: const Color(0xffffffff),
@@ -499,7 +499,7 @@ class Events extends StatelessWidget {
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Container(
                       width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.18,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         color: const Color(0xffffffff),

@@ -7,6 +7,7 @@ import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
 import 'package:connect_plus/Offers.dart';
+import 'package:connect_plus/Calendar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -162,6 +163,15 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => BottomNavPreview()),
+              )
+            },
+          ), ListTile(
+            leading: Icon(Icons.calendar_today),
+            title: Text('Calendar'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Calendar()),
               )
             },
           ),
