@@ -7,6 +7,8 @@ import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'widgets/pushNotification.dart';
+
 
 class login extends StatefulWidget {
   login({Key key, this.title}) : super(key: key);
@@ -19,6 +21,7 @@ class login extends StatefulWidget {
 
 class _loginState extends State<login> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
+  final PushNotificationService pushNotification = PushNotificationService();
 
   final emController = TextEditingController();
   final pwController = TextEditingController();
@@ -30,6 +33,7 @@ class _loginState extends State<login> {
   void initState() {
     super.initState();
     setEnv();
+    pushNotification.initialize();
   }
 
   setEnv() {

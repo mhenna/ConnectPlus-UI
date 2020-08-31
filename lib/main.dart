@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:connect_plus/login.dart';
+import 'package:no_context_navigation/no_context_navigation.dart';
+import 'routes.dart';
 
 
 Future main() async {
@@ -15,6 +17,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      navigatorKey: NavigationService.navigationKey,
+      initialRoute: '/',
+      routes: Routes.routes,
       theme: ThemeData(
         // This is the theme of your application.
         //
