@@ -24,6 +24,7 @@ dependencies:
   flutter:
     sdk: flutter
   carousel_slider: ^2.2.1
+  flutter_staggered_grid_view: ^0.3.2
 
   flutter_localizations:
     sdk: flutter
@@ -39,7 +40,6 @@ dependencies:
   load: ^0.1.6
   localstorage: ^3.0.2+5
   flutter_typeahead: ^1.8.7
-
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -64,7 +64,9 @@ flutter:
     - assets/Glogo.png
     - assets/background.png
     - assets/sale.png
-    - .env
+    - assets/famDay.jpg
+    - assets/olympics.jpg
+
 
 
   # The following line ensures that the Material Icons font is

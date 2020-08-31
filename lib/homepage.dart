@@ -1,22 +1,29 @@
 import 'package:flutter/cupertino.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Carousel.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/Events.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'EventsVariable.dart';
+
+
+
+final List<String> imgList = [
+  'https://mainvibes.com/wp-content/uploads/2020/05/Party.jpeg',
+  'https://identity-mag.com/wp-content/uploads/2020/01/My-Post-19.jpg',
+  'https://img.freepik.com/free-photo/senior-businesswoman-young-business-people-work-modern-office_52137-28330.jpg?size=626&ext=jpg',
+  'https://www.potential.com/wp-content/uploads/2018/01/teamwork-.jpg',
+  'https://www.csregypt.com/wp-content/uploads/2019/07/Feature-Image-1.jpg',
+  'https://corporate.delltechnologies.com/is/image/content/dam/delltechnologies/assets/home/images/photos/MichaelDell.jpg?fit=constrain&wid=640'
+];
+
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -55,52 +62,106 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+              padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
               child: Column(
                 children: <Widget>[
                   CarouselSlider(
                     options: CarouselOptions(
+                      viewportFraction: 1.0,
                       autoPlay: true,
                       aspectRatio: 2.0,
-                      enlargeCenterPage: true,
+                      enlargeCenterPage: false,
                     ),
                     items: imageSliders,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(80.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
-                        ),
-                      ],
-                    ),
+                new Padding(padding: const EdgeInsets.all(20.0),
+                  child: new Text('Recent Events',
+                  style: TextStyle(
+                      fontSize: 20.0,
+                      foreground: Paint()
+                        ..shader = ui.Gradient.linear(
+                          const Offset(0, 20),
+                          const Offset(150, 20),
+                          <Color>[
+                            Colors.red,
+                            Colors.black,
+                          ],
+                        )
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
-                        ),
-                      ],
-                    ),
+                  ),),
+                  //gridview
+                  Container(
+                    height: 320.0,
+                    child: EventsVariables(),
                   ),
+
+                  new Padding(padding: const EdgeInsets.all(20.0),
+                    child: new Text('Recent Offers',
+                      style: TextStyle(
+                          fontSize: 20.0,
+                          foreground: Paint()
+                            ..shader = ui.Gradient.linear(
+                              const Offset(0, 20),
+                              const Offset(150, 20),
+                              <Color>[
+                                Colors.red,
+                                Colors.black,
+                              ],
+                            )
+                      ),
+                    ),),
+                  //gridview
+                  Container(
+                    height: 320.0,
+                    child: EventsVariables(),
+                  ),
+
+
                 ],
-              ))),
+              )
+
+          )),
+
 // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 }
+final List<Widget> imageSliders = imgList.map((item) => Container(
+  child: Container(
+    margin: EdgeInsets.all(5.0),
+    child: ClipRRect(
+        borderRadius: BorderRadius.all(Radius.circular(5.0)),
+        child: Stack(
+          children: <Widget>[
+            Image.network(item, fit: BoxFit.cover, width: 1000.0),
+            Positioned(
+              bottom: 0.0,
+              left: 0.0,
+              right: 0.0,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color.fromARGB(200, 0, 0, 0),
+                      Color.fromARGB(0, 0, 0, 0)
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                ),
+                padding: EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                child: Text(
+                  'No. ${imgList.indexOf(item)} image',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        )
+    ),
+  ),
+)).toList();

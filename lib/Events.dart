@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:connect_plus/Navbar.dart';
 
 class Events extends StatelessWidget {
+
   Events({
     Key key,
   }) : super(key: key);
