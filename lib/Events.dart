@@ -24,12 +24,11 @@ class MyEventsPageState extends State<Events>
 
   void initState() {
     super.initState();
-    getEvents();
     setEnv();
+    getEvents();
   }
 
   Future setEnv() async {
-    await DotEnv().load('.env');
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -40,7 +39,7 @@ class MyEventsPageState extends State<Events>
 //    Working for android emulator -- set to actual ip for use with physical device
 //    ip = "10.0.2.2";
 //    port = '3300';
-      var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
+      var url = 'http://' + ip + ':' + port + '/event';
     print(url);
     var response =
         await http.get(url, headers: {"Content-Type": "application/json"});
@@ -116,7 +115,7 @@ class MyEventsPageState extends State<Events>
                   padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
                   child: Container(
                       width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.18,
+                      height: MediaQuery.of(context).size.height * 0.25,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10.0),
                         color: const Color(0xffffffff),

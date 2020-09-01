@@ -57,7 +57,7 @@ class _registrationState extends State<registration> {
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Email",
+          hintText: "Email(@dell.com)",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
