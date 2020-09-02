@@ -65,10 +65,6 @@ class MyEventsPageState extends State<Events>
             width: MediaQuery.of(context).size.width * 1,
             height: MediaQuery.of(context).size.height * 0.20,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomRight: Radius.circular(30.0),
-                bottomLeft: Radius.circular(30.0),
-              ),
               gradient: LinearGradient(
                 begin: Alignment(-1.0, 1.0),
                 end: Alignment(1.0, -1.0),
