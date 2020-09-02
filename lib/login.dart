@@ -7,14 +7,11 @@ import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-<<<<<<< HEAD
 import 'widgets/pushNotification.dart';
 
-=======
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter/foundation.dart';
->>>>>>> upstream/develop
 
 class login extends StatefulWidget {
   login({Key key, this.title}) : super(key: key);
