@@ -8,6 +8,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:flutter/foundation.dart';
 
 class login extends StatefulWidget {
   login({Key key, this.title}) : super(key: key);
@@ -29,6 +31,7 @@ class _loginState extends State<login> {
   var ip;
   var port;
   var loading = true;
+  var asyncCall = false;
 
   void initState() {
     super.initState();
@@ -66,6 +69,33 @@ class _loginState extends State<login> {
       setState(() {
         loading = false;
       });
+    }
+  }
+
+  void loginPressed() async {
+    //use these values in .env for android simulator, actual ip for iOS and physical devices
+    var url = 'http://' + ip + ':' + port + '/user/login';
+    final msg = jsonEncode({
+      'email': emController.text,
+      'password': hashPassword(),
+    });
+    var response = await http.post(url,
+        headers: {"Content-Type": "application/json"}, body: msg);
+    if (response.statusCode == 200) {
+      localStorage.setItem("token", json.decode(response.body)["token"]);
+      prefs.setString("token", json.decode(response.body)["token"]);
+      setState(() {
+        asyncCall = false;
+      });
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => MyHomePage()),
+      );
+    } else {
+      setState(() {
+        asyncCall = false;
+      });
+      _showDialog(response.body);
     }
   }
 
@@ -135,7 +165,13 @@ class _loginState extends State<login> {
           minWidth: MediaQuery.of(context).size.width,
           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           onPressed: () {
-            loginPressed();
+            FocusScope.of(context).unfocus();
+            setState(() {
+              asyncCall = true;
+            });
+            Future.delayed(Duration(seconds: 1), () {
+              loginPressed();
+            });
           },
           child: Text("Login",
               textAlign: TextAlign.center,
@@ -144,84 +180,65 @@ class _loginState extends State<login> {
         ),
       );
       return Scaffold(
-        body: Center(
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Color(0xfffafafa),
-                  image: DecorationImage(
-                    image: AssetImage("assets/logo2.png"),
-                    fit: BoxFit.fitWidth,
-                    alignment: Alignment.topCenter,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding:
-                          const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 30.0),
-                      child: Card(
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 20.0),
-                            Container(
-                                alignment: Alignment.centerLeft,
-                                child: loginTitle),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: 250,
-                              child: emailField,
-                            ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: 250,
-                              child: passwordField,
-                            ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: 250,
-                              child: Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: loginButton),
-                            ),
-                          ],
-                        ),
+        body: ModalProgressHUD(
+            inAsyncCall: asyncCall,
+            opacity: 0.5,
+            progressIndicator: LoadingText(),
+            child: Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Color(0xfffafafa),
+                      image: DecorationImage(
+                        image: AssetImage("assets/logo2.png"),
+                        fit: BoxFit.fitWidth,
+                        alignment: Alignment.topCenter,
                       ),
                     ),
-                    register
-                  ],
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                              36.0, 220.0, 36.0, 30.0),
+                          child: Card(
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 20.0),
+                                Container(
+                                    alignment: Alignment.centerLeft,
+                                    child: loginTitle),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: 250,
+                                  child: emailField,
+                                ),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: 250,
+                                  child: passwordField,
+                                ),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: 250,
+                                  child: Padding(
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      child: loginButton),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        register
+                      ],
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-        ),
+            )),
       );
     }
-  }
-
-  void loginPressed() async {
-    //use these values in .env for android simulator, actual ip for iOS and physical devices
-    var url = 'http://' + ip + ':' + port + '/user/login';
-    final msg = jsonEncode({
-      'email': emController.text,
-      'password': hashPassword(),
-    });
-    var response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: msg);
-    if (response.statusCode == 200) {
-      localStorage.setItem("token", json.decode(response.body)["token"]);
-      prefs.setString("token", json.decode(response.body)["token"]);
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-      );
-    } else
-      _showDialog(response.body);
-
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
   }
 
   void _showDialog(err) {
@@ -258,5 +275,24 @@ class _loginState extends State<login> {
         ],
       ),
     ));
+  }
+
+  Widget LoadingText() {
+    return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              new Text(
+                  "Loading...",
+                style: TextStyle (
+                  fontSize: 30,
+                  color: Colors.orangeAccent
+                ),
+              ),
+            ],
+          ),
+        ));
   }
 }

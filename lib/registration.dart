@@ -3,8 +3,9 @@ import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:load/load.dart';
-import 'package:flutter/gestures.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:connect_plus/login.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class registration extends StatefulWidget {
   registration({Key key, this.title}) : super(key: key);
@@ -20,9 +21,19 @@ class _registrationState extends State<registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
+  var asyncCall = false;
+  var ip;
+  var port;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+
   void initState() {
     super.initState();
+    setEnv();
+  }
+
+  setEnv() {
+    port = DotEnv().env['PORT'];
+    ip = DotEnv().env['SERVER_IP'];
   }
 
   String hashPassword() {
@@ -90,9 +101,13 @@ class _registrationState extends State<registration> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
         onPressed: () {
-          showLoadingDialog();
-          register();
-          hideLoadingDialog();
+          FocusScope.of(context).unfocus();
+          setState(() {
+            asyncCall = true;
+          });
+          Future.delayed(Duration(seconds: 1), () {
+            register();
+          });
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -128,7 +143,11 @@ class _registrationState extends State<registration> {
 //    );
 
     return Scaffold(
-      body: Center(
+        body: ModalProgressHUD(
+      inAsyncCall: asyncCall,
+      opacity: 0.5,
+      progressIndicator: LoadingText(),
+      child: Center(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.only(top: 10.0),
@@ -180,11 +199,11 @@ class _registrationState extends State<registration> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   void register() async {
-    var url = 'http://10.0.2.2:5400/user/register';
+    var url = 'http://' + ip + ':' + port + '/user/register';
     final msg = jsonEncode({
       'name': fnController.text,
       'email': emController.text,
@@ -192,14 +211,58 @@ class _registrationState extends State<registration> {
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
-    print(msg);
-    if(response.statusCode == 200)
+    if (response.statusCode == 200) {
+      setState(() {
+        asyncCall = false;
+      });
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context) => login()),
       );
+    } else {
+      setState(() {
+        asyncCall = false;
+      });
+      _showDialog(response.body);
+    }
+  }
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
+  void _showDialog(err) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Oops!"),
+          content: new Text(err),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Close"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget LoadingText() {
+    return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              new Text(
+                "Loading...",
+                style: TextStyle(fontSize: 30, color: Colors.orangeAccent),
+              ),
+            ],
+          ),
+        ));
   }
 }
