@@ -32,75 +32,78 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
+    return new WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
 //        title: Text(widget.title),
-        flexibleSpace: Image(
-          image: AssetImage('assets/background.png'),
-          fit: BoxFit.cover,
-        ),
-        backgroundColor: Colors.transparent,
-      ),
-
-      drawer: NavDrawer(),
-      body: Container(
-
-          //background image
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage("assets/meetERGs.png"),
-              fit: BoxFit.cover,
-            ),
+          flexibleSpace: Image(
+            image: AssetImage('assets/background.png'),
+            fit: BoxFit.cover,
           ),
-          child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-              child: Column(
-                children: <Widget>[
-                  CarouselSlider(
-                    options: CarouselOptions(
-                      autoPlay: true,
-                      aspectRatio: 2.0,
-                      enlargeCenterPage: true,
-                    ),
-                    items: imageSliders,
+          backgroundColor: Colors.transparent,
+        ),
+
+        drawer: NavDrawer(),
+        body: SingleChildScrollView(
+            child: Container(
+                //background image
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage("assets/meetERGs.png"),
+                    fit: BoxFit.cover,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(80.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+                child: Padding(
+                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                    child: Column(
                       children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
+                        CarouselSlider(
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            aspectRatio: 2.0,
+                            enlargeCenterPage: true,
+                          ),
+                          items: imageSliders,
                         ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
+                        Padding(
+                          padding: const EdgeInsets.all(80.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset('assets/WIAlogo.png'),
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset('assets/Glogo.png'),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset('assets/WIAlogo.png'),
+                              ),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.asset('assets/Glogo.png'),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/WIAlogo.png'),
-                        ),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.asset('assets/Glogo.png'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ))),
+                    )))),
 // This trailing comma makes auto-formatting nicer for build methods.
+      ),
     );
   }
 }
