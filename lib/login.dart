@@ -39,11 +39,8 @@ class _loginState extends State<login> {
   void initState() {
     super.initState();
     setEnv();
-<<<<<<< HEAD
     pushNotification.initialize();
-=======
     checkLoggedInStatus();
->>>>>>> upstream/develop
   }
 
   setEnv() {
