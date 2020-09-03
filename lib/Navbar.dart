@@ -7,9 +7,11 @@ import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
 import 'package:connect_plus/Offers.dart';
+import 'package:connect_plus/Calendar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -26,6 +28,8 @@ class NavDrawerState extends State<NavDrawer>
   var ip;
   var port;
   var offerCategories = [];
+  SharedPreferences prefs;
+
 
   void initState() {
     super.initState();
@@ -35,6 +39,7 @@ class NavDrawerState extends State<NavDrawer>
 
   Future setEnv() async {
     await DotEnv().load('.env');
+    prefs = await SharedPreferences.getInstance();
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -164,6 +169,16 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
+            leading: Icon(Icons.calendar_today),
+            title: Text('Calendar'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Calendar()),
+              )
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.event),
             title: Text('Events'),
             onTap: () => {
@@ -207,8 +222,10 @@ class NavDrawerState extends State<NavDrawer>
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
             onTap: () => {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => login()))
+              prefs.remove("token"),
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => login()),
+                  (Route<dynamic> route) => false)
             },
           ),
         ],
