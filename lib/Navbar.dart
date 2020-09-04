@@ -1,7 +1,7 @@
 import 'package:connect_plus/events.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
-import 'package:connect_plus/bottomNav.dart';
+import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
@@ -161,7 +161,7 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BottomNavPreview()),
+                MaterialPageRoute(builder: (context) => ProfilePage()),
               )
             },
           ),
