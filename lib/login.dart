@@ -81,8 +81,14 @@ class _loginState extends State<login> {
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => MyHomePage()),
+    );
     if (response.statusCode == 200) {
       localStorage.setItem("token", json.decode(response.body)["token"]);
+      localStorage.setItem("profile", json.decode(response.body)["profile"]);
+
       prefs.setString("token", json.decode(response.body)["token"]);
       setState(() {
         asyncCall = false;
@@ -101,9 +107,9 @@ class _loginState extends State<login> {
 
   @override
   Widget build(BuildContext context) {
-    if (loading)
-      return LoadingWidget();
-    else {
+//    if (loading)
+//      return LoadingWidget();
+//    else {
       final emailField = TextField(
         controller: emController,
         obscureText: false,
@@ -238,7 +244,7 @@ class _loginState extends State<login> {
               ),
             )),
       );
-    }
+
   }
 
   void _showDialog(err) {
@@ -285,11 +291,8 @@ class _loginState extends State<login> {
             mainAxisSize: MainAxisSize.min,
             children: [
               new Text(
-                  "Loading...",
-                style: TextStyle (
-                  fontSize: 30,
-                  color: Colors.orangeAccent
-                ),
+                "Loading...",
+                style: TextStyle(fontSize: 30, color: Colors.orangeAccent),
               ),
             ],
           ),
