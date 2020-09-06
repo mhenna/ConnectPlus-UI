@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:connect_plus/Offer.dart';
 
 class OfferVariables extends StatefulWidget {
   @override
@@ -80,6 +81,7 @@ class _OfferVariables extends State<OfferVariables> {
         offer_name: offer['name'],
         offer_picture: base64Decode(offer['logo']['fileData']),
         offer_date: offer['createdAt'].toString().split("T")[0],
+        offer: offer,
       ));
     }
     return list;
@@ -90,13 +92,11 @@ class Single_Offer extends StatelessWidget {
   final offer_name;
   final offer_picture;
   final offer_date;
+  final offer;
 
   //constructor
-  Single_Offer({
-    this.offer_name,
-    this.offer_picture,
-    this.offer_date,
-  });
+  Single_Offer(
+      {this.offer_name, this.offer_picture, this.offer_date, this.offer});
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -107,7 +107,16 @@ class Single_Offer extends StatelessWidget {
             tag: offer_name,
             child: Material(
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Offer(
+                              category: offer['category']['name'],
+                              offer: offer,
+                            )),
+                  );
+                },
                 child: GridTile(
                     footer: Container(
                       color: Colors.white70,
