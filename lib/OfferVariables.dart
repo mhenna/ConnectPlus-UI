@@ -79,7 +79,7 @@ class _OfferVariables extends State<OfferVariables> {
       list.add(Single_Offer(
         offer_name: offer['name'],
         offer_picture: base64Decode(offer['logo']['fileData']),
-        offer_date: offer['createdAt'],
+        offer_date: offer['createdAt'].toString().split("T")[0],
       ));
     }
     return list;

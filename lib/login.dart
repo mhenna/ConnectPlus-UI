@@ -57,18 +57,31 @@ class _loginState extends State<login> {
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
-    });
-
-    if (response.statusCode == 200) {
-      loading = false;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-      );
-    } else {
+    }).timeout(Duration(seconds: 5), onTimeout: () {
       setState(() {
         loading = false;
       });
+     _showDialog("Internet connection problem");
+      return null;
+    });
+
+    try {
+      if (response.statusCode == 200) {
+        setState(() {
+          loading = false;
+        });
+        localStorage.setItem("token", token);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+        );
+      } else {
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {
+
     }
   }
 
@@ -82,10 +95,7 @@ class _loginState extends State<login> {
 
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => MyHomePage()),
-    );
+
     if (response.statusCode == 200) {
       localStorage.setItem("token", json.decode(response.body)["token"]);
       localStorage.setItem("profile", json.decode(response.body)["profile"]);
@@ -108,9 +118,9 @@ class _loginState extends State<login> {
 
   @override
   Widget build(BuildContext context) {
-//    if (loading)
-//      return LoadingWidget();
-//    else {
+    if (loading)
+      return LoadingWidget();
+    else {
       final emailField = TextField(
         controller: emController,
         obscureText: false,
@@ -119,7 +129,7 @@ class _loginState extends State<login> {
             contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
             hintText: "Email(@dell.com)",
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+            OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
       final passwordField = TextField(
         controller: pwController,
@@ -129,7 +139,7 @@ class _loginState extends State<login> {
             contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
             hintText: "Password",
             border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+            OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
       final loginTitle = Text.rich(
         TextSpan(children: <TextSpan>[
@@ -169,7 +179,10 @@ class _loginState extends State<login> {
         borderRadius: BorderRadius.circular(30.0),
         color: Color(0xFFE15F5F),
         child: MaterialButton(
-          minWidth: MediaQuery.of(context).size.width,
+          minWidth: MediaQuery
+              .of(context)
+              .size
+              .width,
           padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           onPressed: () {
             FocusScope.of(context).unfocus();
@@ -207,8 +220,8 @@ class _loginState extends State<login> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              36.0, 220.0, 36.0, 30.0),
+                          padding:
+                          const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 30.0),
                           child: Card(
                             child: Column(
                               children: <Widget>[
@@ -245,7 +258,7 @@ class _loginState extends State<login> {
               ),
             )),
       );
-
+    }
   }
 
   void _showDialog(err) {
