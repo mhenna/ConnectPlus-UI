@@ -48,8 +48,6 @@ class NavDrawerState extends State<NavDrawer>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-    ip = "10.0.2.2";
-    port = '3300';
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
     print(url);
     var response =

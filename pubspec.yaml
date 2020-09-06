@@ -39,6 +39,7 @@ dependencies:
   load: ^0.1.6
   localstorage: ^3.0.2+5
   flutter_typeahead: ^1.8.7
+  flutter_full_pdf_viewer: ^1.0.6 
   table_calendar: ^2.2.3
   shared_preferences: ^0.5.10
   modal_progress_hud: ^0.1.3
