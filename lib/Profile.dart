@@ -4,6 +4,8 @@ import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -34,17 +36,27 @@ class MapScreenState extends State<ProfilePage>
   void initState() {
     // TODO: implement initState
     super.initState();
-    getProfile();
+    setProfile();
+    setEnv();
   }
 
-  void getProfile() async {
+  setEnv() {
+    port = DotEnv().env['PORT'];
+    ip = DotEnv().env['SERVER_IP'];
+  }
+
+  void setProfile() async {
+    setState(() {
+      profile = localStorage.getItem('profile');
+    });
+  }
+
+  void getProfile(mobile) async {
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-    ip = "192.168.1.4";
-    port = '3300';
     String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/profile/getProfile/01095608558';
+    var url = 'http://' + ip + ':' + port + '/profile/getProfile/' + mobile;
     print(url);
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
