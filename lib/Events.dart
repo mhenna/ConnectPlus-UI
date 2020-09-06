@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:connect_plus/Navbar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:localstorage/localstorage.dart';
 
 class Events extends StatefulWidget {
   Events({
@@ -13,6 +14,7 @@ class Events extends StatefulWidget {
   @override
   MyEventsPageState createState() => MyEventsPageState();
 }
+
 class MyEventsPageState extends State<Events>
     with AutomaticKeepAliveClientMixin<Events> {
   @override
@@ -21,6 +23,7 @@ class MyEventsPageState extends State<Events>
   var ip;
   var port;
   var events = [];
+  final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
     super.initState();
@@ -39,10 +42,13 @@ class MyEventsPageState extends State<Events>
 //    Working for android emulator -- set to actual ip for use with physical device
 //    ip = "10.0.2.2";
 //    port = '3300';
-      var url = 'http://' + ip + ':' + port + '/event';
+    var url = 'http://' + ip + ':' + port + '/event';
+    var token = localStorage.getItem("token");
     print(url);
-    var response =
-        await http.get(url, headers: {"Content-Type": "application/json"});
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
     print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {
@@ -53,11 +59,12 @@ class MyEventsPageState extends State<Events>
     print('Response body: ${response.body}');
     print(events.length);
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-        appBar: PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(150.0), // here the desired height
         child: AppBar(
           backgroundColor: const Color(0xfffafafa),
@@ -95,14 +102,13 @@ class MyEventsPageState extends State<Events>
         ),
       ),
       drawer: NavDrawer(),
-     backgroundColor: const Color(0xfffafafa),
-
-      body:
-      GridView.count(
-         crossAxisCount: 1,
-      addAutomaticKeepAlives: true,
-
-          children: List.generate(events.length, (index) {
+      backgroundColor: const Color(0xfffafafa),
+      body: GridView.count(
+        crossAxisCount: 1,
+        addAutomaticKeepAlives: true,
+        children: List.generate(
+          events.length,
+          (index) {
             return Container(
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -136,7 +142,8 @@ class MyEventsPageState extends State<Events>
                                 bottomLeft: Radius.circular(10.0),
                               ),
                               image: DecorationImage(
-                                image: const AssetImage('assets/WIAlogo.png'),
+                                image: MemoryImage(base64Decode(events
+                                    .elementAt(index)['poster']['fileData'])),
                               ),
                             ),
                           ),
@@ -151,7 +158,9 @@ class MyEventsPageState extends State<Events>
                                     width: MediaQuery.of(context).size.width *
                                         0.40,
                                     child: Text(
-                                      events.elementAt(index)['name'].toString(),
+                                      events
+                                          .elementAt(index)['name']
+                                          .toString(),
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 18,
@@ -187,7 +196,10 @@ class MyEventsPageState extends State<Events>
                                     width: MediaQuery.of(context).size.width *
                                         0.50,
                                     child: Text(
-                                      'Venue: ' + events.elementAt(index)['venue'].toString(),
+                                      'Venue: ' +
+                                          events
+                                              .elementAt(index)['venue']
+                                              .toString(),
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 13,
@@ -205,7 +217,11 @@ class MyEventsPageState extends State<Events>
                                     width: MediaQuery.of(context).size.width *
                                         0.50,
                                     child: Text(
-                                      'Start Date: ' + events.elementAt(index)['startDate'].toString().substring(0,10),
+                                      'Start Date: ' +
+                                          events
+                                              .elementAt(index)['startDate']
+                                              .toString()
+                                              .substring(0, 10),
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 13,
@@ -223,7 +239,11 @@ class MyEventsPageState extends State<Events>
                                     width: MediaQuery.of(context).size.width *
                                         0.50,
                                     child: Text(
-                                      'End Date: ' + events.elementAt(index)['endDate'].toString().substring(0,10),
+                                      'End Date: ' +
+                                          events
+                                              .elementAt(index)['endDate']
+                                              .toString()
+                                              .substring(0, 10),
                                       style: TextStyle(
                                         fontFamily: 'Arial',
                                         fontSize: 13,
@@ -240,10 +260,10 @@ class MyEventsPageState extends State<Events>
                       )),
                 ),
               ],
-            ));},
+            ));
+          },
         ),
       ),
-    )
-    );
+    ));
   }
 }
