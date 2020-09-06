@@ -12,6 +12,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -28,17 +29,15 @@ class NavDrawerState extends State<NavDrawer>
   var ip;
   var port;
   var offerCategories = [];
+  final LocalStorage localStorage = new LocalStorage("Connect+");
   SharedPreferences prefs;
-
 
   void initState() {
     super.initState();
-    getCategories();
-    setEnv();
+    setEnv().then((value) => getCategories());
   }
 
   Future setEnv() async {
-    await DotEnv().load('.env');
     prefs = await SharedPreferences.getInstance();
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
@@ -49,9 +48,12 @@ class NavDrawerState extends State<NavDrawer>
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
+    var token = localStorage.getItem("token");
     print(url);
-    var response =
-        await http.get(url, headers: {"Content-Type": "application/json"});
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
     print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {

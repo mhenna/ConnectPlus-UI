@@ -75,12 +75,12 @@ class _EventsVariablesState extends State<EventsVariables> {
 
   List<Widget> constructEvents() {
     List<Widget> list = List<Widget>();
-    int index = 0;
+
     for (var event in event_list) {
       list.add(Single_Event(
         event_name: event['name'],
         event_picture: base64Decode(event['poster']['fileData']),
-        event_date: event['startDate'],
+        event_date: event['startDate'].toString().split("T")[0],
       ));
     }
     return list;
