@@ -69,6 +69,7 @@ flutter:
     - assets/background.png
     - assets/sale.png
     - .env
+    - assets/as.png
 
 
   # The following line ensures that the Material Icons font is
