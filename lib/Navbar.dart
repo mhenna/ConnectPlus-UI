@@ -81,6 +81,26 @@ class NavDrawerState extends State<NavDrawer>
               ),
             ),
           ),
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text('Home'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.verified_user),
+            title: Text('Profile'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              )
+            },
+          ),
           ExpansionTile(
               leading: Icon(Icons.person),
               title: Text('Committees'),
@@ -151,36 +171,6 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.local_offer),
-            title: Text('Offer Categories ver 2'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MyOffersPage()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.verified_user),
-            title: Text('Profile'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => ProfilePage()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_today),
-            title: Text('Calendar'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Calendar()),
-              )
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.event),
             title: Text('Events'),
             onTap: () => {
@@ -191,22 +181,12 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
+            leading: Icon(Icons.calendar_today),
+            title: Text('Calendar'),
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.border_color),
-            title: Text('Feedback'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => dummyPage()),
+                MaterialPageRoute(builder: (context) => Calendar()),
               )
             },
           ),
