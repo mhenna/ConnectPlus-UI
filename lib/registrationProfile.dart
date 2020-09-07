@@ -1,28 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:load/load.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:connect_plus/registrationProfile.dart';
+import 'package:connect_plus/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 
-class registration extends StatefulWidget {
-  registration({Key key, this.title}) : super(key: key);
+
+class RegistrationProfile extends StatefulWidget {
+  RegistrationProfile({Key key, this.title}) : super(key: key);
   final String title;
 
   // This widget is the root of your application.
   @override
-  _registrationState createState() => _registrationState();
+  _RegistrationProfileState createState() => _RegistrationProfileState();
 }
 
-class _registrationState extends State<registration> {
+class _RegistrationProfileState extends State<RegistrationProfile> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final fnController = TextEditingController();
-  final emController = TextEditingController();
-  final pwController = TextEditingController();
-  final algorithm = PBKDF2();
+  final addressController = TextEditingController();
+  final phoneController = TextEditingController();
+  final carPlateController = TextEditingController();
+
   var asyncCall = false;
   var ip;
   var port;
@@ -38,23 +38,19 @@ class _registrationState extends State<registration> {
     ip = DotEnv().env['SERVER_IP'];
   }
 
-  String hashPassword() {
-    final hash = Password.hash(pwController.text, algorithm);
-    return hash;
-  }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
     fnController.dispose();
-    emController.dispose();
-    pwController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final firstNameField = TextField(
+    final fullNameField = TextField(
       controller: fnController,
       obscureText: false,
       style: style,
@@ -62,27 +58,35 @@ class _registrationState extends State<registration> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Full Name",
           border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
-    final emailField = TextField(
-      controller: emController,
+    final addressField = TextField(
+      controller: addressController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Email(@dell.com)",
+          hintText: "Building, 67 Street, Nasr City",
           border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
-    final passwordField = TextField(
-      controller: pwController,
-      obscureText: true,
+    final phoneField = TextField(
+      controller: phoneController,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "Password",
+          hintText: "01XXXXXXXX",
           border:
-              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+    );
+    final carPlateField = TextField(
+      controller: carPlateController,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "wkd890",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
     final registerTitle = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -146,81 +150,85 @@ class _registrationState extends State<registration> {
 
     return Scaffold(
         body: ModalProgressHUD(
-      inAsyncCall: asyncCall,
-      opacity: 0.5,
-      progressIndicator: LoadingText(),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xfffafafa),
-                image: DecorationImage(
-                  image: AssetImage("assets/logo2.png"),
-                  fit: BoxFit.fitWidth,
-                  alignment: Alignment.topCenter,
-                ),
-              ),
+          inAsyncCall: asyncCall,
+          opacity: 0.5,
+          progressIndicator: LoadingText(),
+          child: Center(
+            child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
-                child: Card(
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 20.0),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          child: registerTitle),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: firstNameField,
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Color(0xfffafafa),
+                    image: DecorationImage(
+                      image: AssetImage("assets/logo2.png"),
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
+                    child: Card(
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(height: 20.0),
+                          Container(
+                              alignment: Alignment.centerLeft,
+                              child: registerTitle),
+                          SizedBox(height: 20.0),
+                          Container(
+                            width: 250,
+                            child: fullNameField,
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            width: 250,
+                            child: addressField,
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            width: 250,
+                            child: phoneField,
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            width: 250,
+                            child: carPlateField,
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            width: 250,
+                            child: Padding(
+                                padding: EdgeInsets.only(bottom: 20),
+                                child: registerButton),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: emailField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: passwordField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: 20),
-                            child: registerButton),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   void register() async {
-    var url = 'http://' + ip + ':' + port + '/user/register';
+    var user = localStorage.getItem('user');
+    var url = 'http://' + ip + ':' + port + '/profile/addProfile';
     final msg = jsonEncode({
-      'name': fnController.text,
-      'email': emController.text,
-      'password': hashPassword(),
+     "profile": { 'name': fnController.text, 'address': addressController.text, 'phoneNumber': phoneController.text, 'carPlate': carPlateController.text},
+      "userId": user['_id']
     });
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     if (response.statusCode == 200) {
-      localStorage.setItem("user", json.decode(response.body)['user']);
       setState(() {
         asyncCall = false;
       });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => RegistrationProfile()),
+        MaterialPageRoute(builder: (context) => login()),
       );
     } else {
       setState(() {

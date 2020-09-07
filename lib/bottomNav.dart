@@ -3,7 +3,6 @@ import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:connect_plus/dummyPage.dart';
 import 'package:connect_plus/offersPage.dart';
 
-
 class BottomNavPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

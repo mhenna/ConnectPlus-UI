@@ -1,15 +1,18 @@
 import 'package:connect_plus/events.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
-import 'package:connect_plus/bottomNav.dart';
+import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/offersPage.dart';
 import 'package:connect_plus/Offers.dart';
+import 'package:connect_plus/Calendar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -26,15 +29,16 @@ class NavDrawerState extends State<NavDrawer>
   var ip;
   var port;
   var offerCategories = [];
+  final LocalStorage localStorage = new LocalStorage("Connect+");
+  SharedPreferences prefs;
 
   void initState() {
     super.initState();
-    getCategories();
-    setEnv();
+    setEnv().then((value) => getCategories());
   }
 
   Future setEnv() async {
-    await DotEnv().load('.env');
+    prefs = await SharedPreferences.getInstance();
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -43,12 +47,13 @@ class NavDrawerState extends State<NavDrawer>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-    ip = "10.0.2.2";
-    port = '3300';
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
+    var token = localStorage.getItem("token");
     print(url);
-    var response =
-        await http.get(url, headers: {"Content-Type": "application/json"});
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
     print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {
@@ -76,6 +81,65 @@ class NavDrawerState extends State<NavDrawer>
               ),
             ),
           ),
+          ExpansionTile(
+              leading: Icon(Icons.person),
+              title: Text('Committees'),
+              children: <Widget>[
+                ExpansionTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text("ERGs"),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('GENNEXT',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('DT Belmasry',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('WIA',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('MOSAIC',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    )
+                  ],
+                ),
+                ListTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text('Internal Comms',
+                      style: TextStyle(color: Color(0xFFE15F5F))),
+                  onTap: () => print(""),
+                ),
+                ExpansionTile(
+                  leading: Padding(padding: EdgeInsets.only(left: 60.0)),
+                  title: Text("Engagement Teams"),
+                  children: <Widget>[
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('Wezaret ELSAADA (Deploy)',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                    ListTile(
+                      leading: Padding(padding: EdgeInsets.only(left: 75.0)),
+                      title: Text('FUN CREW (CS)',
+                          style: TextStyle(color: Color(0xFFE15F5F))),
+                      onTap: () => print(""),
+                    ),
+                  ],
+                ),
+              ]),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offers'),
@@ -102,7 +166,17 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BottomNavPreview()),
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.calendar_today),
+            title: Text('Calendar'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Calendar()),
               )
             },
           ),
@@ -150,8 +224,10 @@ class NavDrawerState extends State<NavDrawer>
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
             onTap: () => {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => login()))
+              prefs.remove("token"),
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => login()),
+                  (Route<dynamic> route) => false)
             },
           ),
         ],

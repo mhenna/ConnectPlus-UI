@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:connect_plus/login.dart';
+import 'package:connect_plus/homepage.dart';
 
 
-void main() {
+Future main() async {
+  await DotEnv().load('.env');
   runApp(MyApp());
 }
 
@@ -39,7 +42,7 @@ class Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     return new SplashScreen(
       seconds: 5,
-      navigateAfterSeconds: new login(title: "home",),
+      navigateAfterSeconds: new login(title: "login",),
       imageBackground: AssetImage('assets/splash.png'),
       styleTextUnderTheLoader: new TextStyle(),
       photoSize: 100.0,

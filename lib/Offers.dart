@@ -4,11 +4,13 @@ import 'dart:math';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
+import 'package:connect_plus/Offer.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class Offers extends StatefulWidget {
-  Offers({Key key, @required this.offerCategory}) : super(key: key);
+  Offers({Key key, this.offerCategory}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -32,16 +34,16 @@ class _OffersState extends State<Offers> {
   var categoriesAndOffers = [];
   var randIndexCat;
   var randIndexOffer;
+  var searchData = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
     super.initState();
-    setEnv().then((value) => getOffers());
-//    getOffers();
+    setEnv();
+    getOffers();
   }
 
-  Future setEnv() async {
-    await DotEnv().load('.env');
+  setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
   }
@@ -63,6 +65,16 @@ class _OffersState extends State<Offers> {
         randIndexOffer = Offers._random.nextInt(
             categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
       });
+    getSearchData();
+  }
+
+  getSearchData() {
+    categoriesAndOffers.forEach((category) {
+      category['offers'].forEach((offer) {
+        offer['category'] = category['name'];
+        searchData.add(offer);
+      });
+    });
   }
 
   Widget base64ToImage(String base64) {
@@ -112,11 +124,38 @@ class _OffersState extends State<Offers> {
               itemCount: 3,
               itemBuilder: (BuildContext context, int elem) {
                 if (elem == 0) {
-                  return Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    width: MediaQuery.of(context).size.width,
-                    child: base64ToImageFeatured(),
-                  );
+                  return Column(children: <Widget>[
+                    TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(),
+                              hintText: "Search")),
+                      suggestionsCallback: (pattern) async {
+                        return await getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          leading: Icon(Icons.shopping_cart),
+                          title: Text(suggestion['name']),
+//                subtitle: Text(suggestion['category']),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Offer(
+                                      offer: suggestion,
+                                      category: suggestion['category'],
+                                    )));
+                      },
+                    ),
+                    Container(
+                      height: MediaQuery.of(context).size.height * 0.35,
+                      width: MediaQuery.of(context).size.width,
+                      child: base64ToImageFeatured(),
+                    )
+                  ]);
                 } else if (elem == 1) {
                   return Padding(
                       padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
@@ -197,7 +236,24 @@ class _OffersState extends State<Offers> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(fontSize: 22),
                                               ),
-                                              onPressed: () {},
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder:
+                                                          (context) => Offer(
+                                                                category: categoriesAndOffers
+                                                                        .elementAt(
+                                                                            cat)[
+                                                                    'name'],
+                                                                offer: categoriesAndOffers
+                                                                    .elementAt(cat)[
+                                                                        'offers']
+                                                                    .elementAt(
+                                                                        index),
+                                                              )),
+                                                );
+                                              },
                                             )
                                           ],
                                         ),
@@ -215,5 +271,12 @@ class _OffersState extends State<Offers> {
     } catch (Exception) {
       return LoadingWidget();
     }
+  }
+
+  getSuggestions(pattern) {
+    if (pattern == "") return null;
+    var filter = List.from(searchData.where((entry) =>
+        entry["name"].toLowerCase().startsWith(pattern.toLowerCase()) as bool));
+    return filter;
   }
 }
