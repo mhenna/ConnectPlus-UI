@@ -42,149 +42,153 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
+        onWillPop: () async => false,
+        child: Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
 //        title: Text(widget.title),
-          flexibleSpace: Image(
-            image: AssetImage('assets/background.png'),
-            fit: BoxFit.cover,
-          ),
-          backgroundColor: Colors.transparent,
-        ),
-        drawer: NavDrawer(),
-        body: Stack(children: <Widget>[
-          new Container(
-            decoration: new BoxDecoration(
-                image: new DecorationImage(
-                    image: new AssetImage("assets/meetERGs.png"),
-                    fit: BoxFit.fill)),
-          ),
-          SingleChildScrollView(
-              child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
-                  child: Column(
-                    children: <Widget>[
-                      CarouselSlider(
-                        options: CarouselOptions(
-                          viewportFraction: 1.0,
-                          autoPlay: true,
-                          aspectRatio: 2.0,
-                          enlargeCenterPage: false,
-                        ),
-                        items: imageSliders,
-                      ),
-                      new Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
-                        child: new Text(
-                          'Recent Events',
-                          style: TextStyle(
-                              fontSize: 20.0,
-                              foreground: Paint()
-                                ..shader = ui.Gradient.linear(
-                                  const Offset(0, 20),
-                                  const Offset(150, 20),
-                                  <Color>[
-                                    Colors.red,
-                                    Colors.black,
-                                  ],
-                                )),
-                        ),
-                      ),
-                      //gridview
-                      Container(
-                        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                        height: 400,
-                        child: EventsVariables(),
-                      ),
-                      Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                            width: 130,
-                            height: 55,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: Material(
-                                  elevation: 5.0,
-                                  borderRadius: BorderRadius.circular(30.0),
-                                  color: Color(0xFFE15F5F),
-                                  child: MaterialButton(
-                                    minWidth: MediaQuery.of(context).size.width,
-                                    padding: EdgeInsets.fromLTRB(
-                                        20.0, 0.0, 20.0, 0.0),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => Events()),
-                                      );
-                                    },
-                                    child: Text("See More",
-                                        textAlign: TextAlign.center,
-                                        style: style.copyWith(
-                                            color: Colors.white)),
-                                  ),
-                                )),
-                          )),
-                      new Padding(
-                        padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
-                        child: new Text(
-                          'Recent Offers',
-                          style: TextStyle(
-                              fontSize: 20.0,
-                              foreground: Paint()
-                                ..shader = ui.Gradient.linear(
-                                  const Offset(0, 20),
-                                  const Offset(150, 20),
-                                  <Color>[
-                                    Colors.red,
-                                    Colors.black,
-                                  ],
-                                )),
-                        ),
-                      ),
-                      //gridview
-                      Container(
-                        padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
-                        height: 400,
-                        child: OfferVariables(),
-                      ),
-                      Align(
-                          alignment: Alignment.bottomLeft,
-                          child: Container(
-                            padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                            width: 130,
-                            height: 55,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: Material(
-                                  elevation: 5.0,
-                                  borderRadius: BorderRadius.circular(30.0),
-                                  color: Color(0xFFE15F5F),
-                                  child: MaterialButton(
-                                    minWidth: MediaQuery.of(context).size.width,
-                                    padding: EdgeInsets.fromLTRB(
-                                        20.0, 0.0, 20.0, 0.0),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(builder: (context) => Offers()),
-                                      );
-                                    },
-                                    child: Text("See More",
-                                        textAlign: TextAlign.center,
-                                        style: style.copyWith(
-                                            color: Colors.white)),
-                                  ),
-                                )),
-                          )),
-                    ],
-                  ))),
+              flexibleSpace: Image(
+                image: AssetImage('assets/background.png'),
+                fit: BoxFit.cover,
+              ),
+              backgroundColor: Colors.transparent,
+            ),
+            drawer: NavDrawer(),
+            body: Stack(children: <Widget>[
+              new Container(
+                decoration: new BoxDecoration(
+                    image: new DecorationImage(
+                        image: new AssetImage("assets/meetERGs.png"),
+                        fit: BoxFit.fill)),
+              ),
+              SingleChildScrollView(
+                  child: Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                      child: Column(
+                        children: <Widget>[
+                          CarouselSlider(
+                            options: CarouselOptions(
+                              viewportFraction: 1.0,
+                              autoPlay: true,
+                              aspectRatio: 2.0,
+                              enlargeCenterPage: false,
+                            ),
+                            items: imageSliders,
+                          ),
+                          new Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
+                            child: new Text(
+                              'Recent Events',
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  foreground: Paint()
+                                    ..shader = ui.Gradient.linear(
+                                      const Offset(0, 20),
+                                      const Offset(150, 20),
+                                      <Color>[
+                                        Colors.red,
+                                        Colors.black,
+                                      ],
+                                    )),
+                            ),
+                          ),
+                          //gridview
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            height: 400,
+                            child: EventsVariables(),
+                          ),
+                          Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                                width: 130,
+                                height: 55,
+                                child: Padding(
+                                    padding: EdgeInsets.only(bottom: 20),
+                                    child: Material(
+                                      elevation: 5.0,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      color: Color(0xFFE15F5F),
+                                      child: MaterialButton(
+                                        minWidth:
+                                            MediaQuery.of(context).size.width,
+                                        padding: EdgeInsets.fromLTRB(
+                                            20.0, 0.0, 20.0, 0.0),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => Events()),
+                                          );
+                                        },
+                                        child: Text("See More",
+                                            textAlign: TextAlign.center,
+                                            style: style.copyWith(
+                                                color: Colors.white)),
+                                      ),
+                                    )),
+                              )),
+                          new Padding(
+                            padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
+                            child: new Text(
+                              'Recent Offers',
+                              style: TextStyle(
+                                  fontSize: 20.0,
+                                  foreground: Paint()
+                                    ..shader = ui.Gradient.linear(
+                                      const Offset(0, 20),
+                                      const Offset(150, 20),
+                                      <Color>[
+                                        Colors.red,
+                                        Colors.black,
+                                      ],
+                                    )),
+                            ),
+                          ),
+                          //gridview
+                          Container(
+                            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            height: 400,
+                            child: OfferVariables(),
+                          ),
+                          Align(
+                              alignment: Alignment.bottomLeft,
+                              child: Container(
+                                padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
+                                width: 130,
+                                height: 55,
+                                child: Padding(
+                                    padding: EdgeInsets.only(bottom: 20),
+                                    child: Material(
+                                      elevation: 5.0,
+                                      borderRadius: BorderRadius.circular(30.0),
+                                      color: Color(0xFFE15F5F),
+                                      child: MaterialButton(
+                                        minWidth:
+                                            MediaQuery.of(context).size.width,
+                                        padding: EdgeInsets.fromLTRB(
+                                            20.0, 0.0, 20.0, 0.0),
+                                        onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) => Offers()),
+                                          );
+                                        },
+                                        child: Text("See More",
+                                            textAlign: TextAlign.center,
+                                            style: style.copyWith(
+                                                color: Colors.white)),
+                                      ),
+                                    )),
+                              )),
+                        ],
+                      ))),
 
 // This trailing comma makes auto-formatting nicer for build methods.
-        ])));
+            ])));
   }
 }
 

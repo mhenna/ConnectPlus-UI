@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:connect_plus/Event.dart';
 
 class EventsVariables extends StatefulWidget {
   @override
@@ -81,6 +82,7 @@ class _EventsVariablesState extends State<EventsVariables> {
         event_name: event['name'],
         event_picture: base64Decode(event['poster']['fileData']),
         event_date: event['startDate'].toString().split("T")[0],
+        event: event
       ));
     }
     return list;
@@ -91,12 +93,14 @@ class Single_Event extends StatelessWidget {
   final event_name;
   final event_picture;
   final event_date;
+  final event;
 
   //constructor
   Single_Event({
     this.event_name,
     this.event_picture,
     this.event_date,
+    this.event,
   });
   @override
   Widget build(BuildContext context) {
@@ -108,7 +112,16 @@ class Single_Event extends StatelessWidget {
             tag: event_name,
             child: Material(
               child: InkWell(
-                onTap: () {},
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Event(
+                          event: event_name,
+                          erg: event['ERG'],
+                        )),
+                  );
+                },
                 child: GridTile(
                     footer: Container(
                       color: Colors.white70,

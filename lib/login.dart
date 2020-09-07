@@ -95,6 +95,7 @@ class _loginState extends State<login> {
 
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
+
     if (response.statusCode == 200) {
       localStorage.setItem("token", json.decode(response.body)["token"]);
       localStorage.setItem("profile", json.decode(response.body)["profile"]);

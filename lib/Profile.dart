@@ -72,6 +72,11 @@ class MapScreenState extends State<ProfilePage>
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
+    //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
+//    print(ip)
+//    Working for android emulator -- set to actual ip for use with physical device
+    ip = "192.168.1.4";
+    port = '3300';
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/profile/editProfile';
     print(url);

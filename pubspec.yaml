@@ -39,6 +39,7 @@ dependencies:
   http: ^0.12.2
   load: ^0.1.6
   localstorage: ^3.0.2+5
+  google_fonts: ^0.3.9
   flutter_typeahead: ^1.8.7
   flutter_full_pdf_viewer: ^1.0.6 
   table_calendar: ^2.2.3
@@ -72,6 +73,7 @@ flutter:
     - assets/famDay.jpg
     - assets/olympics.jpg
     - .env
+    - assets/Event1.jpg
     - assets/as.png
 
 
