@@ -107,30 +107,31 @@ class NavDrawerState extends State<NavDrawer>
               children: <Widget>[
                 ExpansionTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-                  title: Text("ERGs"),
+                  title: Text("ERGs",
+                      style: TextStyle(color: Colors.black)),
                   children: <Widget>[
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('GENNEXT',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('DT Belmasry',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('WIA',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('MOSAIC',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     )
                   ],
@@ -138,23 +139,23 @@ class NavDrawerState extends State<NavDrawer>
                 ListTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
                   title: Text('Internal Comms',
-                      style: TextStyle(color: Color(0xFFE15F5F))),
+                      style: TextStyle(color: Colors.grey)),
                   onTap: () => print(""),
                 ),
                 ExpansionTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-                  title: Text("Engagement Teams"),
+                  title: Text("Engagement Teams",style: TextStyle(color: Colors.black)),
                   children: <Widget>[
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('Wezaret ELSAADA (Deploy)',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('FUN CREW (CS)',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                   ],
