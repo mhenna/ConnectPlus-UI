@@ -206,7 +206,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(18),
           side: BorderSide(color: Utils.iconColor)),
       child: Container(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
         child: const Text('Register', style: TextStyle(fontSize: 20)),
       ),
     );
@@ -229,7 +229,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
           alignment: Alignment.bottomCenter,
           children: <Widget>[
             SizedBox(
-              width: 250,
+              width: MediaQuery.of(context).size.width,
               child: Image.memory(
                   base64Decode(eventDetails['poster']['fileData'].toString())),
             )
@@ -244,9 +244,9 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
       return CircularIndicator();
     } else {
       return DraggableScrollableSheet(
-        maxChildSize: .8,
-        initialChildSize: .8,
-        minChildSize: .7,
+        maxChildSize: .7,
+        initialChildSize: .6,
+        minChildSize: .5,
         builder: (context, scrollController) {
           return Container(
             padding: Utils.padding.copyWith(bottom: 0),
@@ -289,7 +289,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                   SizedBox(
                     height: 20,
                   ),
-                  _dateWidget(eventDetails['event']['startDate']),
+//                  _dateWidget(eventDetails['event']['startDate'].toString().split("T")[0]),
                   SizedBox(
                     height: 20,
                   ),
@@ -326,27 +326,54 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   Widget _dateWidget(String text) {
     return Container(
       padding: EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
-        color: Utils.iconColor,
-      ),
+//      decoration: BoxDecoration(
+//        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
+//        borderRadius: BorderRadius.all(Radius.circular(13)),
+//        color: Utils.iconColor,
+//      ),
       child: Utils.titleText(
         textString: text,
         fontSize: 16,
-        textcolor: Color(0xffffffff),
+        textcolor: Colors.black,
       ),
     );
   }
 
   Widget _description() {
+    String fulltime =
+        eventDetails['event']['startDate'].toString().split("T")[1];
+    int index = fulltime.lastIndexOf(":");
+    String time = fulltime.toString().substring(0, index);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Utils.titleText(
-            textString: "Event Details", fontSize: 14, textcolor: Colors.black),
-        SizedBox(height: 20),
-        Text("venue :" + eventDetails['event']['venue']),
+            textString: "Event Details", fontSize: 24, textcolor: Colors.black),
+        SizedBox(height: 15),
+        Row(children: <Widget>[
+          Text(
+            "Venue: ",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Text(eventDetails['event']['venue'], style: TextStyle(fontSize: 18))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Date: ",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Text(eventDetails['event']['startDate'].toString().split("T")[0],
+              style: TextStyle(fontSize: 18))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Time: ",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Text(time, style: TextStyle(fontSize: 18))
+        ]),
       ],
     );
   }
