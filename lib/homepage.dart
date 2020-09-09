@@ -81,7 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: new Text(
                               'Recent Events',
                               style: TextStyle(
-                                  fontSize: 20.0,
+                                  fontSize: 28.0,
+                                  fontWeight: FontWeight.bold,
                                   foreground: Paint()
                                     ..shader = ui.Gradient.linear(
                                       const Offset(0, 20),
@@ -95,7 +96,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           //gridview
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                             height: 400,
                             child: EventsVariables(),
                           ),
@@ -135,7 +136,8 @@ class _MyHomePageState extends State<MyHomePage> {
                             child: new Text(
                               'Recent Offers',
                               style: TextStyle(
-                                  fontSize: 20.0,
+                                  fontSize: 28.0,
+                                  fontWeight: FontWeight.bold,
                                   foreground: Paint()
                                     ..shader = ui.Gradient.linear(
                                       const Offset(0, 20),
@@ -149,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           //gridview
                           Container(
-                            padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
+                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
                             height: 400,
                             child: OfferVariables(),
                           ),

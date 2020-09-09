@@ -62,14 +62,17 @@ class _OfferVariables extends State<OfferVariables> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        mostRecent(),
+        Padding(
+            padding: EdgeInsets.only(left: 8, right: 8), child: mostRecent()),
         Expanded(
-            child: ListView(
-          physics: ClampingScrollPhysics(),
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          children: constructEvents(),
-        )),
+            child: Padding(
+                padding: EdgeInsets.only(left: 4, right: 6),
+                child: ListView(
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: constructEvents(),
+                ))),
       ],
     );
   }
@@ -80,7 +83,7 @@ class _OfferVariables extends State<OfferVariables> {
       list.add(Single_Offer(
         offer_name: offer['name'],
         offer_picture: base64Decode(offer['logo']['fileData']),
-        offer_date: offer['createdAt'].toString().split("T")[0],
+        offer_date: offer['expiration'].toString().split("T")[0],
         offer: offer,
       ));
     }
@@ -121,12 +124,19 @@ class Single_Offer extends StatelessWidget {
                     footer: Container(
                       color: Colors.white70,
                       child: ListTile(
-                        leading: Text(offer_name,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        title: Text(offer_date,
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w800)),
+                          title: Column(children: <Widget>[
+                            Text(offer_name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: <Widget>[
+                                  Text("Expiration Date: "),
+                                  Text(offer_date,
+                                      style: TextStyle(
+                                          color: Colors.red,
+                                          fontWeight: FontWeight.w800)),
+                                ])
+                          ])
                       ),
                     ),
                     child: Image.memory(
