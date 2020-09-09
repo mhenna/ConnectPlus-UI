@@ -5,13 +5,16 @@ class AppScaffold extends StatelessWidget {
   final Widget body;
   final Color backgroundColor;
   final Widget bottomNavigationBar;
+  String title;
 
-  AppScaffold({this.body, this.backgroundColor, this.bottomNavigationBar});
+  AppScaffold({this.body, this.backgroundColor, this.bottomNavigationBar, this.title});
 
   @override
   Widget build(BuildContext context) {
+    if (title == null)
+      title = "Connect+";
     return Scaffold(
-      appBar: AppBar(title: Text('Connect+')),
+      appBar: AppBar(title: Text(title)),
       body: body,
       drawer: NavDrawer(),
       bottomNavigationBar: bottomNavigationBar,

@@ -71,6 +71,7 @@ class _loginState extends State<login> {
           loading = false;
         });
         localStorage.setItem("token", token);
+        localStorage.setItem("profile", json.decode(response.body)["profile"]);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage()),
