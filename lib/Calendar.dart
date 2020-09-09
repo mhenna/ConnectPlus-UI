@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/Event.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -78,10 +79,31 @@ class _CalendarState extends State<Calendar> {
                     _selectedEvents = events;
                   });
                 },
+                builders: CalendarBuilders(
+                  singleMarkerBuilder: (context, date, event) {
+                    Color cor = Color(int.parse(event["ERG"]["color"]));
+                    return Container(
+                      decoration:
+                          BoxDecoration(shape: BoxShape.circle, color: cor),
+                      width: 7.0,
+                      height: 7.0,
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                    );
+                  },
+                ),
               ),
               ..._selectedEvents.map((event) => ListTile(
-                    title: Text(event["name"]),
-                  )),
+                  title: Text(event["name"]),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Event(
+                                event: event["name"],
+                                erg: event['ERG']["name"],
+                              )),
+                    );
+                  })),
             ])));
   }
 }
