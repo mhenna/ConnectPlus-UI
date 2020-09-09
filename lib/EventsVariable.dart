@@ -118,7 +118,7 @@ class Single_Event extends StatelessWidget {
                     MaterialPageRoute(
                         builder: (context) => Event(
                           event: event_name,
-                          erg: event['ERG'],
+                          erg: event['ERG']["name"],
                         )),
                   );
                 },
