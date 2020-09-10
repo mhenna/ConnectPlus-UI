@@ -62,14 +62,19 @@ class _EventsVariablesState extends State<EventsVariables> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        mostRecent(),
+        Padding(
+          child: mostRecent(),
+          padding: EdgeInsets.only(left: 8, right: 8),
+        ),
         Expanded(
-            child: ListView(
-          physics: ClampingScrollPhysics(),
-          shrinkWrap: true,
-          scrollDirection: Axis.horizontal,
-          children: constructEvents(),
-        )),
+            child: Padding(
+                padding: EdgeInsets.only(left: 4, right: 6),
+                child: ListView(
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: constructEvents(),
+                ))),
       ],
     );
   }
@@ -79,11 +84,10 @@ class _EventsVariablesState extends State<EventsVariables> {
 
     for (var event in event_list) {
       list.add(Single_Event(
-        event_name: event['name'],
-        event_picture: base64Decode(event['poster']['fileData']),
-        event_date: event['startDate'].toString().split("T")[0],
-        event: event
-      ));
+          event_name: event['name'],
+          event_picture: base64Decode(event['poster']['fileData']),
+          event_date: event['startDate'].toString().split("T")[0],
+          event: event));
     }
     return list;
   }
@@ -117,21 +121,28 @@ class Single_Event extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => Event(
-                          event: event_name,
-                          erg: event['ERG']["name"],
-                        )),
+                              event: event_name,
+                              erg: event['ERG']["name"],
+                            )),
                   );
                 },
                 child: GridTile(
                     footer: Container(
                       color: Colors.white70,
                       child: ListTile(
-                        leading: Text(event_name,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        title: Text(event_date,
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.w800)),
+                        title: Column(children: <Widget>[
+                          Text(event_name,
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                Text("Start Date: "),
+                                Text(event_date,
+                                    style: TextStyle(
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.w800)),
+                              ])
+                        ]),
                       ),
                     ),
                     child: Image.memory(

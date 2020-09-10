@@ -118,7 +118,7 @@ class _OfferState extends State<Offer> {
                     FlatButton(
                       onPressed: () {
                         offer['offer']['logo'] = offer['logo'];
-                        Navigator.push(
+                        Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
                               builder: (context) => Offer(

@@ -1,16 +1,19 @@
 import 'dart:convert';
-
+import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/Event.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
+import 'dart:typed_data';
+import 'dart:math';
 
 class Events extends StatefulWidget {
   Events({
     Key key,
   }) : super(key: key);
+  static final _random = new Random();
+
   @override
   MyEventsPageState createState() => MyEventsPageState();
 }
@@ -23,6 +26,7 @@ class MyEventsPageState extends State<Events>
   var ip;
   var port;
   var events = [];
+  var randIndex;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -44,226 +48,125 @@ class MyEventsPageState extends State<Events>
 //    port = '3300';
     var url = 'http://' + ip + ':' + port + '/event';
     var token = localStorage.getItem("token");
-    print(url);
+
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
     });
-    print(response.statusCode);
+
     if (response.statusCode == 200)
       setState(() {
         events = json.decode(response.body);
+        randIndex = Events._random.nextInt(events.length);
       });
+  }
 
-    print('Response status: ${response.statusCode}');
-    print('Response body: ${response.body}');
-    print(events.length);
+  Widget base64ToImageFeatured() {
+    try {
+      Uint8List bytes =
+          base64Decode(events.elementAt(randIndex)['poster']['fileData']);
+      return FittedBox(
+        fit: BoxFit.contain,
+        child: Image.memory(bytes),
+      );
+    } catch (Exception) {
+      return LoadingWidget();
+    }
+  }
+
+  Widget base64ToImage(String base64) {
+    Uint8List bytes = base64Decode(base64);
+    return SizedBox(
+      width:
+          MediaQuery.of(context).size.width, // otherwise the logo will be tiny
+      child: Image.memory(bytes),
+    );
+  }
+
+  Widget LoadingWidget() {
+    return Scaffold(
+        body: Center(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          new CircularProgressIndicator(),
+          new Text("Loading"),
+        ],
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        home: Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(150.0), // here the desired height
-        child: AppBar(
-          backgroundColor: const Color(0xfffafafa),
-          flexibleSpace: Container(
-            width: MediaQuery.of(context).size.width * 1,
-            height: MediaQuery.of(context).size.height * 0.20,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment(-1.0, 1.0),
-                end: Alignment(1.0, -1.0),
-                colors: [const Color(0xfff7501e), const Color(0xffed136e)],
-                stops: [0.0, 1.0],
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0x29000000),
-                  offset: Offset(0, 3),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: EdgeInsets.fromLTRB(0, 100, 0, 0),
-              child: Text('All Events',
-                  style: TextStyle(
-                    fontFamily: 'Arial',
-                    fontSize: 28,
-                    color: const Color(0xffffffff),
-                    fontWeight: FontWeight.w700,
-                  ),
-                  textAlign: TextAlign.center),
-            ),
-          ),
-          elevation: 0.0,
-        ),
-      ),
-      drawer: NavDrawer(),
-      backgroundColor: const Color(0xfffafafa),
-      body: GridView.count(
-        crossAxisCount: 1,
-        addAutomaticKeepAlives: true,
-        children: List.generate(
-          events.length,
-          (index) {
-            return Container(
-                child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, 30, 0, 0),
-                  child: Container(
-                      width: MediaQuery.of(context).size.width * 0.85,
-                      height: MediaQuery.of(context).size.height * 0.25,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        color: const Color(0xffffffff),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x4d000000),
-                            offset: Offset(0, 3),
-                            blurRadius: 6,
-                          ),
-                        ],
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: MediaQuery.of(context).size.width * 0.30,
-                            height: MediaQuery.of(context).size.height * 1,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10.0),
-                                bottomLeft: Radius.circular(10.0),
-                              ),
-                              image: DecorationImage(
-                                image: MemoryImage(base64Decode(events
-                                    .elementAt(index)['poster']['fileData'])),
-                              ),
-                            ),
-                          ),
-                          Container(
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.40,
-                                    child: Text(
-                                      events
-                                          .elementAt(index)['name']
-                                          .toString(),
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 18,
-                                        color: const Color(0xfff23441),
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.2857142857142858,
-                                      ),
-                                      textAlign: TextAlign.left,
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    try {
+      return AppScaffold(
+          body: ListView.builder(
+              shrinkWrap: true,
+              padding: const EdgeInsets.all(10),
+              itemCount: 2,
+              itemBuilder: (BuildContext context, int elem) {
+                if (elem == 0) {
+                  return Padding(
+                      padding: EdgeInsets.only(top: 40, bottom: 20),
+                      child: Text(
+                        "Events",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 32,
+                        ),
+                      ));
+                } else {
+                  return ListView.builder(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      itemCount: events.length,
+                      itemBuilder: (BuildContext catContext, int cat) {
+                        return Center(
+                          child: Padding(
+                              padding: EdgeInsets.only(bottom: 20),
+                              child: Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    base64ToImage(events
+                                        .elementAt(cat)['poster']['fileData']
+                                        .toString()),
+                                    ButtonBar(
+                                      alignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        FlatButton(
+                                          child: Text(
+                                            events
+                                                .elementAt(cat)['name']
+                                                .toString(),
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 22),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) => Event(
+                                                        event: events.elementAt(
+                                                            cat)['name'],
+                                                        erg: events.elementAt(
+                                                            cat)['ERG'])));
+                                          },
+                                        )
+                                      ],
                                     ),
-                                  ),
+                                  ],
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.50,
-                                    child: Text(
-                                      events.elementAt(index)['ERG'].toString(),
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 15,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.2857142857142858,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.50,
-                                    child: Text(
-                                      'Venue: ' +
-                                          events
-                                              .elementAt(index)['venue']
-                                              .toString(),
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 13,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.2857142857142858,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.50,
-                                    child: Text(
-                                      'Start Date: ' +
-                                          events
-                                              .elementAt(index)['startDate']
-                                              .toString()
-                                              .substring(0, 10),
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 13,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.2857142857142858,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.50,
-                                    child: Text(
-                                      'End Date: ' +
-                                          events
-                                              .elementAt(index)['endDate']
-                                              .toString()
-                                              .substring(0, 10),
-                                      style: TextStyle(
-                                        fontFamily: 'Arial',
-                                        fontSize: 13,
-                                        color: Colors.grey.shade600,
-                                        fontWeight: FontWeight.w700,
-                                        height: 1.2857142857142858,
-                                      ),
-                                      textAlign: TextAlign.left,
-                                    ),
-                                  ),
-                                ),
-                              ]))
-                        ],
-                      )),
-                ),
-              ],
-            ));
-          },
-        ),
-      ),
-    ));
+                              )),
+                        );
+                      });
+                }
+              }));
+    } catch (err) {
+      return LoadingWidget();
+    }
   }
 }
