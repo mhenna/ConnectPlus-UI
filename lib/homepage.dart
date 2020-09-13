@@ -1,3 +1,4 @@
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -35,6 +36,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -47,191 +51,179 @@ class _MyHomePageState extends State<MyHomePage> {
             appBar: AppBar(
               // Here we take the value from the MyHomePage object that was created by
               // the App.build method, and use it to set our appbar title.
-//        title: Text(widget.title),
-              flexibleSpace: Image(
-                image: AssetImage('assets/background.png'),
-                fit: BoxFit.cover,
+              title: Text("Home"),
+              centerTitle: true,
+              backgroundColor: Colors.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.secondaryColor,
+                      Colors.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
               ),
-              backgroundColor: Colors.transparent,
             ),
             drawer: NavDrawer(),
+            backgroundColor: Colors.background,
             body: Stack(children: <Widget>[
-              new Container(
-                decoration: new BoxDecoration(
-                    image: new DecorationImage(
-                        image: new AssetImage("assets/meetERGs.png"),
-                        fit: BoxFit.fill)),
-              ),
               SingleChildScrollView(
-                  child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                  child: Container(
                       child: Column(
-                        children: <Widget>[
-                          CarouselSlider(
-                            options: CarouselOptions(
-                              viewportFraction: 1.0,
-                              autoPlay: true,
-                              aspectRatio: 2.0,
-                              enlargeCenterPage: false,
-                            ),
-                            items: imageSliders,
-                          ),
-                          new Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
-                            child: new Text(
-                              'Recent Events',
-                              style: TextStyle(
-                                  fontSize: 28.0,
-                                  fontWeight: FontWeight.bold,
-                                  foreground: Paint()
-                                    ..shader = ui.Gradient.linear(
-                                      const Offset(0, 20),
-                                      const Offset(150, 20),
-                                      <Color>[
-                                        Colors.red,
-                                        Colors.black,
-                                      ],
-                                    )),
-                            ),
-                          ),
-                          //gridview
-                          Container(
-                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            height: 400,
-                            child: EventsVariables(),
-                          ),
-                          Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                                width: 130,
-                                height: 55,
-                                child: Padding(
-                                    padding: EdgeInsets.only(bottom: 20),
-                                    child: Material(
-                                      elevation: 5.0,
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      color: Color(0xFFE15F5F),
-                                      child: MaterialButton(
-                                        minWidth:
-                                            MediaQuery.of(context).size.width,
-                                        padding: EdgeInsets.fromLTRB(
-                                            20.0, 0.0, 20.0, 0.0),
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => Events()),
-                                          );
-                                        },
-                                        child: Text("See More",
-                                            textAlign: TextAlign.center,
-                                            style: style.copyWith(
-                                                color: Colors.white)),
-                                      ),
-                                    )),
-                              )),
-                          new Padding(
-                            padding: const EdgeInsets.fromLTRB(10, 40, 10, 0),
-                            child: new Text(
-                              'Recent Offers',
-                              style: TextStyle(
-                                  fontSize: 28.0,
-                                  fontWeight: FontWeight.bold,
-                                  foreground: Paint()
-                                    ..shader = ui.Gradient.linear(
-                                      const Offset(0, 20),
-                                      const Offset(150, 20),
-                                      <Color>[
-                                        Colors.red,
-                                        Colors.black,
-                                      ],
-                                    )),
-                            ),
-                          ),
-                          //gridview
-                          Container(
-                            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                            height: 400,
-                            child: OfferVariables(),
-                          ),
-                          Align(
-                              alignment: Alignment.bottomLeft,
-                              child: Container(
-                                padding: EdgeInsets.fromLTRB(10, 5, 10, 0),
-                                width: 130,
-                                height: 55,
-                                child: Padding(
-                                    padding: EdgeInsets.only(bottom: 20),
-                                    child: Material(
-                                      elevation: 5.0,
-                                      borderRadius: BorderRadius.circular(30.0),
-                                      color: Color(0xFFE15F5F),
-                                      child: MaterialButton(
-                                        minWidth:
-                                            MediaQuery.of(context).size.width,
-                                        padding: EdgeInsets.fromLTRB(
-                                            20.0, 0.0, 20.0, 0.0),
-                                        onPressed: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => Offers()),
-                                          );
-                                        },
-                                        child: Text("See More",
-                                            textAlign: TextAlign.center,
-                                            style: style.copyWith(
-                                                color: Colors.white)),
-                                      ),
-                                    )),
-                              )),
+                children: <Widget>[
+                  SizedBox(
+                      height: height * 0.42,
+                      width: width,
+                      child: Carousel(
+                        images: [
+                          Image.asset('./assets/logo2.png'),
+                          Image.asset('./assets/logo.png'),
                         ],
-                      ))),
+                        dotSize: 4.0,
+                        dotSpacing: 15.0,
+                        dotColor: Colors.header,
+                        indicatorBgPadding: 5.0,
+                        dotBgColor: Colors.header.withOpacity(0.1),
+                        overlayShadow: true,
+                        overlayShadowColors: Colors.white,
+                        overlayShadowSize: 0.7,
+                      )),
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.07,
+                        width * 0.03, height * 0.01),
+                    child: new Text(
+                      'Recent Events',
+                      style: TextStyle(
+                        fontSize: size * 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.headline,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.headline,
+                    thickness: 3,
+                    indent: width * 0.25,
+                    endIndent: width * 0.25,
+                  ),
+                  //gridview
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
+                    height: height * 0.55,
+                    child: EventsVariables(),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(
+                            width * 0.03, height * 0.02, width * 0.03, 0),
+                        width: width * 0.4,
+                        height: height * 0.12,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.04),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30.0),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.secondaryColor,
+                                    Colors.primaryColor,
+                                  ],
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                ),
+                              ),
+                              child: MaterialButton(
+                                minWidth: MediaQuery.of(context).size.width,
+                                padding:
+                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Events()),
+                                  );
+                                },
+                                child: Text("See More",
+                                    textAlign: TextAlign.center,
+                                    style: style.copyWith(color: Colors.white)),
+                              ),
+                            )),
+                      )),
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.09,
+                        width * 0.03, height * 0.01),
+                    child: new Text(
+                      'Recent Offers',
+                      style: TextStyle(
+                        fontSize: size * 48,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.headline,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Colors.headline,
+                    thickness: 3,
+                    indent: width * 0.25,
+                    endIndent: width * 0.25,
+                  ),
+
+                  //gridview
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
+                    height: height * 0.55,
+                    child: OfferVariables(),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(
+                            width * 0.03, height * 0.02, width * 0.03, 0),
+                        width: width * 0.4,
+                        height: height * 0.12,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.04),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30.0),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.secondaryColor,
+                                    Colors.primaryColor,
+                                  ],
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                ),
+                              ),
+                              child: MaterialButton(
+                                minWidth: MediaQuery.of(context).size.width,
+                                padding:
+                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Offers()),
+                                  );
+                                },
+                                child: Text("See More",
+                                    textAlign: TextAlign.center,
+                                    style: style.copyWith(color: Colors.white)),
+                              ),
+                            )),
+                      )),
+                ],
+              ))),
 
 // This trailing comma makes auto-formatting nicer for build methods.
             ])));
   }
 }
 
-final List<Widget> imageSliders = imgList
-    .map((item) => Container(
-          child: Container(
-            margin: EdgeInsets.all(5.0),
-            child: ClipRRect(
-                borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                child: Stack(
-                  children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
-                    Positioned(
-                      bottom: 0.0,
-                      left: 0.0,
-                      right: 0.0,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              Color.fromARGB(200, 0, 0, 0),
-                              Color.fromARGB(0, 0, 0, 0)
-                            ],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                        ),
-                        padding: EdgeInsets.symmetric(
-                            vertical: 10.0, horizontal: 20.0),
-                        child: Text(
-                          'No. ${imgList.indexOf(item)} image',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20.0,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ),
-        ))
-    .toList();
+final Iterable<Image> imageSliders = imgList.map(
+  (item) => Image.network(item),
+);

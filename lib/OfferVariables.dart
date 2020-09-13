@@ -49,9 +49,11 @@ class _OfferVariables extends State<OfferVariables> {
   }
 
   Widget mostRecent() {
+    var height = MediaQuery.of(context).size.height;
+
     if (mostRecentOffer == null) return CircularProgressIndicator();
     return Container(
-        height: 200,
+        height: height,
         decoration: BoxDecoration(
           image: new DecorationImage(
               image: MemoryImage(mostRecentOffer), fit: BoxFit.cover),
@@ -60,24 +62,31 @@ class _OfferVariables extends State<OfferVariables> {
 
   @override
   Widget build(BuildContext context) {
+    final _scrollController = ScrollController();
+    var height = MediaQuery.of(context).size.height;
     return Column(
       children: <Widget>[
         Padding(
-            padding: EdgeInsets.only(left: 8, right: 8), child: mostRecent()),
+            padding: EdgeInsets.only(left: 6, right: 6),
+            child: Container(height: height * 0.30, child: mostRecent())),
         Expanded(
             child: Padding(
-                padding: EdgeInsets.only(left: 4, right: 6),
-                child: ListView(
-                  physics: ClampingScrollPhysics(),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: constructEvents(),
-                ))),
+                padding: EdgeInsets.only(left: 6, right: 6),
+                child: Scrollbar(
+                    controller: _scrollController,
+                    isAlwaysShown: true,
+                    child: ListView(
+                      controller: _scrollController,
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      children: constructOffers(),
+                    )))),
       ],
     );
   }
 
-  List<Widget> constructEvents() {
+  List<Widget> constructOffers() {
     List<Widget> list = List<Widget>();
     for (var offer in offer_list) {
       list.add(Single_Offer(
@@ -102,9 +111,12 @@ class Single_Offer extends StatelessWidget {
       {this.offer_name, this.offer_picture, this.offer_date, this.offer});
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+
     return SizedBox(
-        height: 230,
-        width: 270,
+        height: height,
+        width: width * 0.60,
         child: Card(
           child: Hero(
             tag: offer_name,
@@ -125,19 +137,18 @@ class Single_Offer extends StatelessWidget {
                       color: Colors.white70,
                       child: ListTile(
                           title: Column(children: <Widget>[
-                            Text(offer_name,
-                                style: TextStyle(fontWeight: FontWeight.bold)),
-                            Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text("Expiration Date: "),
-                                  Text(offer_date,
-                                      style: TextStyle(
-                                          color: Colors.red,
-                                          fontWeight: FontWeight.w800)),
-                                ])
-                          ])
-                      ),
+                        Text(offer_name,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Expiration Date: "),
+                              Text(offer_date,
+                                  style: TextStyle(
+                                      color: Colors.red,
+                                      fontWeight: FontWeight.w800)),
+                            ])
+                      ])),
                     ),
                     child: Image.memory(
                       offer_picture,
