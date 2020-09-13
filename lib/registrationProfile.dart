@@ -102,7 +102,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     final registerButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
-      color: Color(0xFFE15F5F),
+      color:Colors.headline,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
