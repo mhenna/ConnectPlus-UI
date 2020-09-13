@@ -153,7 +153,7 @@ class _registrationState extends State<registration> {
         child: Text("Register",
             textAlign: TextAlign.center,
             style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
 
