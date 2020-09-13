@@ -49,12 +49,10 @@ class NavDrawerState extends State<NavDrawer>
 //    Working for android emulator -- set to actual ip for use with physical device
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
     var token = localStorage.getItem("token");
-    print(url);
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
     });
-    print(response.statusCode);
     if (response.statusCode == 200)
       setState(() {
         offerCategories = json.decode(response.body)['offerCategories'];
@@ -67,19 +65,19 @@ class NavDrawerState extends State<NavDrawer>
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Image.network(
-              'http://www.emc2movecar.com/connectplus/wp-content/uploads/2018/01/logo.png',
+            child: Image.asset(
+              './assets/logo2.png',
             ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.deepOrange,
-                  Color.fromARGB(0, 0, 0, 0),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            // decoration: BoxDecoration(
+            //   gradient: LinearGradient(
+            //     colors: [
+            //       Colors.secondaryColor.withAlpha(255),
+            //       Colors.primaryColor.withAlpha(255),
+            //     ],
+            //     begin: Alignment.topCenter,
+            //     end: Alignment.bottomCenter,
+            //   ),
+            // ),
           ),
           
           ListTile(
@@ -181,6 +179,16 @@ class NavDrawerState extends State<NavDrawer>
                 MaterialPageRoute(builder: (context) => Events()),
               )
             },
+          ),
+          ListTile(
+            leading: Icon(Icons.local_activity),
+            title: Text('Activities'),
+            // onTap: () => {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(builder: (context) => Activities()),
+            //   )
+            // },
           ),
           ListTile(
             leading: Icon(Icons.calendar_today),
