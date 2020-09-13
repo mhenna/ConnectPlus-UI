@@ -116,8 +116,30 @@ class _OffersState extends State<Offers> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
     try {
-      return AppScaffold(
+      return Scaffold(
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text("Offers"),
+            centerTitle: true,
+            backgroundColor: Colors.header,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Colors.secondaryColor,
+                    Colors.primaryColor,
+                  ],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+              ),
+            ),
+          ),
           body: ListView.builder(
               shrinkWrap: true,
               padding: const EdgeInsets.all(10),
@@ -151,21 +173,33 @@ class _OffersState extends State<Offers> {
                       },
                     ),
                     Container(
-                      height: MediaQuery.of(context).size.height * 0.35,
-                      width: MediaQuery.of(context).size.width,
-                      child: base64ToImageFeatured(),
-                    )
+                        height: MediaQuery.of(context).size.height * 0.35,
+                        width: MediaQuery.of(context).size.width,
+                        child: Padding(
+                          padding:
+                              EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
+                          child: base64ToImageFeatured(),
+                        ))
                   ]);
                 } else if (elem == 1) {
-                  return Padding(
-                      padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
-                      child: Text(
-                        "OFFERS",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                        ),
-                      ));
+                  return Column(children: [
+                    Padding(
+                        padding: EdgeInsets.fromLTRB(0, height * 0.08, 0, 8.0),
+                        child: Text(
+                          "OFFERS",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: size * 60,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.headline),
+                        )),
+                    Divider(
+                      color: Colors.headline,
+                      thickness: 3,
+                      indent: width * 0.27,
+                      endIndent: width * 0.27,
+                    )
+                  ]);
                 } else {
                   return ListView.builder(
                       shrinkWrap: true,
@@ -176,27 +210,41 @@ class _OffersState extends State<Offers> {
                           children: <Widget>[
                             if (cat == 0)
                               Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 12.0, 0, 8.0),
+                                  padding: EdgeInsets.fromLTRB(
+                                      width * 0.03,
+                                      height * 0.03,
+                                      width * 0.03,
+                                      height * 0.06),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Container(
                                       child: Text(
                                         categoriesAndOffers
                                             .elementAt(cat)['name'],
-                                        style: TextStyle(fontSize: 28),
+                                        style: TextStyle(
+                                            fontSize: size * 45,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.headline),
                                       ),
                                     ),
                                   ))
                             else
                               Padding(
-                                  padding: EdgeInsets.fromLTRB(0, 55.0, 0, 8.0),
+                                  padding: EdgeInsets.fromLTRB(
+                                      width * 0.03,
+                                      height * 0.03,
+                                      width * 0.03,
+                                      height * 0.06),
                                   child: Align(
                                     alignment: Alignment.centerLeft,
                                     child: Container(
                                       child: Text(
                                         categoriesAndOffers
                                             .elementAt(cat)['name'],
-                                        style: TextStyle(fontSize: 28),
+                                        style: TextStyle(
+                                            fontSize: size * 45,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.headline),
                                       ),
                                     ),
                                   )),
@@ -234,7 +282,9 @@ class _OffersState extends State<Offers> {
                                                     .elementAt(index)['name']
                                                     .toString(),
                                                 textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 22),
+                                                style: TextStyle(
+                                                    fontSize: size * 35,
+                                                    color: Colors.headline),
                                               ),
                                               onPressed: () {
                                                 Navigator.push(
