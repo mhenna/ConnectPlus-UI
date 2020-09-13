@@ -102,21 +102,40 @@ class MapScreenState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
-    return AppScaffold(
-        title: "Profile Details",
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    return Scaffold(
+        backgroundColor: Colors.background,
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("Profile Details"),
+          centerTitle: true,
+          backgroundColor: Colors.header,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Colors.secondaryColor,
+                  Colors.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+            ),
+          ),
+        ),
         body: new Container(
-          color: Colors.white,
           child: new ListView(
             children: <Widget>[
               Column(
                 children: <Widget>[
                   new Container(
-                    height: 220.0,
-                    color: Colors.white,
+                    height: height * 0.3,
                     child: new Column(
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.only(top: 20.0),
+                          padding: EdgeInsets.only(top: height * 0.04),
                           child:
                               new Stack(fit: StackFit.loose, children: <Widget>[
                             new Row(
@@ -124,8 +143,8 @@ class MapScreenState extends State<ProfilePage>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 new Container(
-                                    width: 140.0,
-                                    height: 140.0,
+                                    width: width * 0.35,
+                                    height: height * 0.21,
                                     decoration: new BoxDecoration(
                                       shape: BoxShape.circle,
                                       image: new DecorationImage(
@@ -137,13 +156,13 @@ class MapScreenState extends State<ProfilePage>
                               ],
                             ),
                             Padding(
-                                padding:
-                                    EdgeInsets.only(top: 90.0, right: 100.0),
+                                padding: EdgeInsets.only(
+                                    top: height * 0.13, right: width * 0.27),
                                 child: new Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     new CircleAvatar(
-                                      backgroundColor: Colors.red,
+                                      backgroundColor: Colors.header,
                                       radius: 25.0,
                                       child: new Icon(
                                         Icons.camera_alt,
@@ -158,35 +177,19 @@ class MapScreenState extends State<ProfilePage>
                     ),
                   ),
                   new Container(
-                    color: Color(0xffFFFFFF),
+                    color: Colors.background,
                     child: Padding(
-                      padding: EdgeInsets.only(bottom: 25.0),
+                      padding: EdgeInsets.only(bottom: height * 0.03),
                       child: new Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 25.0),
+                              padding: EdgeInsets.only(right: width * 0.08 ),
                               child: new Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.end,
                                 mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Personal Information',
-                                        style: TextStyle(
-                                            fontSize: 22.0,
-                                            fontWeight: FontWeight.bold,
-                                            decoration:
-                                                TextDecoration.underline),
-                                      ),
-                                    ],
-                                  ),
                                   new Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     mainAxisSize: MainAxisSize.min,
@@ -198,157 +201,172 @@ class MapScreenState extends State<ProfilePage>
                                   )
                                 ],
                               )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 25.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Name',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 2.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Flexible(
-                                    child: new TextField(
-                                      controller: nameController,
-                                      decoration: InputDecoration(
-                                        hintText: profile['name'].toString(),
-                                      ),
-                                      enabled: !_status,
-                                      autofocus: !_status,
-                                    ),
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 25.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Address',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 2.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Flexible(
-                                    child: new TextField(
-                                      controller: addressController,
-                                      decoration: InputDecoration(
-                                          hintText: profile['address']),
-                                      enabled: !_status,
-                                    ),
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 25.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new Text(
-                                        'Phone Number',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 2.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Flexible(
-                                    child: new TextField(
-                                      controller: phoneController,
-                                      decoration: InputDecoration(
-                                          hintText: profile['phoneNumber']),
-                                      enabled: !_status,
-                                    ),
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 25.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Container(
-                                      child: new Text(
-                                        'Car Plate # (Please write letters in Arabic)',
-                                        style: TextStyle(
-                                            fontSize: 16.0,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    flex: 2,
-                                  ),
-                                ],
-                              )),
-                          Padding(
-                              padding: EdgeInsets.only(
-                                  left: 25.0, right: 25.0, top: 2.0),
-                              child: new Row(
-                                mainAxisSize: MainAxisSize.max,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Flexible(
-                                    child: Padding(
-                                      padding: EdgeInsets.only(right: 10.0),
-                                      child: new TextField(
-                                        controller: carPlateController,
-                                        decoration: InputDecoration(
-                                            hintText: profile['carPlate']),
-                                        enabled: !_status,
-                                      ),
-                                    ),
-                                    flex: 2,
-                                  ),
-                                ],
-                              )),
+                          Container(
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.02),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            new Text(
+                                              'Name',
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Flexible(
+                                          child: new TextField(
+                                            controller: nameController,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  profile['name'].toString(),
+                                            ),
+                                            enabled: !_status,
+                                            autofocus: !_status,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            new Text(
+                                              'Address',
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Flexible(
+                                          child: new TextField(
+                                            controller: addressController,
+                                            decoration: InputDecoration(
+                                                hintText: profile['address']),
+                                            enabled: !_status,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            new Text(
+                                              'Phone Number',
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Flexible(
+                                          child: new TextField(
+                                            controller: phoneController,
+                                            decoration: InputDecoration(
+                                                hintText:
+                                                    profile['phoneNumber']),
+                                            enabled: !_status,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            child: new Text(
+                                              'Car Plate # (Please write letters in Arabic)',
+                                              style: TextStyle(
+                                                  fontSize: 16.0,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ),
+                                          flex: 2,
+                                        ),
+                                      ],
+                                    )),
+                                Padding(
+                                     padding: EdgeInsets.only(
+                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Flexible(
+                                          child: Padding(
+                                            padding:
+                                                EdgeInsets.only(right: 10.0),
+                                            child: new TextField(
+                                              controller: carPlateController,
+                                              decoration: InputDecoration(
+                                                  hintText:
+                                                      profile['carPlate']),
+                                              enabled: !_status,
+                                            ),
+                                          ),
+                                          flex: 2,
+                                        ),
+                                      ],
+                                    )),
+                              ],
+                            ),
+                          ),
                           !_status ? _getActionButtons() : new Container(),
                         ],
                       ),
@@ -424,12 +442,12 @@ class MapScreenState extends State<ProfilePage>
   Widget _getEditIcon() {
     return new GestureDetector(
       child: new CircleAvatar(
-        backgroundColor: Colors.red,
-        radius: 14.0,
+        backgroundColor: Colors.header,
+        radius: 20.0,
         child: new Icon(
           Icons.edit,
           color: Colors.white,
-          size: 16.0,
+          size: 20.0,
         ),
       ),
       onTap: () {
