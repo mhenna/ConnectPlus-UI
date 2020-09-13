@@ -15,6 +15,7 @@ class OfferVariables extends StatefulWidget {
 class _OfferVariables extends State<OfferVariables> {
   var ip, port;
   var offer_list = [];
+  var emptyList = false;
   Uint8List mostRecentOffer;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
@@ -42,6 +43,9 @@ class _OfferVariables extends State<OfferVariables> {
     if (response.statusCode == 200) {
       setState(() {
         offer_list = json.decode(response.body);
+        if(offer_list.isEmpty)
+          emptyList = true;
+        else
         this.mostRecentOffer =
             base64Decode(offer_list.elementAt(0)['logo']['fileData']);
       });
@@ -60,6 +64,8 @@ class _OfferVariables extends State<OfferVariables> {
 
   @override
   Widget build(BuildContext context) {
+    if(emptyList)
+      return Center(child: Text("No Offers"));
     return Column(
       children: <Widget>[
         Padding(
