@@ -35,6 +35,7 @@ class _OffersState extends State<Offers> {
   var randIndexCat;
   var randIndexOffer;
   var searchData = [];
+  var emptyOffers = false;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -58,14 +59,21 @@ class _OffersState extends State<Offers> {
       "Authorization": "Bearer $token"
     });
 
-    if (response.statusCode == 200)
-      setState(() {
-        categoriesAndOffers = json.decode(response.body);
-        randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
-        randIndexOffer = Offers._random.nextInt(
-            categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
-      });
-    getSearchData();
+    print(response.statusCode);
+    if (response.statusCode == 200) {
+      if (!(json.decode(response.body)).isEmpty) {
+        setState(() {
+          categoriesAndOffers = json.decode(response.body);
+          randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
+          randIndexOffer = Offers._random.nextInt(
+              categoriesAndOffers.elementAt(randIndexCat)['offers'].length);
+        });
+      } else
+        setState(() {
+          emptyOffers = false;
+        });
+      getSearchData();
+    }
   }
 
   getSearchData() {
@@ -110,7 +118,8 @@ class _OffersState extends State<Offers> {
         child: Image.memory(bytes),
       );
     } catch (Exception) {
-      return LoadingWidget();
+      print(Exception);
+      return Center(child: Text("No Offers"));
     }
   }
 
@@ -119,6 +128,9 @@ class _OffersState extends State<Offers> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
+     if (emptyOffers) {
+        return AppScaffold(body: Center(child: Text("No Offers")));
+      }
     try {
       return Scaffold(
           appBar: AppBar(
@@ -248,6 +260,7 @@ class _OffersState extends State<Offers> {
                                       ),
                                     ),
                                   )),
+                            if(categoriesAndOffers.elementAt(cat)['offers'].length>0)
                             GridView.count(
                               shrinkWrap: true,
                               physics: ScrollPhysics(),
@@ -255,7 +268,6 @@ class _OffersState extends State<Offers> {
                               // horizontal, this produces 2 rows.
                               crossAxisCount: 2,
                               addAutomaticKeepAlives: true,
-                              // Generate 100 widgets that display their index in the List.
                               children: List.generate(
                                   categoriesAndOffers
                                       .elementAt(cat)['offers']
@@ -313,12 +325,15 @@ class _OffersState extends State<Offers> {
                                 );
                               }),
                             )
+                            else
+                              Center(child: Text("No Offers"))
                           ],
                         );
                       });
                 }
               }));
     } catch (Exception) {
+      print(Exception);
       return LoadingWidget();
     }
   }

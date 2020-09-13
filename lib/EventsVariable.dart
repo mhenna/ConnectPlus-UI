@@ -15,6 +15,7 @@ class EventsVariables extends StatefulWidget {
 class _EventsVariablesState extends State<EventsVariables> {
   var ip, port;
   var event_list = [];
+  var emptyList = false;
   Uint8List mostRecentEvent;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
@@ -42,6 +43,9 @@ class _EventsVariablesState extends State<EventsVariables> {
     if (response.statusCode == 200) {
       setState(() {
         event_list = json.decode(response.body);
+        if(event_list.isEmpty)
+          emptyList = true;
+        else
         this.mostRecentEvent =
             base64Decode(event_list.elementAt(0)['poster']['fileData']);
       });
@@ -64,6 +68,8 @@ class _EventsVariablesState extends State<EventsVariables> {
   Widget build(BuildContext context) {
     final _scrollController = ScrollController();
     var height = MediaQuery.of(context).size.height;
+    if(emptyList)
+      return Center(child: Text("No Events"));
     return Column(
       children: <Widget>[
         Padding(
