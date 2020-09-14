@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
@@ -151,7 +152,7 @@ class _loginState extends State<login> {
               text: ' Login ',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.headline,
+                  color: Utils.header,
                   fontSize: size * 55,
                   fontFamily: "Arial"))
         ]),
@@ -168,7 +169,7 @@ class _loginState extends State<login> {
               text: ' Register now ',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.headline,
+                  color: Utils.header,
                   fontSize: size * 25,
                   fontFamily: "Arial"),
               recognizer: TapGestureRecognizer()
@@ -185,8 +186,8 @@ class _loginState extends State<login> {
           borderRadius: BorderRadius.circular(30.0),
           gradient: LinearGradient(
             colors: [
-              Colors.secondaryColor,
-              Colors.primaryColor,
+              Utils.secondaryColor,
+              Utils.primaryColor,
             ],
             begin: Alignment.topRight,
             end: Alignment.bottomLeft,
@@ -222,7 +223,7 @@ class _loginState extends State<login> {
                   padding: const EdgeInsets.only(top: 10.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.background,
+                      color: Utils.background,
                       image: DecorationImage(
                         image: AssetImage("assets/logo2.png"),
                         fit: BoxFit.fitWidth,

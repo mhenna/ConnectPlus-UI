@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
@@ -105,19 +106,19 @@ class MapScreenState extends State<ProfilePage>
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-        backgroundColor: Colors.background,
+        backgroundColor: Utils.background,
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
           // the App.build method, and use it to set our appbar title.
           title: Text("Profile Details"),
           centerTitle: true,
-          backgroundColor: Colors.header,
+          backgroundColor: Utils.header,
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Colors.secondaryColor,
-                  Colors.primaryColor,
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
                 ],
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
@@ -162,7 +163,7 @@ class MapScreenState extends State<ProfilePage>
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
                                     new CircleAvatar(
-                                      backgroundColor: Colors.header,
+                                      backgroundColor: Utils.header,
                                       radius: 25.0,
                                       child: new Icon(
                                         Icons.camera_alt,
@@ -177,7 +178,7 @@ class MapScreenState extends State<ProfilePage>
                     ),
                   ),
                   new Container(
-                    color: Colors.background,
+                    color: Utils.background,
                     child: Padding(
                       padding: EdgeInsets.only(bottom: height * 0.03),
                       child: new Column(
@@ -442,7 +443,7 @@ class MapScreenState extends State<ProfilePage>
   Widget _getEditIcon() {
     return new GestureDetector(
       child: new CircleAvatar(
-        backgroundColor: Colors.header,
+        backgroundColor: Utils.header,
         radius: 20.0,
         child: new Icon(
           Icons.edit,

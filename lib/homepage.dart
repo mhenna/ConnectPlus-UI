@@ -1,4 +1,5 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
@@ -53,13 +54,13 @@ class _MyHomePageState extends State<MyHomePage> {
               // the App.build method, and use it to set our appbar title.
               title: Text("Home"),
               centerTitle: true,
-              backgroundColor: Colors.header,
+              backgroundColor: Utils.header,
               flexibleSpace: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Colors.secondaryColor,
-                      Colors.primaryColor,
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
                     ],
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
@@ -68,7 +69,7 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             drawer: NavDrawer(),
-            backgroundColor: Colors.background,
+            backgroundColor: Utils.background,
             body: Stack(children: <Widget>[
               SingleChildScrollView(
                   child: Container(
@@ -84,9 +85,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         ],
                         dotSize: 4.0,
                         dotSpacing: 15.0,
-                        dotColor: Colors.header,
+                        dotColor: Utils.header,
                         indicatorBgPadding: 5.0,
-                        dotBgColor: Colors.header.withOpacity(0.1),
+                        dotBgColor: Utils.header.withOpacity(0.1),
                         overlayShadow: true,
                         overlayShadowColors: Colors.white,
                         overlayShadowSize: 0.7,
@@ -99,12 +100,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(
                         fontSize: size * 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.headline,
+                        color: Utils.header,
                       ),
                     ),
                   ),
                   Divider(
-                    color: Colors.headline,
+                    color: Utils.header,
                     thickness: 3,
                     indent: width * 0.25,
                     endIndent: width * 0.25,
@@ -129,8 +130,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 borderRadius: BorderRadius.circular(30.0),
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.secondaryColor,
-                                    Colors.primaryColor,
+                                    Utils.secondaryColor,
+                                    Utils.primaryColor,
                                   ],
                                   begin: Alignment.topRight,
                                   end: Alignment.bottomLeft,
@@ -161,12 +162,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       style: TextStyle(
                         fontSize: size * 48,
                         fontWeight: FontWeight.bold,
-                        color: Colors.headline,
+                        color: Utils.header,
                       ),
                     ),
                   ),
                   Divider(
-                    color: Colors.headline,
+                    color: Utils.header,
                     thickness: 3,
                     indent: width * 0.25,
                     endIndent: width * 0.25,
@@ -192,8 +193,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                 borderRadius: BorderRadius.circular(30.0),
                                 gradient: LinearGradient(
                                   colors: [
-                                    Colors.secondaryColor,
-                                    Colors.primaryColor,
+                                    Utils.secondaryColor,
+                                    Utils.primaryColor,
                                   ],
                                   begin: Alignment.topRight,
                                   end: Alignment.bottomLeft,

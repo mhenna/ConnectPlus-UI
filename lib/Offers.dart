@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'dart:math';
@@ -138,13 +139,13 @@ class _OffersState extends State<Offers> {
             // the App.build method, and use it to set our appbar title.
             title: Text("Offers"),
             centerTitle: true,
-            backgroundColor: Colors.header,
+            backgroundColor: Utils.header,
             flexibleSpace: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.secondaryColor,
-                    Colors.primaryColor,
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
                   ],
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
@@ -203,10 +204,10 @@ class _OffersState extends State<Offers> {
                           style: TextStyle(
                               fontSize: size * 60,
                               fontWeight: FontWeight.w600,
-                              color: Colors.headline),
+                              color: Utils.header),
                         )),
                     Divider(
-                      color: Colors.headline,
+                      color: Utils.header,
                       thickness: 3,
                       indent: width * 0.27,
                       endIndent: width * 0.27,
@@ -236,7 +237,7 @@ class _OffersState extends State<Offers> {
                                         style: TextStyle(
                                             fontSize: size * 45,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.headline),
+                                            color: Utils.header),
                                       ),
                                     ),
                                   ))
@@ -256,7 +257,7 @@ class _OffersState extends State<Offers> {
                                         style: TextStyle(
                                             fontSize: size * 45,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.headline),
+                                            color: Utils.header),
                                       ),
                                     ),
                                   )),
@@ -296,7 +297,7 @@ class _OffersState extends State<Offers> {
                                                 textAlign: TextAlign.center,
                                                 style: TextStyle(
                                                     fontSize: size * 35,
-                                                    color: Colors.headline),
+                                                    color: Utils.header),
                                               ),
                                               onPressed: () {
                                                 Navigator.push(

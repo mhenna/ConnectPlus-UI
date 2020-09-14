@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -18,8 +19,8 @@ class emergencyContact extends StatelessWidget {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Colors.secondaryColor,
-                    Colors.primaryColor,
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
                   ],
                   begin: Alignment.topRight,
                   end: Alignment.bottomLeft,
@@ -49,42 +50,42 @@ class emergencyContact extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text('BUPA Egypt Hotline',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel://16816"),
                   ),
                   ListTile(
                     title: Text('Bupa Medical queries (Outside Egypt)',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+202 27681100"),
                   ),
                   ListTile(
                     title: Text('BUPA Emergency contact',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+201227624595"),
                   ),
                   ListTile(
                     title: Text('BUPA Medical Center',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +44 1273333911"),
                   ),
                   ListTile(
                     title: Text('BUPA 24/7 Hotline',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +44 1273 323 563"),
                   ),
                   ListTile(
                     title: Text('Travel Security Emergency (ISOS)',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +44 20 7939 8899"),
                   ),
                   ListTile(
                     title: Text('*Rehab Emergency Medical Center',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +202 26077980"),
                   ),
                   ListTile(
                     title: Text('*Air Force Specialized Hospital',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel://19448"),
                   )
                 ],
@@ -93,12 +94,12 @@ class emergencyContact extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text('DELL EMC Office',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+202 2 5032500"),
                   ),
                   ListTile(
                     title: Text('DELL EMC Fax',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +202 2503 2555"),
                   ),
                   ListTile(
@@ -106,7 +107,7 @@ class emergencyContact extends StatelessWidget {
                   ),
                   ListTile(
                     title: Text('IT International Direct',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: +1 (508) 898-5812"),
                   )
                 ],
@@ -115,32 +116,32 @@ class emergencyContact extends StatelessWidget {
                 children: <Widget>[
                   ListTile(
                     title: Text('Ambulance – 123',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+202 35345260"),
                   ),
                   ListTile(
                     title: Text('Police',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel: 122"),
                   ),
                   ListTile(
                     title: Text('New Cairo Police Station',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+202 26173630"),
                   ),
                   ListTile(
                     title: Text('Fire Brigade – 180',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+202 23910115"),
                   ),
                   ListTile(
                     title: Text('Road Rescue',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:128"),
                   ),
                   ListTile(
                     title: Text('Road Accident',
-                        style: TextStyle(color: Colors.headline)),
+                        style: TextStyle(color: Utils.header)),
                     onTap: () => launch("tel:+201221110000"),
                   )
                 ],

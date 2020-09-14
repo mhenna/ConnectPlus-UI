@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -102,7 +103,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     final registerButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
-      color:Colors.headline,
+      color:Utils.header,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),

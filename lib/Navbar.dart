@@ -71,8 +71,8 @@ class NavDrawerState extends State<NavDrawer>
             // decoration: BoxDecoration(
             //   gradient: LinearGradient(
             //     colors: [
-            //       Colors.secondaryColor.withAlpha(255),
-            //       Colors.primaryColor.withAlpha(255),
+            //       Utils.secondaryColor.withAlpha(255),
+            //       Utils.primaryColor.withAlpha(255),
             //     ],
             //     begin: Alignment.topCenter,
             //     end: Alignment.bottomCenter,
