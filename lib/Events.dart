@@ -22,11 +22,13 @@ class MyEventsPageState extends State<Events>
     with AutomaticKeepAliveClientMixin<Events> {
   @override
   bool get wantKeepAlive => true;
+
 //  String token;
   var ip;
   var port;
   var events = [];
   var randIndex;
+  var emptyEvents = false;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -57,7 +59,10 @@ class MyEventsPageState extends State<Events>
     if (response.statusCode == 200)
       setState(() {
         events = json.decode(response.body);
+        if (events.isEmpty) emptyEvents = true;
+        else
         randIndex = Events._random.nextInt(events.length);
+
       });
   }
 
@@ -93,7 +98,8 @@ class MyEventsPageState extends State<Events>
           new Text("Loading"),
         ],
       ),
-    ));
+        ),
+    );
   }
 
   @override
@@ -101,6 +107,9 @@ class MyEventsPageState extends State<Events>
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     try {
+      if(emptyEvents)
+        return AppScaffold(body: Center(child: Text("No Events")));
+      else
       return AppScaffold(
           body: ListView.builder(
               shrinkWrap: true,

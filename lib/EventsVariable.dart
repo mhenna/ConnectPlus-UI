@@ -15,6 +15,7 @@ class EventsVariables extends StatefulWidget {
 class _EventsVariablesState extends State<EventsVariables> {
   var ip, port;
   var event_list = [];
+  var emptyList = false;
   Uint8List mostRecentEvent;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
@@ -42,6 +43,9 @@ class _EventsVariablesState extends State<EventsVariables> {
     if (response.statusCode == 200) {
       setState(() {
         event_list = json.decode(response.body);
+        if(event_list.isEmpty)
+          emptyList = true;
+        else
         this.mostRecentEvent =
             base64Decode(event_list.elementAt(0)['poster']['fileData']);
       });
@@ -49,9 +53,11 @@ class _EventsVariablesState extends State<EventsVariables> {
   }
 
   Widget mostRecent() {
+    var height = MediaQuery.of(context).size.height;
+
     if (mostRecentEvent == null) return CircularProgressIndicator();
     return Container(
-        height: 200,
+        height: height,
         decoration: BoxDecoration(
           image: new DecorationImage(
               image: MemoryImage(mostRecentEvent), fit: BoxFit.cover),
@@ -60,21 +66,28 @@ class _EventsVariablesState extends State<EventsVariables> {
 
   @override
   Widget build(BuildContext context) {
+    final _scrollController = ScrollController();
+    var height = MediaQuery.of(context).size.height;
+    if(emptyList)
+      return Center(child: Text("No Events"));
     return Column(
       children: <Widget>[
         Padding(
-          child: mostRecent(),
-          padding: EdgeInsets.only(left: 8, right: 8),
-        ),
+            padding: EdgeInsets.only(left: 6, right: 6),
+            child: Container(height: height * 0.30, child: mostRecent())),
         Expanded(
             child: Padding(
-                padding: EdgeInsets.only(left: 4, right: 6),
-                child: ListView(
-                  physics: ClampingScrollPhysics(),
-                  shrinkWrap: true,
-                  scrollDirection: Axis.horizontal,
-                  children: constructEvents(),
-                ))),
+                padding: EdgeInsets.only(left: 6, right: 6),
+                child: Scrollbar(
+                    controller: _scrollController,
+                    isAlwaysShown: true,
+                    child: ListView(
+                      controller: _scrollController,
+                      physics: ClampingScrollPhysics(),
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      children: constructEvents(),
+                    )))),
       ],
     );
   }
@@ -108,9 +121,12 @@ class Single_Event extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+
     return SizedBox(
-        height: 230,
-        width: 270,
+        height: height,
+        width: width * 0.60,
         child: Card(
           child: Hero(
             tag: event_name,
