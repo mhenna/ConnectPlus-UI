@@ -39,7 +39,6 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   void initState() {
     super.initState();
     getEvent();
-    print("event Name: $event and erg name : $erg");
     setEnv();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
@@ -104,12 +103,15 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   }
 
   List<Widget> eventsByERG() {
+    var width = MediaQuery.of(context).size.width;
+    var size = MediaQuery.of(context).size.aspectRatio;
+
     List<Widget> list = List<Widget>();
     for (var ergEvent in ergEvents) {
       if (ergEvent['_id'] != eventDetails['event']['_id']) {
         list.add(Container(
           padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
-          width: 200.0,
+          width: width * 0.45,
           child: Card(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -133,7 +135,8 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                       child: Text(
                         ergEvent['name'].toString(),
                         textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 22),
+                        style: TextStyle(
+                            fontSize: size * 35, color: Utils.header),
                       ),
                     )
                   ],
@@ -148,6 +151,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   }
 
   Widget _appBar() {
+    var size = MediaQuery.of(context).size.aspectRatio;
     return Container(
       padding: Utils.padding,
       child: Row(
@@ -155,9 +159,9 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
         children: <Widget>[
           _icon(
             Icons.arrow_back_ios,
-            color: Colors.black54,
-            size: 15,
-            padding: 12,
+            color: Utils.header,
+            size: size * 30,
+            padding: size * 0.03,
             isOutLine: true,
             onPressed: () {
               Navigator.of(context).pop();
@@ -206,8 +210,22 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
           borderRadius: BorderRadius.circular(18),
           side: BorderSide(color: Utils.iconColor)),
       child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-        child: const Text('Register', style: TextStyle(fontSize: 20)),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+          gradient: LinearGradient(
+            colors: [
+              Utils.secondaryColor,
+              Utils.primaryColor,
+            ],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+        ),
+        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+        child: Text(
+          'Register',
+          style: TextStyle(fontSize: 20),
+        ),
       ),
     );
   }
@@ -240,13 +258,18 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   }
 
   Widget _detailWidget() {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    final _scrollController = ScrollController();
+
     if (loading == true) {
       return CircularIndicator();
     } else {
       return DraggableScrollableSheet(
-        maxChildSize: .7,
-        initialChildSize: .6,
-        minChildSize: .5,
+        maxChildSize: .6,
+        initialChildSize: .5,
+        minChildSize: .4,
         builder: (context, scrollController) {
           return Container(
             padding: Utils.padding.copyWith(bottom: 0),
@@ -255,7 +278,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
                 ),
-                color: Colors.white),
+                color: Utils.background),
             child: SingleChildScrollView(
               controller: scrollController,
               child: Column(
@@ -266,14 +289,14 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                   Container(
                     alignment: Alignment.center,
                     child: Container(
-                      width: 50,
+                      width: width * 0.1,
                       height: 5,
                       decoration: BoxDecoration(
-                          color: Utils.iconColor,
+                          color: Utils.header,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: 15),
                   Container(
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,8 +304,8 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                       children: <Widget>[
                         Utils.titleText(
                             textString: eventDetails['event']['name'],
-                            fontSize: 25,
-                            textcolor: Colors.black),
+                            fontSize: size * 45,
+                            textcolor: Utils.header),
                       ],
                     ),
                   ),
@@ -299,21 +322,27 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                   ),
                   Center(child: _registerButton()),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
+                      padding: EdgeInsets.fromLTRB(
+                          0, height * 0.08, 0, height * 0.02),
                       child: Utils.titleText(
                           textString: "Events by $erg",
-                          fontSize: 25,
-                          textcolor: Colors.black)),
+                          fontSize: size * 45,
+                          textcolor: Utils.header)),
                   Padding(
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      padding: EdgeInsets.fromLTRB(
+                          width * 0.02, 0, width * 0.02, height * 0.02),
                       child: SizedBox(
-                          height: 200,
-                          child: ListView(
-                            physics: ClampingScrollPhysics(),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            children: eventsByERG(),
-                          ))),
+                          height: height * 0.28,
+                          child: Scrollbar(
+                              controller: _scrollController,
+                              isAlwaysShown: true,
+                              child: ListView(
+                                controller: _scrollController,
+                                physics: ClampingScrollPhysics(),
+                                shrinkWrap: true,
+                                scrollDirection: Axis.horizontal,
+                                children: eventsByERG(),
+                              )))),
                 ],
               ),
             ),
@@ -340,6 +369,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
   }
 
   Widget _description() {
+    var size = MediaQuery.of(context).size.aspectRatio;
     String fulltime =
         eventDetails['event']['startDate'].toString().split("T")[1];
     int index = fulltime.lastIndexOf(":");
@@ -348,31 +378,34 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Utils.titleText(
-            textString: "Event Details", fontSize: 24, textcolor: Colors.black),
+            textString: "Event Details",
+            fontSize: size * 37,
+            textcolor: Colors.black),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(
             "Venue: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(eventDetails['event']['venue'], style: TextStyle(fontSize: 18))
+          Text(eventDetails['event']['venue'],
+              style: TextStyle(fontSize: size * 28))
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Date: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
           Text(eventDetails['event']['startDate'].toString().split("T")[0],
-              style: TextStyle(fontSize: 18))
+              style: TextStyle(fontSize: size * 28))
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Time: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(time, style: TextStyle(fontSize: 18))
+          Text(time, style: TextStyle(fontSize: size * 28 ))
         ]),
       ],
     );
@@ -380,23 +413,32 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
-      backgroundColor: const Color(0xfffafafa),
+      backgroundColor: Utils.background,
       drawer: NavDrawer(),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-            colors: [const Color(0xfff7501e), const Color(0xffed136e)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          )),
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
           child: Stack(
             children: <Widget>[
               Column(
                 children: <Widget>[
                   _appBar(),
-                  _eventPoster(),
+                  Container(
+                    height: height * 0.3,
+                    child: _eventPoster(),
+                  )
                 ],
               ),
               _detailWidget(),

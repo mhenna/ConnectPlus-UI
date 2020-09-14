@@ -98,7 +98,8 @@ class MyEventsPageState extends State<Events>
           new Text("Loading"),
         ],
       ),
-    ));
+        ),
+    );
   }
 
   @override
