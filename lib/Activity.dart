@@ -10,14 +10,13 @@ import 'dart:typed_data';
 import 'widgets/Indicator.dart';
 
 class Activity extends StatefulWidget {
-  Activity({Key key, @required this.activity, @required this.erg}) : super(key: key);
+  Activity({Key key, @required this.activity}) : super(key: key);
 
   final String activity;
-  final String erg;
 
   @override
   State<StatefulWidget> createState() {
-    return new _ActivityState(this.activity, this.erg);
+    return new _ActivityState(this.activity);
   }
 }
 
@@ -27,19 +26,17 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
   var activityDetails;
   var ergActivities;
   final String activity;
-  final String erg;
   bool loading = true;
 
   AnimationController controller;
   Animation<double> animation;
 
-  _ActivityState(this.activity, this.erg);
+  _ActivityState(this.activity);
 
   @override
   void initState() {
     super.initState();
     getActivity();
-    print("Activity Name: $activity and erg name : $erg");
     setEnv();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
@@ -72,23 +69,6 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
     if (response.statusCode == 200)
       setState(() {
         activityDetails = json.decode(response.body);
-        getERGActivities();
-      });
-  }
-
-  Future getERGActivities() async {
-    final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString("token");
-    var url = 'http://' + ip + ':' + port + '/activity/getByERG/$erg';
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-
-    if (response.statusCode == 200)
-      setState(() {
-        ergActivities = json.decode(response.body);
         loading = false;
       });
   }
@@ -103,51 +83,10 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
     );
   }
 
-  List<Widget> activitiesByERG() {
-    List<Widget> list = List<Widget>();
-    for (var ergActivity in ergActivities) {
-      if (ergActivity['_id'] != activityDetails['activity']['_id']) {
-        list.add(Container(
-          padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
-          width: 200.0,
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                base64ToImage(ergActivity['poster']['fileData'].toString()),
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Activity(
-                                activity: ergActivity['name'],
-                                erg: ergActivity['ERG'],
-                              ),
-                            ));
-                      },
-                      child: Text(
-                        ergActivity['name'].toString(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(fontSize: 22),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ));
-      }
-    }
-    return list;
-  }
-
   Widget _appBar() {
+    var width = MediaQuery.of(context).size.width;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    var height = MediaQuery.of(context).size.height;
     return Container(
       padding: Utils.padding,
       child: Row(
@@ -155,14 +94,35 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
         children: <Widget>[
           _icon(
             Icons.arrow_back_ios,
-            color: Colors.black54,
-            size: 15,
-            padding: 12,
+            color: Utils.header,
+            size: size * 30,
+            padding: size * 0.03,
             isOutLine: true,
             onPressed: () {
               Navigator.of(context).pop();
             },
           ),
+          Container(
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Padding(
+                    padding:
+                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
+                    child: Text(
+                      activityDetails['activity']['name'],
+                      style: TextStyle(
+                          fontSize: size * 55,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600),
+                    ))
+              ],
+            ),
+          ),
+          SizedBox(
+            width: width * 0.12,
+          )
         ],
       ),
     );
@@ -196,22 +156,6 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
     }, borderRadius: BorderRadius.all(Radius.circular(13)));
   }
 
-  Widget _registerButton() {
-    return RaisedButton(
-      onPressed: () {},
-      color: Utils.iconColor,
-      textColor: Colors.white,
-      padding: const EdgeInsets.all(0.0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: Utils.iconColor)),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-        child: const Text('Register', style: TextStyle(fontSize: 20)),
-      ),
-    );
-  }
-
   Widget _activityPoster() {
     if (loading == true) {
       return CircularIndicator();
@@ -229,9 +173,10 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
           alignment: Alignment.bottomCenter,
           children: <Widget>[
             SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Image.memory(
-                  base64Decode(activityDetails['poster']['fileData'].toString())),
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: MediaQuery.of(context).size.width * 0.65,
+              child: Image.memory(base64Decode(
+                  activityDetails['poster']['fileData'].toString())),
             )
           ],
         ),
@@ -240,13 +185,15 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
   }
 
   Widget _detailWidget() {
+    var width = MediaQuery.of(context).size.width;
+
     if (loading == true) {
       return CircularIndicator();
     } else {
       return DraggableScrollableSheet(
-        maxChildSize: .7,
-        initialChildSize: .6,
-        minChildSize: .5,
+        maxChildSize: .5,
+        initialChildSize: .4,
+        minChildSize: .3,
         builder: (context, scrollController) {
           return Container(
             padding: Utils.padding.copyWith(bottom: 0),
@@ -255,7 +202,7 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
                 ),
-                color: Colors.white),
+                color: Utils.background),
             child: SingleChildScrollView(
               controller: scrollController,
               child: Column(
@@ -266,53 +213,17 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
                   Container(
                     alignment: Alignment.center,
                     child: Container(
-                      width: 50,
+                      width: width * 0.1,
                       height: 5,
                       decoration: BoxDecoration(
-                          color: Utils.iconColor,
+                          color: Utils.header,
                           borderRadius: BorderRadius.all(Radius.circular(10))),
                     ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Utils.titleText(
-                            textString: activityDetails['activity']['name'],
-                            fontSize: 25,
-                            textcolor: Colors.black),
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 20,
                   ),
                   SizedBox(
                     height: 20,
                   ),
                   _description(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  Center(child: _registerButton()),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(0, 64.0, 0, 8.0),
-                      child: Utils.titleText(
-                          textString: "Activities by $erg",
-                          fontSize: 25,
-                          textcolor: Colors.black)),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
-                      child: SizedBox(
-                          height: 200,
-                          child: ListView(
-                            physics: ClampingScrollPhysics(),
-                            shrinkWrap: true,
-                            scrollDirection: Axis.horizontal,
-                            children: activitiesByERG(),
-                          ))),
                 ],
               ),
             ),
@@ -339,6 +250,7 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
   }
 
   Widget _description() {
+    var size = MediaQuery.of(context).size.aspectRatio;
     String fulltime =
         activityDetails['activity']['startDate'].toString().split("T")[1];
     int index = fulltime.lastIndexOf(":");
@@ -347,31 +259,44 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Utils.titleText(
-            textString: "Activity Details", fontSize: 24, textcolor: Colors.black),
+            textString: "Activity Details",
+            fontSize: size * 37,
+            textcolor: Colors.black),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(
             "Venue: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(activityDetails['activity']['venue'], style: TextStyle(fontSize: 18))
+          Text(activityDetails['activity']['venue'],
+              style: TextStyle(fontSize: size * 28))
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Date: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(activityDetails['activity']['startDate'].toString().split("T")[0],
-              style: TextStyle(fontSize: 18))
+          Text(
+              activityDetails['activity']['startDate'].toString().split("T")[0],
+              style: TextStyle(fontSize: size * 28))
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Time: ",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(time, style: TextStyle(fontSize: 18))
+          Text(time, style: TextStyle(fontSize: size * 28))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Reccurence: ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+          ),
+          Text(activityDetails['activity']['recurrence'],
+              style: TextStyle(fontSize: size * 28))
         ]),
       ],
     );
@@ -380,16 +305,20 @@ class _ActivityState extends State<Activity> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffafafa),
+      backgroundColor: Utils.background,
       drawer: NavDrawer(),
       body: SafeArea(
         child: Container(
           decoration: BoxDecoration(
-              gradient: LinearGradient(
-            colors: [const Color(0xfff7501e), const Color(0xffed136e)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          )),
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
           child: Stack(
             children: <Widget>[
               Column(

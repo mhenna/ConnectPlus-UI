@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'dart:typed_data';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:connect_plus/Activity.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
-import 'dart:typed_data';
 import 'dart:math';
 
 class Activities extends StatefulWidget {
@@ -15,18 +16,20 @@ class Activities extends StatefulWidget {
   static final _random = new Random();
 
   @override
-  MyActivitiesPageState createState() => MyActivitiesPageState();
+  _ActivitiesPageState createState() => _ActivitiesPageState();
 }
 
-class MyActivitiesPageState extends State<Activity>
-    with AutomaticKeepAliveClientMixin<Activity> {
+class _ActivitiesPageState extends State<Activities>
+    with AutomaticKeepAliveClientMixin<Activities> {
   @override
   bool get wantKeepAlive => true;
+
 //  String token;
   var ip;
   var port;
   var activities = [];
   var randIndex;
+  var emptyActivities = false;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
@@ -57,21 +60,25 @@ class MyActivitiesPageState extends State<Activity>
     if (response.statusCode == 200)
       setState(() {
         activities = json.decode(response.body);
-        randIndex = Activities._random.nextInt(activities.length);
+        if (activities.isEmpty)
+          emptyActivities = true;
+        else
+          randIndex = Activities._random.nextInt(activities.length);
       });
   }
 
-  Widget base64ToImageFeatured() {
-    try {
-      Uint8List bytes =
-          base64Decode(activities.elementAt(randIndex)['poster']['fileData']);
-      return FittedBox(
-        fit: BoxFit.contain,
-        child: Image.memory(bytes),
-      );
-    } catch (Exception) {
-      return LoadingWidget();
-    }
+  Widget LoadingWidget() {
+    return Scaffold(
+      body: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            new CircularProgressIndicator(),
+            new Text("Loading"),
+          ],
+        ),
+      ),
+    );
   }
 
   Widget base64ToImage(String base64) {
@@ -83,88 +90,133 @@ class MyActivitiesPageState extends State<Activity>
     );
   }
 
-  Widget LoadingWidget() {
-    return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
+    var size = MediaQuery.of(context).size.aspectRatio;
+
     try {
-      return AppScaffold(
-          body: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(10),
-              itemCount: 2,
-              itemBuilder: (BuildContext context, int elem) {
-                if (elem == 0) {
-                  return Padding(
-                      padding: EdgeInsets.only(top: 40, bottom: 20),
-                      child: Text(
-                        "Activities",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                        ),
-                      ));
-                } else {
-                  return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: activities.length,
-                      itemBuilder: (BuildContext catContext, int cat) {
-                        return Center(
-                          child: Padding(
-                              padding: EdgeInsets.only(bottom: 20),
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    base64ToImage(activities
-                                        .elementAt(cat)['poster']['fileData']
-                                        .toString()),
-                                    ButtonBar(
-                                      alignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        FlatButton(
-                                          child: Text(
-                                            activities
-                                                .elementAt(cat)['name']
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 22),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => Activity(
-                                                        activity: activities.elementAt(
-                                                            cat)['name'],
-                                                        erg: activities.elementAt(
-                                                            cat)['ERG'])));
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      });
-                }
-              }));
+      if (emptyActivities)
+        return Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Activities"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ),
+            body: Center(child: Text("No Activities")));
+      else
+        return Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Activities"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ),
+            body: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(10),
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int elem) {
+                  if (elem == 0) {
+                    return Padding(
+                        padding: EdgeInsets.only(
+                            top: height * 0.03, bottom: height * 0.02),
+                        child: Text(
+                          "Current Activities",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 25,
+                              fontWeight: FontWeight.w600,
+                              color: Utils.headline),
+                        ));
+                  } else {
+                    return GridView.count(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        // Create a grid with 2 columns. If you change the scrollDirection to
+                        // horizontal, this produces 2 rows.
+                        crossAxisCount: 1,
+                        addAutomaticKeepAlives: true,
+                        children: List.generate(activities.length, (index) {
+                          return Center(
+                              child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.05),
+                            child: Container(
+                                width: MediaQuery.of(context).size.width * 0.60,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.47,
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      base64ToImage(activities
+                                          .elementAt(index)['poster']
+                                              ['fileData']
+                                          .toString()),
+                                          
+                                      ButtonBar(
+                                        alignment: MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          FlatButton(
+                                            child: Text(
+                                              activities
+                                                  .elementAt(index)['name']
+                                                  .toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: size * 40),
+                                            ),
+                                            onPressed: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          Activity(
+                                                              activity: activities
+                                                                      .elementAt(
+                                                                          index)[
+                                                                  'name'])));
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ));
+                        }));
+                  }
+                }));
     } catch (err) {
       return LoadingWidget();
     }

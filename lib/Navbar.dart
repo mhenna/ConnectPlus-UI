@@ -1,3 +1,4 @@
+import 'package:connect_plus/Activities.dart';
 import 'package:connect_plus/events.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
@@ -5,7 +6,6 @@ import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
-import 'package:connect_plus/offersPage.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/Calendar.dart';
 import 'package:http/http.dart' as http;
@@ -13,6 +13,7 @@ import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:localstorage/localstorage.dart';
+
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -183,12 +184,12 @@ class NavDrawerState extends State<NavDrawer>
           ListTile(
             leading: Icon(Icons.local_activity),
             title: Text('Activities'),
-            // onTap: () => {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(builder: (context) => Activities()),
-            //   )
-            // },
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Activities()),
+              )
+            },
           ),
           ListTile(
             leading: Icon(Icons.calendar_today),
