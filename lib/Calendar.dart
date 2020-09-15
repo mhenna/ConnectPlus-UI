@@ -15,6 +15,8 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   CalendarController _controller;
   Map<DateTime, List<dynamic>> _events;
+  Map<DateTime, List<dynamic>> _activities;
+  Map<DateTime, List<dynamic>> _all;
   List<dynamic> _selectedEvents;
   var ip;
   var port;
@@ -24,10 +26,13 @@ class _CalendarState extends State<Calendar> {
   void initState() {
     super.initState();
     _events = {};
+    _activities = {};
+    _all={};
     _selectedEvents = [];
     _controller = CalendarController();
     setEnv();
     getEvents();
+    getActivities();
   }
 
   setEnv() {
@@ -52,9 +57,34 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
+       _all.addAll(_events);
     }
   }
 
+void getActivities() async {
+    var activities;
+    String token = localStorage.getItem("token");
+    var url = 'http://' + ip + ':' + port + '/activity';
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
+    if (response.statusCode == 200) {
+      activities = json.decode(response.body);
+      for (var activity in activities) {
+        var dates = activity["recurrenceDates"];
+        for (var date in dates)
+        {
+           date = DateTime.parse(date);
+           if (_activities[date] != null)
+                _activities[date].add(activity);
+          else
+             _activities[date] = [activity];
+         }
+      }
+      _all.addAll(_activities);
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +97,7 @@ class _CalendarState extends State<Calendar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
               TableCalendar(
-                events: _events,
+                events: _all,
                 calendarController: _controller,
                 calendarStyle: CalendarStyle(
                   todayColor: Color(0xFFE15F5F),
@@ -81,10 +111,12 @@ class _CalendarState extends State<Calendar> {
                 },
                 builders: CalendarBuilders(
                   singleMarkerBuilder: (context, date, event) {
-                    Color cor = Color(int.parse(event["ERG"]["color"]));
-                    return Container(
+                     bool condition = _events.containsKey(DateTime.parse(event['startDate']));
+                     Color cor = Color(int.parse(event["ERG"]["color"]));
+                    return Container( 
                       decoration:
-                          BoxDecoration(shape: BoxShape.circle, color: cor),
+                          condition ? BoxDecoration(shape: BoxShape.circle, color: cor) 
+                           : BoxDecoration(shape: BoxShape.rectangle, color: Colors.blue) ,
                       width: 7.0,
                       height: 7.0,
                       margin: const EdgeInsets.symmetric(horizontal: 1.5),
@@ -95,6 +127,8 @@ class _CalendarState extends State<Calendar> {
               ..._selectedEvents.map((event) => ListTile(
                   title: Text(event["name"]),
                   onTap: () {
+                    bool condition = _events.containsKey(DateTime.parse(event['startDate']));
+                    condition ?
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -102,7 +136,7 @@ class _CalendarState extends State<Calendar> {
                                 event: event["name"],
                                 erg: event['ERG']["name"],
                               )),
-                    );
+                    ): /*Add Activities navigation route here*/ MaterialPageRoute(builder: (BuildContext context) {  }) ;
                   })),
             ])));
   }
