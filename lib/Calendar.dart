@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/Event.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -56,9 +57,8 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
-    _all.addAll(_events);
+       _all.addAll(_events);
     }
-
   }
 
 void getActivities() async {
@@ -85,35 +85,6 @@ void getActivities() async {
       _all.addAll(_activities);
     }
   }
-
-
-  Widget _buildEventsMarker(DateTime date, List events) {
-     for (var item in events) {
-        bool condition= _events.containsKey(DateTime.parse(item['startDate']));
-        return AnimatedContainer(
-         duration: const Duration(milliseconds: 300),
-         decoration: BoxDecoration(
-          shape:  condition ? BoxShape.circle : BoxShape.rectangle,
-          color:  _controller.isSelected(date)? (condition ? Colors.brown[500] : Colors.blue[500])
-                 : _controller.isToday(date) ?  (condition ? Colors.red[300] : Colors.yellow[400]) 
-                 : (condition ? Colors.black : Colors.green[300]) 
-        ),
-         width: 16.0,  
-        height: 16.0,
-        child: Center(
-         child: Text(
-          '${events.length}',
-          style: TextStyle().copyWith(
-            color: Colors.white,
-            fontSize: 12.0,
-          ),
-        ),
-      ),
-    );
-       }
-
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -128,33 +99,45 @@ void getActivities() async {
               TableCalendar(
                 events: _all,
                 calendarController: _controller,
+                calendarStyle: CalendarStyle(
+                  todayColor: Color(0xFFE15F5F),
+                  selectedColor: Colors.black,
+                ),
                 weekendDays: [5, 6],
                 onDaySelected: (date, events) {
                   setState(() {
                     _selectedEvents = events;
                   });
                 },
-              builders: CalendarBuilders(
-                markersBuilder: (context, date, events, holidays) {
-                final children = <Widget>[];
-                if (events.isNotEmpty) {
-                children.add(
-                  Positioned(
-                   right: 1,
-                   bottom: 1,
-                   child: _buildEventsMarker(date, events),
-                  ),
-                );
-              }
-              return children;
-           },
-          ),
-                
+                builders: CalendarBuilders(
+                  singleMarkerBuilder: (context, date, event) {
+                     bool condition = _events.containsKey(DateTime.parse(event['startDate']));
+                     Color cor = Color(int.parse(event["ERG"]["color"]));
+                    return Container( 
+                      decoration:
+                          condition ? BoxDecoration(shape: BoxShape.circle, color: cor) 
+                           : BoxDecoration(shape: BoxShape.rectangle, color: Colors.blue) ,
+                      width: 7.0,
+                      height: 7.0,
+                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                    );
+                  },
+                ),
               ),
-
               ..._selectedEvents.map((event) => ListTile(
-                    title: Text(event["name"]),
-                  )),
+                  title: Text(event["name"]),
+                  onTap: () {
+                    bool condition = _events.containsKey(DateTime.parse(event['startDate']));
+                    condition ?
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Event(
+                                event: event["name"],
+                                erg: event['ERG']["name"],
+                              )),
+                    ): /*Add Activities navigation route here*/ MaterialPageRoute(builder: (BuildContext context) {  }) ;
+                  })),
             ])));
   }
 }
