@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -105,12 +106,50 @@ class MyEventsPageState extends State<Events>
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    var size = MediaQuery.of(context).size.aspectRatio;
     try {
       if(emptyEvents)
-        return AppScaffold(body: Center(child: Text("No Events")));
+        return Scaffold(appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Events"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ), body: Center(child: Text("No Events")));
       else
-      return AppScaffold(
+      return Scaffold(
+        
+        appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Events"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ),
           body: ListView.builder(
               shrinkWrap: true,
               padding: const EdgeInsets.all(10),
@@ -134,26 +173,34 @@ class MyEventsPageState extends State<Events>
                       itemBuilder: (BuildContext catContext, int cat) {
                         return Center(
                           child: Padding(
-                              padding: EdgeInsets.only(bottom: 20),
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    base64ToImage(events
-                                        .elementAt(cat)['poster']['fileData']
-                                        .toString()),
-                                    ButtonBar(
-                                      alignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        FlatButton(
-                                          child: Text(
-                                            events
-                                                .elementAt(cat)['name']
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 22),
-                                          ),
+                            padding: EdgeInsets.only(bottom: height * 0.05),
+                            child: Container(
+                                width: MediaQuery.of(context).size.width * 0.60,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.47,
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      base64ToImage(events
+                                          .elementAt(cat)['poster']
+                                              ['fileData']
+                                          .toString()),
+                                          
+                                      ButtonBar(
+                                        alignment: MainAxisAlignment.center,
+                                        children: <Widget>[
+                                          FlatButton(
+                                            child: Text(
+                                              events
+                                                  .elementAt(cat)['name']
+                                                  .toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: size * 40),
+                                            ),
                                           onPressed: () {
                                             Navigator.push(
                                                 context,
@@ -170,7 +217,7 @@ class MyEventsPageState extends State<Events>
                                   ],
                                 ),
                               )),
-                        );
+                        ));
                       });
                 }
               }));
