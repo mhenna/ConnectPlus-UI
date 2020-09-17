@@ -18,6 +18,8 @@ class _CalendarState extends State<Calendar> {
   CalendarController _controller;
   Map<DateTime, List<dynamic>> _events;
   List<dynamic> _selectedEvents;
+    Map<DateTime, List<dynamic>> _activities;
+  Map<DateTime, List<dynamic>> _all;
   var ip;
   var port;
   final LocalStorage localStorage = new LocalStorage("Connect+");
