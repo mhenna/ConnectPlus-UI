@@ -1,3 +1,4 @@
+import 'package:connect_plus/Activity.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -25,6 +26,8 @@ class _CalendarState extends State<Calendar> {
   void initState() {
     super.initState();
     _events = {};
+    _activities = {};
+    _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
     setEnv();
@@ -53,6 +56,32 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
+      _all.addAll(_events);
+    }
+    print(events[0]);
+  }
+
+  void getActivities() async {
+    var activities;
+    String token = localStorage.getItem("token");
+    var url = 'http://' + ip + ':' + port + '/activity';
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
+    if (response.statusCode == 200) {
+      activities = json.decode(response.body);
+      for (var activity in activities) {
+        var dates = activity["recurrenceDates"];
+        for (var date in dates) {
+          date = DateTime.parse(date);
+          if (_activities[date] != null)
+            _activities[date].add(activity);
+          else
+            _activities[date] = [activity];
+        }
+      }
+      _all.addAll(_activities);
     }
   }
 
@@ -60,24 +89,24 @@ class _CalendarState extends State<Calendar> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Calendar"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                ),
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("Calendar"),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
               ),
             ),
+          ),
+        ),
         drawer: NavDrawer(),
         body: SingleChildScrollView(
             child: Column(
@@ -87,7 +116,7 @@ class _CalendarState extends State<Calendar> {
                 events: _events,
                 calendarController: _controller,
                 calendarStyle: CalendarStyle(
-                  todayColor: Color(0xFFE15F5F),
+                  todayColor: Utils.headline,
                   selectedColor: Colors.black,
                 ),
                 weekendDays: [5, 6],
@@ -98,28 +127,51 @@ class _CalendarState extends State<Calendar> {
                 },
                 builders: CalendarBuilders(
                   singleMarkerBuilder: (context, date, event) {
-                    Color cor = Color(int.parse(event["ERG"]["color"]));
-                    return Container(
-                      decoration:
-                          BoxDecoration(shape: BoxShape.circle, color: cor),
-                      width: 7.0,
-                      height: 7.0,
-                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                    );
+                    bool condition =
+                        _events.containsKey(DateTime.parse(event['startDate']));
+                    if (event['ERG'] == null) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle, color: Utils.headline),
+                        width: 7.0,
+                        height: 7.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      );
+                    } else
+                      return Container(
+                        decoration: condition
+                            ? BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(int.parse(event['ERG']['color'])))
+                            : BoxDecoration(
+                                shape: BoxShape.rectangle, color: Colors.blue),
+                        width: 7.0,
+                        height: 7.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      );
                   },
                 ),
               ),
               ..._selectedEvents.map((event) => ListTile(
                   title: Text(event["name"]),
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Event(
-                                event: event["name"],
-                                erg: event['ERG']["name"],
-                              )),
-                    );
+                    if (event['ERG'] == null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Activity(activity: event["name"])),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Event(
+                                  event: event["name"],
+                                  erg: event['ERG']["name"],
+                                )),
+                      );
+                    }
                   })),
             ])));
   }

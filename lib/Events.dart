@@ -130,8 +130,7 @@ class MyEventsPageState extends State<Events>
             ), body: Center(child: Text("No Events")));
       else
       return Scaffold(
-        
-        appBar: AppBar(
+         appBar: AppBar(
               // Here we take the value from the MyHomePage object that was created by
               // the App.build method, and use it to set our appbar title.
               title: Text("Events"),
