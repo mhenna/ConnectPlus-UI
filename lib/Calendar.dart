@@ -17,9 +17,9 @@ class Calendar extends StatefulWidget {
 class _CalendarState extends State<Calendar> {
   CalendarController _controller;
   Map<DateTime, List<dynamic>> _events;
-  List<dynamic> _selectedEvents;
-    Map<DateTime, List<dynamic>> _activities;
+  Map<DateTime, List<dynamic>> _activities;
   Map<DateTime, List<dynamic>> _all;
+  List<dynamic> _selectedEvents;
   var ip;
   var port;
   final LocalStorage localStorage = new LocalStorage("Connect+");
@@ -29,11 +29,12 @@ class _CalendarState extends State<Calendar> {
     super.initState();
     _events = {};
     _activities = {};
-    _all = {};
+    _all={};
     _selectedEvents = [];
     _controller = CalendarController();
     setEnv();
     getEvents();
+    getActivities();
   }
 
   setEnv() {
@@ -58,12 +59,11 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
-      _all.addAll(_events);
+       _all.addAll(_events);
     }
-    print(events[0]);
   }
 
-  void getActivities() async {
+void getActivities() async {
     var activities;
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/activity';
@@ -75,18 +75,18 @@ class _CalendarState extends State<Calendar> {
       activities = json.decode(response.body);
       for (var activity in activities) {
         var dates = activity["recurrenceDates"];
-        for (var date in dates) {
-          date = DateTime.parse(date);
-          if (_activities[date] != null)
-            _activities[date].add(activity);
+        for (var date in dates)
+        {
+           date = DateTime.parse(date);
+           if (_activities[date] != null)
+                _activities[date].add(activity);
           else
-            _activities[date] = [activity];
-        }
+             _activities[date] = [activity];
+         }
       }
       _all.addAll(_activities);
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -115,7 +115,7 @@ class _CalendarState extends State<Calendar> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
               TableCalendar(
-                events: _events,
+                events: _all,
                 calendarController: _controller,
                 calendarStyle: CalendarStyle(
                   todayColor: Utils.headline,
