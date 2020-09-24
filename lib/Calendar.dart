@@ -29,7 +29,7 @@ class _CalendarState extends State<Calendar> {
     super.initState();
     _events = {};
     _activities = {};
-    _all={};
+    _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
     setEnv();
@@ -59,11 +59,11 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
-       _all.addAll(_events);
+      _all.addAll(_events);
     }
   }
 
-void getActivities() async {
+  void getActivities() async {
     var activities;
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/activity';
@@ -75,20 +75,22 @@ void getActivities() async {
       activities = json.decode(response.body);
       for (var activity in activities) {
         var dates = activity["recurrenceDates"];
-        for (var date in dates)
-        {
-           date = DateTime.parse(date);
-           if (_activities[date] != null)
-                _activities[date].add(activity);
+        for (var date in dates) {
+          date = DateTime.parse(date);
+          if (_activities[date] != null)
+            _activities[date].add(activity);
           else
-             _activities[date] = [activity];
-         }
+            _activities[date] = [activity];
+        }
       }
       _all.addAll(_activities);
     }
   }
+
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by
@@ -114,6 +116,44 @@ void getActivities() async {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+              Container(
+                  child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                    width * 0.04, height * 0.02, width * 0.04, height * 0.02),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Utils.headline),
+                          width: 10.0,
+                          height: 10.0,
+                        ),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        Text("Event")
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle, color: Utils.headline),
+                          width: 10.0,
+                          height: 10.0,
+                        ),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        Text("Activity")
+                      ],
+                    )
+                  ],
+                ),
+              )),
               TableCalendar(
                 events: _all,
                 calendarController: _controller,
@@ -155,16 +195,32 @@ void getActivities() async {
                 ),
               ),
               ..._selectedEvents.map((event) => ListTile(
-                  title: Text(event["name"]),
+                  title: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(event['name']),
+                        if (event["ERG"] != null)
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:Color(int.parse(event['ERG']['color']))),
+                                width: 10.0,
+                                height: 10.0,
+                              ),
+                              SizedBox(
+                                width: width * 0.02,
+                              ),
+                              Text(event["ERG"]["name"])
+                            ],
+                          )
+                      ],
+                    ),
+                  ),
                   onTap: () {
-                    if (event['ERG'] == null) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) =>
-                                Activity(activity: event["name"])),
-                      );
-                    } else {
+                    if (event['ERG'] != null) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -172,6 +228,14 @@ void getActivities() async {
                                   event: event["name"],
                                   erg: event['ERG']["name"],
                                 )),
+                      );
+                      
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Activity(activity: event['name'])),
                       );
                     }
                   })),
