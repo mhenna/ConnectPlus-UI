@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "496778386954",
+    "firebase_url": "https://connectplus-f9144.firebaseio.com",
+    "project_id": "connectplus-f9144",
+    "storage_bucket": "connectplus-f9144.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496778386954:android:5e81e6a51fa74be26889f3",
+        "android_client_info": {
+          "package_name": "com.techdev.connect_plus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "496778386954-kmo28l0fv22c68bab8l3rf23v8d2je5s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAadyaeLkt46HqMBH_rc8cw7SndyL1_mPQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "496778386954-kmo28l0fv22c68bab8l3rf23v8d2je5s.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "496778386954-rk4j120r3pdvv2k2afnmk9cn7pe80tfq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.techdev.connectplus"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
