@@ -8,6 +8,8 @@ import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'widgets/pushNotification.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter/foundation.dart';
@@ -23,6 +25,7 @@ class login extends StatefulWidget {
 
 class _loginState extends State<login> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
+  final PushNotificationService pushNotification = PushNotificationService();
 
   final emController = TextEditingController();
   final pwController = TextEditingController();
@@ -37,6 +40,7 @@ class _loginState extends State<login> {
   void initState() {
     super.initState();
     setEnv();
+    pushNotification.initialize();
     checkLoggedInStatus();
   }
 
