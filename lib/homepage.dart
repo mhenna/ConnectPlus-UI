@@ -1,22 +1,31 @@
+import 'package:carousel_pro/carousel_pro.dart';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Carousel.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/Events.dart';
+import 'package:connect_plus/OfferVariables.dart';
+import 'package:connect_plus/Offers.dart';
+
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import 'EventsVariable.dart';
+
+final List<String> imgList = [
+  'https://mainvibes.com/wp-content/uploads/2020/05/Party.jpeg',
+  'https://identity-mag.com/wp-content/uploads/2020/01/My-Post-19.jpg',
+  'https://img.freepik.com/free-photo/senior-businesswoman-young-business-people-work-modern-office_52137-28330.jpg?size=626&ext=jpg',
+  'https://www.potential.com/wp-content/uploads/2018/01/teamwork-.jpg',
+  'https://www.csregypt.com/wp-content/uploads/2019/07/Feature-Image-1.jpg',
+  'https://corporate.delltechnologies.com/is/image/content/dam/delltechnologies/assets/home/images/photos/MichaelDell.jpg?fit=constrain&wid=640'
+];
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
   final String title;
 
   @override
@@ -24,8 +33,13 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 16.0);
+
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -33,77 +47,226 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-//        title: Text(widget.title),
-          flexibleSpace: Image(
-            image: AssetImage('assets/background.png'),
-            fit: BoxFit.cover,
-          ),
-          backgroundColor: Colors.transparent,
-        ),
-
-        drawer: NavDrawer(),
-        body: SingleChildScrollView(
-            child: Container(
-                //background image
+        onWillPop: () async => false,
+        child: Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Home"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
                 decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage("assets/meetERGs.png"),
-                    fit: BoxFit.cover,
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
                   ),
                 ),
-                child: Padding(
-                    padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                    child: Column(
-                      children: <Widget>[
-                        CarouselSlider(
-                          options: CarouselOptions(
-                            autoPlay: true,
-                            aspectRatio: 2.0,
-                            enlargeCenterPage: true,
-                          ),
-                          items: imageSliders,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(80.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset('assets/WIAlogo.png'),
+              ),
+            ),
+            drawer: NavDrawer(),
+            backgroundColor: Utils.background,
+            body: Stack(children: <Widget>[
+              SingleChildScrollView(
+                  child: Container(
+                      child: Column(
+                children: <Widget>[
+                  SizedBox(
+                      height: height * 0.42,
+                      width: width,
+                      child: Carousel(
+                        images: [
+                          Image.asset('./assets/logo2.png'),
+                          Image.asset('./assets/logo.png'),
+                        ],
+                        dotSize: 4.0,
+                        dotSpacing: 15.0,
+                        dotColor: Utils.header,
+                        indicatorBgPadding: 5.0,
+                        dotBgColor: Utils.header.withOpacity(0.1),
+                        overlayShadow: true,
+                        overlayShadowColors: Colors.white,
+                        overlayShadowSize: 0.7,
+                      )),
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.07,
+                        width * 0.03, height * 0.01),
+                    child: new Text(
+                      'Recent Events',
+                      style: TextStyle(
+                        fontSize: size * 48,
+                        fontWeight: FontWeight.bold,
+                        color: Utils.header,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Utils.header,
+                    thickness: 3,
+                    indent: width * 0.25,
+                    endIndent: width * 0.25,
+                  ),
+                  //gridview
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
+                    height: height * 0.55,
+                    child: EventsVariables(),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(
+                            width * 0.03, height * 0.02, width * 0.03, 0),
+                        width: width * 0.4,
+                        height: height * 0.12,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.04),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30.0),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Utils.secondaryColor,
+                                    Utils.primaryColor,
+                                  ],
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                ),
                               ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset('assets/Glogo.png'),
+                              child: MaterialButton(
+                                minWidth: MediaQuery.of(context).size.width,
+                                padding:
+                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Events()),
+                                  );
+                                },
+                                child: Text("See More",
+                                    textAlign: TextAlign.center,
+                                    style: style.copyWith(color: Colors.white)),
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset('assets/WIAlogo.png'),
+                            )),
+                      )),
+                  new Padding(
+                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.09,
+                        width * 0.03, height * 0.01),
+                    child: new Text(
+                      'Recent Offers',
+                      style: TextStyle(
+                        fontSize: size * 48,
+                        fontWeight: FontWeight.bold,
+                        color: Utils.header,
+                      ),
+                    ),
+                  ),
+                  Divider(
+                    color: Utils.header,
+                    thickness: 3,
+                    indent: width * 0.25,
+                    endIndent: width * 0.25,
+                  ),
+
+                  //gridview
+                  Container(
+                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
+                    height: height * 0.55,
+                    child: OfferVariables(),
+                  ),
+                  Align(
+                      alignment: Alignment.bottomRight,
+                      child: Container(
+                        padding: EdgeInsets.fromLTRB(
+                            width * 0.03, height * 0.02, width * 0.03, 0),
+                        width: width * 0.4,
+                        height: height * 0.12,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.04),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(30.0),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Utils.secondaryColor,
+                                    Utils.primaryColor,
+                                  ],
+                                  begin: Alignment.topRight,
+                                  end: Alignment.bottomLeft,
+                                ),
                               ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Image.asset('assets/Glogo.png'),
+                              child: MaterialButton(
+                                minWidth: MediaQuery.of(context).size.width,
+                                padding:
+                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Offers()),
+                                  );
+                                },
+                                child: Text("See More",
+                                    textAlign: TextAlign.center,
+                                    style: style.copyWith(color: Colors.white)),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    )))),
+                            )),
+                      )),
+                ],
+              ))),
+
 // This trailing comma makes auto-formatting nicer for build methods.
-      ),
-    );
+            ])));
   }
 }
+
+// final Iterable<Image> imageSliders = imgList.map(
+//   (item) => Image.network(item),
+// );
+
+// final List<Widget> imageSliders = imgList
+//     .map((item) => Container(
+//           child: Container(
+//             margin: EdgeInsets.all(5.0),
+//             child: ClipRRect(
+//                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
+//                 child: Stack(
+//                   children: <Widget>[
+//                     Image.network(item, fit: BoxFit.cover, width: 1000.0),
+//                     Positioned(
+//                       bottom: 0.0,
+//                       left: 0.0,
+//                       right: 0.0,
+//                       child: Container(
+//                         decoration: BoxDecoration(
+//                           gradient: LinearGradient(
+//                             colors: [
+//                               Color.fromARGB(200, 0, 0, 0),
+//                               Color.fromARGB(0, 0, 0, 0)
+//                             ],
+//                             begin: Alignment.bottomCenter,
+//                             end: Alignment.topCenter,
+//                           ),
+//                         ),
+//                         padding: EdgeInsets.symmetric(
+//                             vertical: 10.0, horizontal: 20.0),
+//                         child: Text(
+//                           'No. ${imgList.indexOf(item)} image',
+//                           style: TextStyle(
+//                             color: Colors.white,
+//                             fontSize: 20.0,
+//                             fontWeight: FontWeight.bold,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ],
+//                 )),
+//           ),
+//         ))
+//     .toList();

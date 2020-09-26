@@ -1,54 +1,45 @@
-import 'dart:io';
-
 import 'package:connect_plus/Navbar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
-import 'package:http/http.dart' as http;
-import 'package:localstorage/localstorage.dart';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'dart:typed_data';
 import 'widgets/Indicator.dart';
 
-class Offer extends StatefulWidget {
-  Offer({Key key, @required this.offer, @required this.category})
-      : super(key: key);
+class Event extends StatefulWidget {
+  Event({Key key, @required this.event, @required this.erg}) : super(key: key);
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-  final String category;
-  final offer;
+  final String event;
+  final String erg;
 
   @override
-  _OfferState createState() => _OfferState();
+  State<StatefulWidget> createState() {
+    return new _EventState(this.event, this.erg);
+  }
 }
 
-class _OfferState extends State<Offer> with TickerProviderStateMixin {
+class _EventState extends State<Event> with TickerProviderStateMixin {
   var ip;
   var port;
-  var relatedOffers = [];
-  final LocalStorage localStorage = new LocalStorage("Connect+");
-
+  var eventDetails;
+  var ergEvents;
+  final String event;
+  final String erg;
   bool loading = true;
 
   AnimationController controller;
   Animation<double> animation;
-  _OfferState();
 
+  _EventState(this.event, this.erg);
+
+  @override
   void initState() {
     super.initState();
+    getEvent();
     setEnv();
-    getOffers();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     animation = Tween<double>(begin: 0, end: 1).animate(
@@ -67,10 +58,10 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future getOffers() async {
-    String name = widget.category;
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/offers/getByCategory/$name';
+  Future getEvent() async {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString("token");
+    var url = 'http://' + ip + ':' + port + '/event/getEvent/$event';
 
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
@@ -79,7 +70,24 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
 
     if (response.statusCode == 200)
       setState(() {
-        relatedOffers = json.decode(response.body);
+        eventDetails = json.decode(response.body);
+        getERGEvents();
+      });
+  }
+
+  Future getERGEvents() async {
+    final prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString("token");
+    var url = 'http://' + ip + ':' + port + '/event/getByERG/$erg';
+
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
+
+    if (response.statusCode == 200)
+      setState(() {
+        ergEvents = json.decode(response.body);
         loading = false;
       });
   }
@@ -88,73 +96,47 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
     Uint8List bytes = base64Decode(base64);
     return Expanded(
       child: SizedBox(
-        width: 220, // otherwise the logo will be tiny
+        width: 250, // otherwise the logo will be tiny
         child: Image.memory(bytes),
       ),
     );
   }
 
-  base64ToPDF(String base64) async {
-    Uint8List bytes = base64Decode(base64);
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    File f = File(
-        "$dir/" + DateTime.now().millisecondsSinceEpoch.toString() + ".pdf");
-    await f.writeAsBytes(bytes);
-    return f.path;
-  }
-
-  Widget LoadingWidget() {
-    return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
-  }
-
-  List<Widget> constructRelatedOffers() {
-    List<Widget> list = List<Widget>();
+  List<Widget> eventsByERG() {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
 
-    relatedOffers.sort(
-        (b, a) => a['offer']['createdAt'].compareTo(b['offer']['createdAt']));
-
-    for (var offer in relatedOffers) {
-      if (offer['offer']['_id'] != widget.offer['_id'].toString()) {
+    List<Widget> list = List<Widget>();
+    for (var ergEvent in ergEvents) {
+      if (ergEvent['_id'] != eventDetails['event']['_id']) {
         list.add(Container(
-          padding: EdgeInsets.fromLTRB(width * 0.01, 0.0, width * 0.01, 0.0),
-          width: width * 0.48,
+          padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
+          width: width * 0.45,
           child: Card(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                base64ToImage(offer['logo']['fileData'].toString()),
+                base64ToImage(ergEvent['poster']['fileData'].toString()),
                 ButtonBar(
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
                     FlatButton(
                       onPressed: () {
-                        offer['offer']['logo'] = offer['logo'];
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Offer(
-                                category: widget.category,
-                                offer: offer['offer'],
+                              builder: (context) => Event(
+                                event: ergEvent['name'],
+                                erg: ergEvent['ERG'],
                               ),
                             ));
                       },
                       child: Text(
-                        offer['offer']['name'].toString(),
+                        ergEvent['name'].toString(),
                         textAlign: TextAlign.center,
-                        style:
-                            TextStyle(fontSize: size * 30, color: Utils.header),
+                        style: TextStyle(
+                            fontSize: size * 35, color: Utils.header),
                       ),
                     )
                   ],
@@ -169,9 +151,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
   }
 
   Widget _appBar() {
-    var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
-    var height = MediaQuery.of(context).size.height;
     return Container(
       padding: Utils.padding,
       child: Row(
@@ -187,27 +167,6 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
               Navigator.of(context).pop();
             },
           ),
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                    child: Text(
-                      widget.offer['name'],
-                      style: TextStyle(
-                          fontSize: size * 55,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600),
-                    ))
-              ],
-            ),
-          ),
-          SizedBox(
-            width: width * 0.12,
-          )
         ],
       ),
     );
@@ -225,6 +184,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
       height: 40,
       width: 40,
       padding: EdgeInsets.all(padding),
+      // margin: EdgeInsets.all(padding),
       decoration: BoxDecoration(
         border: Border.all(
             color: Utils.iconColor,
@@ -240,7 +200,37 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
     }, borderRadius: BorderRadius.all(Radius.circular(13)));
   }
 
-  Widget _offerPoster() {
+  Widget _registerButton() {
+    return RaisedButton(
+      onPressed: () {},
+      color: Utils.iconColor,
+      textColor: Colors.white,
+      padding: const EdgeInsets.all(0.0),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(18),
+          side: BorderSide(color: Utils.iconColor)),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+          gradient: LinearGradient(
+            colors: [
+              Utils.secondaryColor,
+              Utils.primaryColor,
+            ],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+        ),
+        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
+        child: Text(
+          'Register',
+          style: TextStyle(fontSize: 20),
+        ),
+      ),
+    );
+  }
+
+  Widget _eventPoster() {
     if (loading == true) {
       return CircularIndicator();
     } else {
@@ -259,7 +249,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
             SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Image.memory(
-                  base64Decode(widget.offer['logo']['fileData'].toString())),
+                  base64Decode(eventDetails['poster']['fileData'].toString())),
             )
           ],
         ),
@@ -312,47 +302,30 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(
-                          "${widget.offer['discount']} OFF",
-                          style: TextStyle(
-                              fontSize: size * 45,
-                              color: Utils.headline,
-                              fontWeight: FontWeight.w600),
-                        )
+                        Utils.titleText(
+                            textString: eventDetails['event']['name'],
+                            fontSize: size * 45,
+                            textcolor: Utils.header),
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: 15,
+                    height: 20,
+                  ),
+//                  _dateWidget(eventDetails['event']['startDate'].toString().split("T")[0]),
+                  SizedBox(
+                    height: 20,
                   ),
                   _description(),
                   SizedBox(
                     height: 20,
                   ),
-                  InkWell(
-                    child: Text(
-                      "More Details",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    onTap: () async {
-                      String pathPDF = await base64ToPDF(
-                          widget.offer['attachment']['fileData'].toString());
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => PDFScreen(pathPDF)),
-                      );
-                      // PDFViewer(document: file, indicatorBackground: Colors.red);
-                    },
-                  ),
+                  Center(child: _registerButton()),
                   Padding(
                       padding: EdgeInsets.fromLTRB(
                           0, height * 0.08, 0, height * 0.02),
                       child: Utils.titleText(
-                          textString: " Related Offers",
+                          textString: "Events by $erg",
                           fontSize: size * 45,
                           textcolor: Utils.header)),
                   Padding(
@@ -368,7 +341,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                                 physics: ClampingScrollPhysics(),
                                 shrinkWrap: true,
                                 scrollDirection: Axis.horizontal,
-                                children: constructRelatedOffers(),
+                                children: eventsByERG(),
                               )))),
                 ],
               ),
@@ -382,6 +355,11 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
   Widget _dateWidget(String text) {
     return Container(
       padding: EdgeInsets.all(10),
+//      decoration: BoxDecoration(
+//        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
+//        borderRadius: BorderRadius.all(Radius.circular(13)),
+//        color: Utils.iconColor,
+//      ),
       child: Utils.titleText(
         textString: text,
         fontSize: 16,
@@ -392,29 +370,43 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
+    String fulltime =
+        eventDetails['event']['startDate'].toString().split("T")[1];
+    int index = fulltime.lastIndexOf(":");
+    String time = fulltime.toString().substring(0, index);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
-          widget.offer['details'],
-          style: TextStyle(
-            color: Utils.header,
-            fontSize: size * 27,
+        Utils.titleText(
+            textString: "Event Details",
+            fontSize: size * 37,
+            textcolor: Colors.black),
+        SizedBox(height: 15),
+        Row(children: <Widget>[
+          Text(
+            "Venue: ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-        ),
-        Text(
-          "\n\nLocation: " +
-              widget.offer['location'].toString() +
-              "\n\nContact: " +
-              widget.offer['contact'].toString() +
-              "\n\nExpiration: " +
-              widget.offer['expiration'].toString().substring(0,10) +
-              "\n",
-          style: TextStyle(
-            color: Colors.black87,
-            fontSize: size * 26,
+          Text(eventDetails['event']['venue'],
+              style: TextStyle(fontSize: size * 28))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Date: ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-        ),
+          Text(eventDetails['event']['startDate'].toString().split("T")[0],
+              style: TextStyle(fontSize: size * 28))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Time: ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+          ),
+          Text(time, style: TextStyle(fontSize: size * 28 ))
+        ]),
       ],
     );
   }
@@ -422,6 +414,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: Utils.background,
       drawer: NavDrawer(),
@@ -444,7 +437,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                   _appBar(),
                   Container(
                     height: height * 0.3,
-                    child: _offerPoster(),
+                    child: _eventPoster(),
                   )
                 ],
               ),
@@ -454,25 +447,5 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
         ),
       ),
     );
-  }
-}
-
-class PDFScreen extends StatelessWidget {
-  String pathPDF = "";
-  PDFScreen(this.pathPDF);
-
-  @override
-  Widget build(BuildContext context) {
-    return PDFViewerScaffold(
-        appBar: AppBar(
-          title: Text("Details"),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        path: pathPDF);
   }
 }

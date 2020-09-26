@@ -1,11 +1,15 @@
+import 'package:connect_plus/login.dart';
+import 'package:connect_plus/widgets/Utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:load/load.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:connect_plus/login.dart';
+import 'package:connect_plus/registrationProfile.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:localstorage/localstorage.dart';
 
 class registration extends StatefulWidget {
   registration({Key key, this.title}) : super(key: key);
@@ -17,6 +21,7 @@ class registration extends StatefulWidget {
 }
 
 class _registrationState extends State<registration> {
+  final LocalStorage localStorage = new LocalStorage('Connect+');
   final fnController = TextEditingController();
   final emController = TextEditingController();
   final pwController = TextEditingController();
@@ -52,12 +57,16 @@ class _registrationState extends State<registration> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
     final firstNameField = TextField(
       controller: fnController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
           hintText: "Full Name",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
@@ -67,7 +76,8 @@ class _registrationState extends State<registration> {
       obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
           hintText: "Email(@dell.com)",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
@@ -77,7 +87,8 @@ class _registrationState extends State<registration> {
       obscureText: true,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
           hintText: "Password",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
@@ -88,18 +99,49 @@ class _registrationState extends State<registration> {
             text: ' Register ',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color(0xfff7501e),
-                fontSize: 30.0,
+                color: Utils.header,
+                fontSize: size * 55,
                 fontFamily: "Arial"))
       ]),
     );
-    final registerButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Color(0xFFE15F5F),
+    final loginPath = Text.rich(
+      TextSpan(children: <TextSpan>[
+        TextSpan(
+            text: ' Already a user? ',
+            style: TextStyle(
+                color: Colors.black, fontSize: size * 25, fontFamily: "Arial")),
+        TextSpan(
+            text: ' Login',
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Utils.header,
+                fontSize: size * 25,
+                fontFamily: "Arial"),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => login()),
+                );
+              })
+      ]),
+    );
+    final registerButton = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30.0),
+        gradient: LinearGradient(
+          colors: [
+            Utils.secondaryColor,
+            Utils.primaryColor,
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+      ),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        padding: EdgeInsets.fromLTRB(
+            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
         onPressed: () {
           FocusScope.of(context).unfocus();
           setState(() {
@@ -112,94 +154,77 @@ class _registrationState extends State<registration> {
         child: Text("Register",
             textAlign: TextAlign.center,
             style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
 
-//    final login = Text.rich(
-//      TextSpan(children: <TextSpan>[
-//        TextSpan(
-//            text: ' Already a user? ',
-//            style: TextStyle(
-//                color: Colors.black,
-//                fontSize: 15.0,
-//                fontFamily: "Arial")),
-//        TextSpan(
-//            text: ' Login ',
-//            style: TextStyle(
-//                fontWeight: FontWeight.bold,
-//                color: Color(0xfff7501e),
-//                fontSize: 15.0,
-//                fontFamily: "Arial"),
-//            recognizer: TapGestureRecognizer()
-//              ..onTap = () {
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(builder: (context) => login()),
-//                );
-//              }
-//        )
-//      ]),
-//    );
-
     return Scaffold(
-        body: ModalProgressHUD(
-      inAsyncCall: asyncCall,
-      opacity: 0.5,
-      progressIndicator: LoadingText(),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xfffafafa),
-                image: DecorationImage(
-                  image: AssetImage("assets/logo2.png"),
-                  fit: BoxFit.fitWidth,
-                  alignment: Alignment.topCenter,
-                ),
-              ),
+      body: ModalProgressHUD(
+          inAsyncCall: asyncCall,
+          opacity: 0.5,
+          progressIndicator: LoadingText(),
+          child: Center(
+            child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
-                child: Card(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Utils.background,
+                    image: DecorationImage(
+                      image: AssetImage("assets/logo2.png"),
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
                   child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 20.0),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          child: registerTitle),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: firstNameField,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(width * 0.05,
+                            height * 0.32, width * 0.05, height * 0.03),
+                        child: Card(
+                          child: Column(
+                            children: <Widget>[
+                              SizedBox(height: height * 0.03),
+                              Container(
+                                  alignment: Alignment.centerLeft,
+                                  child: Padding(
+                                      padding:
+                                          EdgeInsets.only(left: width * 0.01),
+                                      child: registerTitle)),
+                              SizedBox(height: height * 0.03),
+                              Container(
+                                width: width * 0.65,
+                                child: firstNameField,
+                              ),
+                              SizedBox(height: height * 0.03),
+                              Container(
+                                width: width * 0.65,
+                                child: emailField,
+                              ),
+                              SizedBox(height: height * 0.03),
+                              Container(
+                                width: width * 0.65,
+                                child: passwordField,
+                              ),
+                              SizedBox(height: height * 0.027),
+                              Container(
+                                width: width * 0.6,
+                                child: Padding(
+                                    padding: EdgeInsets.only(bottom: 20),
+                                    child: registerButton),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: emailField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: passwordField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: 20),
-                            child: registerButton),
-                      ),
+                      loginPath
                     ],
                   ),
                 ),
               ),
             ),
-          ),
-        ),
-      ),
-    ));
+          )),
+    );
   }
 
   void register() async {
@@ -212,12 +237,13 @@ class _registrationState extends State<registration> {
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
     if (response.statusCode == 200) {
+      localStorage.setItem("user", json.decode(response.body)['user']);
       setState(() {
         asyncCall = false;
       });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => login()),
+        MaterialPageRoute(builder: (context) => RegistrationProfile()),
       );
     } else {
       setState(() {

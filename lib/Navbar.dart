@@ -1,17 +1,19 @@
+import 'package:connect_plus/Activities.dart';
 import 'package:connect_plus/events.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/dummyPage.dart';
-import 'package:connect_plus/bottomNav.dart';
+import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
-import 'package:connect_plus/offersPage.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/Calendar.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:localstorage/localstorage.dart';
+
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -28,17 +30,15 @@ class NavDrawerState extends State<NavDrawer>
   var ip;
   var port;
   var offerCategories = [];
+  final LocalStorage localStorage = new LocalStorage("Connect+");
   SharedPreferences prefs;
-
 
   void initState() {
     super.initState();
-    getCategories();
-    setEnv();
+    setEnv().then((value) => getCategories());
   }
 
   Future setEnv() async {
-    await DotEnv().load('.env');
     prefs = await SharedPreferences.getInstance();
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
@@ -48,13 +48,12 @@ class NavDrawerState extends State<NavDrawer>
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
-    ip = "10.0.2.2";
-    port = '3300';
     var url = 'http://' + ip + ':' + port + '/offerCategories/getCategories';
-    print(url);
-    var response =
-        await http.get(url, headers: {"Content-Type": "application/json"});
-    print(response.statusCode);
+    var token = localStorage.getItem("token");
+    var response = await http.get(url, headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    });
     if (response.statusCode == 200)
       setState(() {
         offerCategories = json.decode(response.body)['offerCategories'];
@@ -67,19 +66,40 @@ class NavDrawerState extends State<NavDrawer>
         padding: EdgeInsets.zero,
         children: <Widget>[
           DrawerHeader(
-            child: Image.network(
-              'http://www.emc2movecar.com/connectplus/wp-content/uploads/2018/01/logo.png',
+            child: Image.asset(
+              './assets/logo2.png',
             ),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Colors.deepOrange,
-                  Color.fromARGB(0, 0, 0, 0),
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-            ),
+            // decoration: BoxDecoration(
+            //   gradient: LinearGradient(
+            //     colors: [
+            //       Utils.secondaryColor.withAlpha(255),
+            //       Utils.primaryColor.withAlpha(255),
+            //     ],
+            //     begin: Alignment.topCenter,
+            //     end: Alignment.bottomCenter,
+            //   ),
+            // ),
+          ),
+          
+          ListTile(
+            leading: Icon(Icons.home),
+            title: Text('Home'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.verified_user),
+            title: Text('Profile'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfilePage()),
+              )
+            },
           ),
           ExpansionTile(
               leading: Icon(Icons.person),
@@ -87,30 +107,31 @@ class NavDrawerState extends State<NavDrawer>
               children: <Widget>[
                 ExpansionTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-                  title: Text("ERGs"),
+                  title: Text("ERGs",
+                      style: TextStyle(color: Colors.black)),
                   children: <Widget>[
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('GENNEXT',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('DT Belmasry',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('WIA',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('MOSAIC',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     )
                   ],
@@ -118,23 +139,23 @@ class NavDrawerState extends State<NavDrawer>
                 ListTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
                   title: Text('Internal Comms',
-                      style: TextStyle(color: Color(0xFFE15F5F))),
+                      style: TextStyle(color: Colors.grey)),
                   onTap: () => print(""),
                 ),
                 ExpansionTile(
                   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-                  title: Text("Engagement Teams"),
+                  title: Text("Engagement Teams",style: TextStyle(color: Colors.black)),
                   children: <Widget>[
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('Wezaret ELSAADA (Deploy)',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                     ListTile(
                       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
                       title: Text('FUN CREW (CS)',
-                          style: TextStyle(color: Color(0xFFE15F5F))),
+                          style: TextStyle(color: Colors.grey)),
                       onTap: () => print(""),
                     ),
                   ],
@@ -151,36 +172,6 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.local_offer),
-            title: Text('Offer Categories ver 2'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MyOffersPage()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.verified_user),
-            title: Text('Profile'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => BottomNavPreview()),
-              )
-            },
-          ),
-          ListTile(
-            leading: Icon(Icons.calendar_today),
-            title: Text('Calendar'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Calendar()),
-              )
-            },
-          ),
-          ListTile(
             leading: Icon(Icons.event),
             title: Text('Events'),
             onTap: () => {
@@ -191,22 +182,22 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.home),
-            title: Text('Home'),
+            leading: Icon(Icons.local_activity),
+            title: Text('Activities'),
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
+                MaterialPageRoute(builder: (context) => Activities()),
               )
             },
           ),
           ListTile(
-            leading: Icon(Icons.border_color),
-            title: Text('Feedback'),
+            leading: Icon(Icons.calendar_today),
+            title: Text('Calendar'),
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => dummyPage()),
+                MaterialPageRoute(builder: (context) => Calendar()),
               )
             },
           ),

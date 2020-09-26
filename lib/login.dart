@@ -1,3 +1,4 @@
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
@@ -29,7 +30,7 @@ class _loginState extends State<login> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final algorithm = PBKDF2();
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
   SharedPreferences prefs;
   var ip;
   var port;
@@ -61,19 +62,31 @@ class _loginState extends State<login> {
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token"
-    });
-
-    if (response.statusCode == 200) {
-      loading = false;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-      );
-    } else {
+    }).timeout(Duration(seconds: 5), onTimeout: () {
       setState(() {
         loading = false;
       });
-    }
+      _showDialog("Internet connection problem");
+      return null;
+    });
+
+    try {
+      if (response.statusCode == 200) {
+        setState(() {
+          loading = false;
+        });
+        localStorage.setItem("token", token);
+        localStorage.setItem("profile", json.decode(response.body)["profile"]);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+        );
+      } else {
+        setState(() {
+          loading = false;
+        });
+      }
+    } catch (e) {}
   }
 
   void loginPressed() async {
@@ -83,10 +96,14 @@ class _loginState extends State<login> {
       'email': emController.text,
       'password': hashPassword(),
     });
+
     var response = await http.post(url,
         headers: {"Content-Type": "application/json"}, body: msg);
+
     if (response.statusCode == 200) {
       localStorage.setItem("token", json.decode(response.body)["token"]);
+      localStorage.setItem("profile", json.decode(response.body)["profile"]);
+
       prefs.setString("token", json.decode(response.body)["token"]);
       setState(() {
         asyncCall = false;
@@ -105,6 +122,9 @@ class _loginState extends State<login> {
 
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
     if (loading)
       return LoadingWidget();
     else {
@@ -113,8 +133,9 @@ class _loginState extends State<login> {
         obscureText: false,
         style: style,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            hintText: "Email(@dell.com)",
+            contentPadding: EdgeInsets.fromLTRB(
+                width * 0.05, height * 0.02, width * 0.02, height * 0.02),
+            hintText: " Email (@dell.com)",
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
@@ -123,8 +144,9 @@ class _loginState extends State<login> {
         obscureText: true,
         style: style,
         decoration: InputDecoration(
-            contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-            hintText: "Password",
+            contentPadding: EdgeInsets.fromLTRB(
+                width * 0.05, height * 0.02, width * 0.02, height * 0.02),
+            hintText: " Password",
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
@@ -134,8 +156,8 @@ class _loginState extends State<login> {
               text: ' Login ',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xfff7501e),
-                  fontSize: 30.0,
+                  color: Utils.header,
+                  fontSize: size * 55,
                   fontFamily: "Arial"))
         ]),
       );
@@ -144,13 +166,15 @@ class _loginState extends State<login> {
           TextSpan(
               text: ' Not a user? ',
               style: TextStyle(
-                  color: Colors.black, fontSize: 15.0, fontFamily: "Arial")),
+                  color: Colors.black,
+                  fontSize: size * 25,
+                  fontFamily: "Arial")),
           TextSpan(
               text: ' Register now ',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Color(0xfff7501e),
-                  fontSize: 15.0,
+                  color: Utils.header,
+                  fontSize: size * 25,
                   fontFamily: "Arial"),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
@@ -161,13 +185,22 @@ class _loginState extends State<login> {
                 })
         ]),
       );
-      final loginButton = Material(
-        elevation: 5.0,
-        borderRadius: BorderRadius.circular(30.0),
-        color: Color(0xFFE15F5F),
+      final loginButton = Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(30.0),
+          gradient: LinearGradient(
+            colors: [
+              Utils.secondaryColor,
+              Utils.primaryColor,
+            ],
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
+          ),
+        ),
         child: MaterialButton(
           minWidth: MediaQuery.of(context).size.width,
-          padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          padding: EdgeInsets.fromLTRB(
+              width * 0.02, height * 0.023, width * 0.02, height * 0.023),
           onPressed: () {
             FocusScope.of(context).unfocus();
             setState(() {
@@ -194,7 +227,7 @@ class _loginState extends State<login> {
                   padding: const EdgeInsets.only(top: 10.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Color(0xfffafafa),
+                      color: Utils.background,
                       image: DecorationImage(
                         image: AssetImage("assets/logo2.png"),
                         fit: BoxFit.fitWidth,
@@ -204,28 +237,31 @@ class _loginState extends State<login> {
                     child: Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(
-                              36.0, 220.0, 36.0, 30.0),
+                          padding: EdgeInsets.fromLTRB(width * 0.05,
+                              height * 0.32, width * 0.05, height * 0.05),
                           child: Card(
                             child: Column(
                               children: <Widget>[
-                                SizedBox(height: 20.0),
+                                SizedBox(height: height * 0.03),
                                 Container(
                                     alignment: Alignment.centerLeft,
-                                    child: loginTitle),
-                                SizedBox(height: 20.0),
+                                    child: Padding(
+                                        padding:
+                                            EdgeInsets.only(left: width * 0.01),
+                                        child: loginTitle)),
+                                SizedBox(height: height * 0.03),
                                 Container(
-                                  width: 250,
+                                  width: width * 0.65,
                                   child: emailField,
                                 ),
-                                SizedBox(height: 20.0),
+                                SizedBox(height: height * 0.03),
                                 Container(
-                                  width: 250,
+                                  width: width * 0.65,
                                   child: passwordField,
                                 ),
-                                SizedBox(height: 20.0),
+                                SizedBox(height: height * 0.027),
                                 Container(
-                                  width: 250,
+                                  width: width * 0.6,
                                   child: Padding(
                                       padding: EdgeInsets.only(bottom: 20),
                                       child: loginButton),
@@ -282,6 +318,8 @@ class _loginState extends State<login> {
   }
 
   Widget LoadingText() {
+    var size = MediaQuery.of(context).size.aspectRatio;
+
     return Scaffold(
         backgroundColor: Colors.transparent,
         body: Center(
@@ -289,11 +327,9 @@ class _loginState extends State<login> {
             mainAxisSize: MainAxisSize.min,
             children: [
               new Text(
-                  "Loading...",
-                style: TextStyle (
-                  fontSize: 30,
-                  color: Colors.orangeAccent
-                ),
+                "Loading...",
+                style:
+                    TextStyle(fontSize: size * 55, color: Colors.orangeAccent),
               ),
             ],
           ),
