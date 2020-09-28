@@ -156,14 +156,16 @@ class MyEventsPageState extends State<Events>
               itemBuilder: (BuildContext context, int elem) {
                 if (elem == 0) {
                   return Padding(
-                      padding: EdgeInsets.only(top: 40, bottom: 20),
-                      child: Text(
-                        "Events",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                        ),
-                      ));
+                        padding: EdgeInsets.only(
+                            top: height * 0.03, bottom: height * 0.02),
+                        child: Text(
+                          "Events",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                              color: Utils.headline),
+                        ));
                 } else {
                   return ListView.builder(
                       shrinkWrap: true,
@@ -174,9 +176,9 @@ class MyEventsPageState extends State<Events>
                           child: Padding(
                             padding: EdgeInsets.only(bottom: height * 0.05),
                             child: Container(
-                                width: MediaQuery.of(context).size.width * 0.60,
+                                width: MediaQuery.of(context).size.width * 0.80,
                                 height:
-                                    MediaQuery.of(context).size.height * 0.47,
+                                    MediaQuery.of(context).size.height * 0.40,
                                 child: Card(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -198,7 +200,7 @@ class MyEventsPageState extends State<Events>
                                                   .toString(),
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
-                                                  fontSize: size * 40),
+                                                  fontSize: size * 45),
                                             ),
                                           onPressed: () {
                                             Navigator.push(

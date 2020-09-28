@@ -85,7 +85,8 @@ class _ActivitiesPageState extends State<Activities>
     Uint8List bytes = base64Decode(base64);
     return SizedBox(
       width:
-          MediaQuery.of(context).size.width, // otherwise the logo will be tiny
+          MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.3, // otherwise the logo will be tiny
       child: Image.memory(bytes),
     );
   }
@@ -142,7 +143,7 @@ class _ActivitiesPageState extends State<Activities>
             ),
             body: ListView.builder(
                 shrinkWrap: true,
-                padding: const EdgeInsets.all(10),
+                padding: const EdgeInsets.all(5),
                 itemCount: 2,
                 itemBuilder: (BuildContext context, int elem) {
                   if (elem == 0) {
@@ -168,11 +169,11 @@ class _ActivitiesPageState extends State<Activities>
                         children: List.generate(activities.length, (index) {
                           return Center(
                               child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.05),
+                            padding: EdgeInsets.only(bottom: height * 0.02),
                             child: Container(
-                                width: MediaQuery.of(context).size.width * 0.60,
+                                width: MediaQuery.of(context).size.width * 0.85,
                                 height:
-                                    MediaQuery.of(context).size.height * 0.47,
+                                    MediaQuery.of(context).size.height * 0.45,
                                 child: Card(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -183,32 +184,33 @@ class _ActivitiesPageState extends State<Activities>
                                           .elementAt(index)['poster']
                                               ['fileData']
                                           .toString()),
-                                          
-                                      ButtonBar(
-                                        alignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          FlatButton(
-                                            child: Text(
-                                              activities
-                                                  .elementAt(index)['name']
-                                                  .toString(),
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: size * 40),
-                                            ),
-                                            onPressed: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Activity(
-                                                              activity: activities
-                                                                      .elementAt(
-                                                                          index)[
-                                                                  'name'])));
-                                            },
-                                          )
-                                        ],
+                                      Container(
+                                    height: MediaQuery.of(context).size.height * 0.1,
+                                        child: ButtonBar(
+                                          alignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            FlatButton(
+                                              child: Text(
+                                                activities
+                                                    .elementAt(index)['name']
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: size * 40, color: Utils.headline),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => Activity(
+                                                            activity: activities
+                                                                    .elementAt(
+                                                                        index)[
+                                                                'name'])));
+                                              },
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
