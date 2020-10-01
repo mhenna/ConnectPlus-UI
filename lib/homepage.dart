@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   //gridview
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
-                    height: height * 0.45,
+                    height: height * 0.50,
                     child: EventsVariables(),
                   ),
                   Align(
@@ -176,7 +176,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   //gridview
                   Container(
                     padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
-                    height: height * 0.45,
+                    height: height * 0.50,
                     child: OfferVariables(),
                   ),
                   Align(

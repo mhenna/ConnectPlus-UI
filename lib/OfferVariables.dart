@@ -113,7 +113,7 @@ class _OfferVariables extends State<OfferVariables> {
       children: <Widget>[
         Padding(
             padding: EdgeInsets.only(left: 6, right: 6),
-            child: Container(height: height * 0.25, child: mostRecent())),
+            child: Container(height: height * 0.27, child: mostRecent())),
         Expanded(
             child: Padding(
                 padding: EdgeInsets.only(left: 6, right: 6),

@@ -61,10 +61,11 @@ class MyEventsPageState extends State<Events>
       setState(() {
         events = json.decode(response.body);
         if (events.isEmpty) emptyEvents = true;
-        else
+        else {
         randIndex = Events._random.nextInt(events.length);
-
-      });
+events.sort(
+        (b, a) => a['startDate'].compareTo(b['startDate']));
+      }});
   }
 
   Widget base64ToImageFeatured() {
@@ -167,18 +168,22 @@ class MyEventsPageState extends State<Events>
                               color: Utils.headline),
                         ));
                 } else {
-                  return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: events.length,
-                      itemBuilder: (BuildContext catContext, int cat) {
-                        return Center(
-                          child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.05),
+                  return 
+                  GridView.count(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        // Create a grid with 2 columns. If you change the scrollDirection to
+                        // horizontal, this produces 2 rows.
+                        crossAxisCount: 1,
+                        addAutomaticKeepAlives: true,
+                        children: List.generate(events.length, (index) {
+                          return Center(
+                              child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.02),
                             child: Container(
-                                width: MediaQuery.of(context).size.width * 0.80,
+                                width: MediaQuery.of(context).size.width * 0.85,
                                 height:
-                                    MediaQuery.of(context).size.height * 0.40,
+                                    MediaQuery.of(context).size.height * 0.50,
                                 child: Card(
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
@@ -186,40 +191,96 @@ class MyEventsPageState extends State<Events>
                                         CrossAxisAlignment.center,
                                     children: <Widget>[
                                       base64ToImage(events
-                                          .elementAt(cat)['poster']
+                                          .elementAt(index)['poster']
                                               ['fileData']
                                           .toString()),
-                                          
-                                      ButtonBar(
-                                        alignment: MainAxisAlignment.center,
-                                        children: <Widget>[
-                                          FlatButton(
-                                            child: Text(
-                                              events
-                                                  .elementAt(cat)['name']
-                                                  .toString(),
-                                              textAlign: TextAlign.center,
-                                              style: TextStyle(
-                                                  fontSize: size * 45),
-                                            ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => Event(
+                                      Container(
+                                    height: MediaQuery.of(context).size.height * 0.1,
+                                        child: ButtonBar(
+                                          alignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            FlatButton(
+                                              child: Text(
+                                                events
+                                                    .elementAt(index)['name']
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: size * 40, color: Utils.headline),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                       builder: (context) => Event(
                                                         event: events.elementAt(
-                                                            cat)['name'],
+                                                            index)['name'],
                                                         erg: events.elementAt(
-                                                            cat)['ERG'])));
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        ));
-                      });
+                                                            index)['ERG'])));
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ));
+                        }));
+                  
+                  // ListView.builder(
+                  //     shrinkWrap: true,
+                  //     physics: ScrollPhysics(),
+                  //     itemCount: events.length,
+                  //     itemBuilder: (BuildContext catContext, int cat) {
+                  //       return Center(
+                  //         child: Padding(
+                  //           padding: EdgeInsets.only(bottom: height * 0.05),
+                  //           child: Container(
+                  //               width: MediaQuery.of(context).size.width * 0.80,
+                  //               height:
+                  //                   MediaQuery.of(context).size.height * 0.40,
+                  //               child: Card(
+                  //                 child: Column(
+                  //                   mainAxisSize: MainAxisSize.min,
+                  //                   crossAxisAlignment:
+                  //                       CrossAxisAlignment.center,
+                  //                   children: <Widget>[
+                  //                     base64ToImage(events
+                  //                         .elementAt(cat)['poster']
+                  //                             ['fileData']
+                  //                         .toString()),
+                                          
+                  //                     ButtonBar(
+                  //                       alignment: MainAxisAlignment.center,
+                  //                       children: <Widget>[
+                  //                         FlatButton(
+                  //                           child: Text(
+                  //                             events
+                  //                                 .elementAt(cat)['name']
+                  //                                 .toString(),
+                  //                             textAlign: TextAlign.center,
+                  //                             style: TextStyle(
+                  //                                 fontSize: size * 45),
+                  //                           ),
+                  //                         onPressed: () {
+                  //                           Navigator.push(
+                  //                               context,
+                  //                               MaterialPageRoute(
+                  //                                   builder: (context) => Event(
+                  //                                       event: events.elementAt(
+                  //                                           cat)['name'],
+                  //                                       erg: events.elementAt(
+                  //                                           cat)['ERG'])));
+                  //                         },
+                  //                       )
+                  //                     ],
+                  //                   ),
+                  //                 ],
+                  //               ),
+                  //             )),
+                  //       ));
+                  //     });
                 }
               }));
     } catch (err) {
