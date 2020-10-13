@@ -5,8 +5,8 @@ class UserProfile {
   String address;
   String carPlate;
   String phoneNumber;
-  String createdAt;
-  String updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
   int iV;
   String id;
 
@@ -30,8 +30,10 @@ class UserProfile {
     address = json['address'];
     carPlate = json['carPlate'];
     phoneNumber = json['phoneNumber'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt =
+        json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
+    updatedAt =
+        json['updatedAt'] != null ? DateTime.parse((json['updatedAt'])) : null;
     iV = json['__v'];
     id = json['id'];
   }
@@ -44,8 +46,8 @@ class UserProfile {
     data['address'] = this.address;
     data['carPlate'] = this.carPlate;
     data['phoneNumber'] = this.phoneNumber;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
+    data['createdAt'] = this.createdAt.toIso8601String();
+    data['updatedAt'] = this.updatedAt.toIso8601String();
     data['__v'] = this.iV;
     data['id'] = this.id;
     return data;

@@ -28,8 +28,8 @@ class User {
   String username;
   String email;
   String provider;
-  String createdAt;
-  String updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
   int iV;
   Role role;
   String id;
@@ -58,15 +58,19 @@ class User {
     username = json['username'];
     email = json['email'];
     provider = json['provider'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt =
+        json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
+    updatedAt =
+        json['updatedAt'] != null ? DateTime.parse((json['updatedAt'])) : null;
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
     profileId = json['profile'].runtimeType == String
         ? json['profile']
-        : json['profile']['id'];
-    profile = json['profile'].runtimeType != String
+        : json['profile'] != null
+            ? json['profile']['id']
+            : null;
+    profile = json['profile'] != null && json['profile'].runtimeType != String
         ? UserProfile.fromJson(json['profile'])
         : null;
   }
@@ -97,8 +101,8 @@ class Role {
   String name;
   String description;
   String type;
-  String createdAt;
-  String updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
   int iV;
   String id;
 
@@ -118,8 +122,10 @@ class Role {
     name = json['name'];
     description = json['description'];
     type = json['type'];
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
+    createdAt =
+        json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
+    updatedAt =
+        json['updatedAt'] != null ? DateTime.parse((json['updatedAt'])) : null;
     iV = json['__v'];
     id = json['id'];
   }
@@ -130,8 +136,8 @@ class Role {
     data['name'] = this.name;
     data['description'] = this.description;
     data['type'] = this.type;
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
+    data['createdAt'] = this.createdAt.toIso8601String();
+    data['updatedAt'] = this.updatedAt.toIso8601String();
     data['__v'] = this.iV;
     data['id'] = this.id;
     return data;

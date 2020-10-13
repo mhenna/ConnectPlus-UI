@@ -1,11 +1,10 @@
+import 'package:connect_plus/OfferWidget.dart';
+import 'package:connect_plus/models/offer.dart';
+import 'package:connect_plus/services/web_api.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/cupertino.dart';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:connect_plus/Offer.dart';
 
 class OfferVariables extends StatefulWidget {
   @override
@@ -13,92 +12,82 @@ class OfferVariables extends StatefulWidget {
 }
 
 class _OfferVariables extends State<OfferVariables> {
-  var ip, port;
-  var offer_list = [];
-  var emptyList = false;
-  Uint8List mostRecentOffer;
+  List<Offer> offers = [];
+  bool emptyList = false;
+  String mostRecentOfferLogoURL;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   @override
   void initState() {
     super.initState();
-    setEnv();
     getEvents();
   }
 
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
-  }
-
   void getEvents() async {
-    String token = localStorage.getItem("token");
-    var url = 'http://$ip:$port/offers/recent';
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-
-    if (response.statusCode == 200) {
+    try {
+      final recentOffers = await WebAPI.getRecentOffers();
+      recentOffers.sort((a, b) {
+        return a.createdAt.compareTo(b.createdAt);
+      });
       setState(() {
-        offer_list = json.decode(response.body);
-        if(offer_list.isEmpty)
+        this.offers = recentOffers;
+        if (offers.isEmpty)
           emptyList = true;
         else
-        this.mostRecentOffer =
-            base64Decode(offer_list.elementAt(0)['logo']['fileData']);
+          this.mostRecentOfferLogoURL =
+              WebAPI.baseURL + recentOffers.first.logo.url;
       });
-    }
+    } catch (e) {}
   }
 
-  Widget mostRecent() {
+  Widget _mostRecentOfferLogo() {
     var height = MediaQuery.of(context).size.height;
 
-    if (mostRecentOffer == null) return CircularProgressIndicator();
-    return Container(
-        height: height,
-        decoration: BoxDecoration(
-          image: new DecorationImage(
-              image: MemoryImage(mostRecentOffer), fit: BoxFit.cover),
-        ));
+    if (mostRecentOfferLogoURL == null) return CircularProgressIndicator();
+    return Image(
+      image: NetworkImage(mostRecentOfferLogoURL),
+      height: height,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final _scrollController = ScrollController();
     var height = MediaQuery.of(context).size.height;
-    if(emptyList)
-      return Center(child: Text("No Offers"));
+    if (emptyList) return Center(child: Text("No Offers"));
     return Column(
       children: <Widget>[
         Padding(
-            padding: EdgeInsets.only(left: 6, right: 6),
-            child: Container(height: height * 0.30, child: mostRecent())),
+          padding: EdgeInsets.only(left: 6, right: 6),
+          child: Container(
+            height: height * 0.30,
+            child: _mostRecentOfferLogo(),
+          ),
+        ),
         Expanded(
-            child: Padding(
-                padding: EdgeInsets.only(left: 6, right: 6),
-                child: Scrollbar(
-                    controller: _scrollController,
-                    isAlwaysShown: true,
-                    child: ListView(
-                      controller: _scrollController,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: constructOffers(),
-                    )))),
+          child: Padding(
+            padding: EdgeInsets.only(left: 6, right: 6),
+            child: Scrollbar(
+              controller: _scrollController,
+              isAlwaysShown: true,
+              child: ListView(
+                controller: _scrollController,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: constructOffers(),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
   List<Widget> constructOffers() {
     List<Widget> list = List<Widget>();
-    for (var offer in offer_list) {
+    for (var offer in offers) {
       list.add(Single_Offer(
-        offer_name: offer['name'],
-        offer_picture: base64Decode(offer['logo']['fileData']),
-        offer_date: offer['expiration'].toString().split("T")[0],
         offer: offer,
       ));
     }
@@ -107,62 +96,69 @@ class _OfferVariables extends State<OfferVariables> {
 }
 
 class Single_Offer extends StatelessWidget {
-  final offer_name;
-  final offer_picture;
-  final offer_date;
-  final offer;
+  final Offer offer;
 
   //constructor
-  Single_Offer(
-      {this.offer_name, this.offer_picture, this.offer_date, this.offer});
+  Single_Offer({this.offer});
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
 
     return SizedBox(
-        height: height,
-        width: width * 0.60,
-        child: Card(
-          child: Hero(
-            tag: offer_name,
-            child: Material(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => Offer(
-                              category: offer['category']['name'],
-                              offer: offer,
-                            )),
-                  );
-                },
-                child: GridTile(
-                    footer: Container(
-                      color: Colors.white70,
-                      child: ListTile(
-                          title: Column(children: <Widget>[
-                        Text(offer_name,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
-                        Row(
+      height: height,
+      width: width * 0.60,
+      child: Card(
+        child: Hero(
+          tag: offer.name,
+          child: Material(
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => OfferWidget(
+                      category: offer.category,
+                      offer: offer,
+                    ),
+                  ),
+                );
+              },
+              child: GridTile(
+                  footer: Container(
+                    color: Colors.white70,
+                    child: ListTile(
+                      title: Column(
+                        children: <Widget>[
+                          Text(
+                            offer.name,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                              Text("Expiration Date: "),
-                              Text(offer_date,
-                                  style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.w800)),
-                            ])
-                      ])),
+                              Text("Expires: "),
+                              Text(
+                                DateFormat.yMMMMd('en_US')
+                                    .format(offer.expiration),
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
                     ),
-                    child: Image.memory(
-                      offer_picture,
-                      fit: BoxFit.cover,
-                    )),
-              ),
+                  ),
+                  child: Image.network(
+                    WebAPI.baseURL + offer.logo.url,
+                    fit: BoxFit.cover,
+                  )),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

@@ -60,13 +60,14 @@ class _loginState extends State<login> {
       prefs = await SharedPreferences.getInstance();
       final token = prefs.getString("token");
       if (token != null) {
-        final userWithToken = await WebAPI.checkToken(token);
+        final user = await WebAPI.checkToken(token);
         localStorage.setItem("token", token);
         UserProfile profile;
-        if (userWithToken.user.profile == null) {
-          profile = await WebAPI.getProfile(userWithToken.user.profileId);
+        if (user.profile == null) {
+          profile = await WebAPI.getProfile(user.profileId);
+        } else {
+          profile = user.profile;
         }
-        profile = userWithToken.user.profile;
         localStorage.setItem("profile", profile);
         Navigator.push(
           context,
@@ -96,8 +97,9 @@ class _loginState extends State<login> {
       UserProfile profile;
       if (userWithToken.user.profile == null) {
         profile = await WebAPI.getProfile(userWithToken.user.profileId);
+      } else {
+        profile = userWithToken.user.profile;
       }
-      profile = userWithToken.user.profile;
 
       localStorage.setItem("token", userWithToken.jwt);
       localStorage.setItem("profile", profile);

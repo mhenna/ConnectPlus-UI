@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:connect_plus/models/login_request_params.dart';
+import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/models/user_profile.dart';
 import 'package:connect_plus/models/user_profile_request_params.dart';
+
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
@@ -16,12 +18,14 @@ class WebAPI {
   static final String _loginURL = '/auth/local';
   static final String _profilesURL = '/profiles';
   static final String _checkUserURL = '/users/me';
+  static final String _offersURL = '/offers';
 
   // TODO: remove this to a separate service
   static final localStorage = LocalStorage('Connect+');
 
   // TODO: remove this to a separate service
-  static UserWithToken currentUser;
+  static User currentUser;
+  static String currentToken;
 
   static String constructURL(String apiURL) {
     return baseURL + apiURL;
@@ -44,11 +48,11 @@ class WebAPI {
     return response;
   }
 
-  static get<T>(String url) async {
+  static get(String url, {String token}) async {
     final requestURL = constructURL(url);
 
     // create default headers
-    Map<String, String> headers = generateHeaders();
+    Map<String, String> headers = generateHeaders(token);
     final response = await http.get(
       requestURL,
       headers: headers,
@@ -69,8 +73,8 @@ class WebAPI {
 
     // always attach Authorization Header when user is logged in
     if (currentUser != null) {
-      final jwt = currentUser.jwt;
-      headers['Authorization'] = "Bearer $jwt";
+      final token = currentToken;
+      headers['Authorization'] = "Bearer $token";
     }
     if (token != null) {
       headers['Authorization'] = "Bearer $token";
@@ -87,7 +91,8 @@ class WebAPI {
     final registeredUser = UserWithToken.fromJson(responseBody);
 
     // reset the current user on register
-    currentUser = registeredUser;
+    currentUser = registeredUser.user;
+    currentToken = registeredUser.jwt;
     return registeredUser;
   }
 
@@ -100,7 +105,8 @@ class WebAPI {
     final loggedInUser = UserWithToken.fromJson(responseBody);
 
     // reset the current user on login
-    currentUser = loggedInUser;
+    currentUser = loggedInUser.user;
+    currentToken = loggedInUser.jwt;
     return loggedInUser;
   }
 
@@ -114,11 +120,13 @@ class WebAPI {
     return profile;
   }
 
-  static Future<UserWithToken> checkToken(String token) async {
-    final headers = generateHeaders(token);
-    final response = await http.get(_checkUserURL, headers: headers);
-    final user = UserWithToken.fromJson(json.decode(response.body));
-    currentUser = user;
+  static Future<User> checkToken(String token) async {
+    final response = await get(_checkUserURL, token: token);
+    final user = User.fromJson(json.decode(response.body));
+    if (user != null) {
+      currentUser = user;
+    }
+    currentToken = token;
     return user;
   }
 
@@ -126,5 +134,46 @@ class WebAPI {
     final response = await get(_profilesURL + "/$id");
     final profile = UserProfile.fromJson(json.decode(response.body));
     return profile;
+  }
+
+  static Future<List<Offer>> getOffers() async {
+    final response = await get(_offersURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawOffers = json.decode(response.body);
+    final List<Offer> offers = [];
+    for (final offerJson in rawOffers) {
+      offers.add(Offer.fromJson(offerJson));
+    }
+
+    return offers;
+  }
+
+  static Future<List<Offer>> getOffersByCategory(OfferCategory category) async {
+    final categoryName = category.toString();
+    final categoryURL = "$_offersURL?category_eq=$categoryName";
+    final response = await get(categoryURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final rawOffers = json.decode(response.body);
+    final List<Offer> offers = [];
+    for (final offerJson in rawOffers) {
+      offers.add(Offer.fromJson(offerJson));
+    }
+    return offers;
+  }
+
+  static Future<List<Offer>> getRecentOffers() async {
+    final recentURL = "$_offersURL?_limit=5";
+    final response = await get(recentURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawOffers = json.decode(response.body);
+    final List<Offer> offers = [];
+    for (final offerJson in rawOffers) {
+      offers.add(Offer.fromJson(offerJson));
+    }
+
+    return offers;
   }
 }
