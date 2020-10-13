@@ -18,10 +18,11 @@ class MapScreenState extends State<ProfilePage>
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
 
-  final nameController = TextEditingController();
-  final addressController = TextEditingController();
-  final phoneController = TextEditingController();
-  final carPlateController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController carPlateController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
   var ip;
   var port;
@@ -38,6 +39,7 @@ class MapScreenState extends State<ProfilePage>
     super.initState();
     setProfile();
     setEnv();
+    getProfile(profile['phoneNumber']);
   }
 
   setEnv() {
@@ -51,12 +53,13 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
-  void getProfile(mobile) async {
+  void getProfile(phoneNumber) async {
 //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
 //    print(ip)
 //    Working for android emulator -- set to actual ip for use with physical device
     String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/profile/getProfile/' + mobile;
+    var url =
+        'http://' + ip + ':' + port + '/profile/getProfile/' + phoneNumber;
     print(url);
     var response = await http.get(url, headers: {
       "Content-Type": "application/json",
@@ -66,6 +69,10 @@ class MapScreenState extends State<ProfilePage>
     if (response.statusCode == 200)
       setState(() {
         profile = json.decode(response.body)['Profile'];
+        nameController = TextEditingController(text: profile['name']);
+        addressController = TextEditingController(text: profile['address']);
+        carPlateController = TextEditingController(text: profile['carPlate']);
+        phoneController = TextEditingController(text: profile['phoneNumber']);
       });
   }
 
@@ -89,9 +96,8 @@ class MapScreenState extends State<ProfilePage>
           ? carPlateController.text
           : profile['carPlate']
     };
-
     var sentObj = jsonEncode(
-        {'profile': editedProfile, 'phoneNumber': profile['phoneNumber']});
+        {'profile': editedProfile, 'phoneNumber':  profile['phoneNumber']});
     var response = await http.post(url,
         headers: {
           "Content-Type": "application/json",
@@ -99,6 +105,59 @@ class MapScreenState extends State<ProfilePage>
         },
         body: sentObj);
     print(response.statusCode);
+    localStorage.setItem('profile', editedProfile);
+  }
+
+  Widget _getLabel(String value) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    return Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.08, right: width * 0.08, top: height * 0.02),
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            new Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                new Text(
+                  value,
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ],
+        ));
+  }
+
+  Widget _getField(String value, TextEditingController controller) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    return Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.08, right: width * 0.08, top: height * 0.01),
+        child: new Row(
+          mainAxisSize: MainAxisSize.max,
+          children: <Widget>[
+            new Flexible(
+              child: TextFormField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: value,
+                ),
+                enabled: !_status,
+                autofocus: !_status,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter some text';
+                  }
+                  return null;
+                },
+              ),
+            ),
+          ],
+        ));
   }
 
   @override
@@ -132,11 +191,11 @@ class MapScreenState extends State<ProfilePage>
               Column(
                 children: <Widget>[
                   new Container(
-                    height: height * 0.3,
+                    height: height * 0.23,
                     child: new Column(
                       children: <Widget>[
                         Padding(
-                          padding: EdgeInsets.only(top: height * 0.04),
+                          padding: EdgeInsets.only(top: height * 0.05),
                           child:
                               new Stack(fit: StackFit.loose, children: <Widget>[
                             new Row(
@@ -144,10 +203,9 @@ class MapScreenState extends State<ProfilePage>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 new Container(
-                                    width: width * 0.35,
-                                    height: height * 0.21,
+                                    width: width * 0.22,
+                                    height: height * 0.14,
                                     decoration: new BoxDecoration(
-                                      shape: BoxShape.circle,
                                       image: new DecorationImage(
                                         image: new ExactAssetImage(
                                             'assets/as.png'),
@@ -156,22 +214,6 @@ class MapScreenState extends State<ProfilePage>
                                     )),
                               ],
                             ),
-                            Padding(
-                                padding: EdgeInsets.only(
-                                    top: height * 0.13, right: width * 0.27),
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    new CircleAvatar(
-                                      backgroundColor: Utils.header,
-                                      radius: 25.0,
-                                      child: new Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  ],
-                                )),
                           ]),
                         )
                       ],
@@ -186,7 +228,7 @@ class MapScreenState extends State<ProfilePage>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                              padding: EdgeInsets.only(right: width * 0.08 ),
+                              padding: EdgeInsets.only(right: width * 0.08),
                               child: new Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 mainAxisSize: MainAxisSize.max,
@@ -202,169 +244,24 @@ class MapScreenState extends State<ProfilePage>
                                   )
                                 ],
                               )),
-                          Container(
+                          Form(
+                            key: _formKey,
                             child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                Padding(
-                                    padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.02),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            new Text(
-                                              'Name',
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Flexible(
-                                          child: new TextField(
-                                            controller: nameController,
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  profile['name'].toString(),
-                                            ),
-                                            enabled: !_status,
-                                            autofocus: !_status,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            new Text(
-                                              'Address',
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Flexible(
-                                          child: new TextField(
-                                            controller: addressController,
-                                            decoration: InputDecoration(
-                                                hintText: profile['address']),
-                                            enabled: !_status,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: <Widget>[
-                                            new Text(
-                                              'Phone Number',
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Flexible(
-                                          child: new TextField(
-                                            controller: phoneController,
-                                            decoration: InputDecoration(
-                                                hintText:
-                                                    profile['phoneNumber']),
-                                            enabled: !_status,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.03),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Expanded(
-                                          child: Container(
-                                            child: new Text(
-                                              'Car Plate # (Please write letters in Arabic)',
-                                              style: TextStyle(
-                                                  fontSize: 16.0,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ),
-                                          flex: 2,
-                                        ),
-                                      ],
-                                    )),
-                                Padding(
-                                     padding: EdgeInsets.only(
-                                        left: width * 0.08, right: width * 0.08, top: height * 0.01),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      children: <Widget>[
-                                        Flexible(
-                                          child: Padding(
-                                            padding:
-                                                EdgeInsets.only(right: 10.0),
-                                            child: new TextField(
-                                              controller: carPlateController,
-                                              decoration: InputDecoration(
-                                                  hintText:
-                                                      profile['carPlate']),
-                                              enabled: !_status,
-                                            ),
-                                          ),
-                                          flex: 2,
-                                        ),
-                                      ],
-                                    )),
+                                _getLabel("Name"),
+                                _getField(
+                                    profile['name'].toString(), nameController),
+                                _getLabel("Address"),
+                                _getField(profile['address'].toString(),
+                                    addressController),
+                                _getLabel("Phone Number"),
+                                _getField(profile['phoneNumber'].toString(),
+                                    phoneController),
+                                _getLabel(
+                                    "Car Plate # (Please write letters in Arabic)"),
+                                _getField(profile['carPlate'].toString(),
+                                    carPlateController)
                               ],
                             ),
                           ),
@@ -403,11 +300,13 @@ class MapScreenState extends State<ProfilePage>
                 textColor: Colors.white,
                 color: Colors.green,
                 onPressed: () {
-                  editProfile();
-                  setState(() {
-                    _status = true;
-                    FocusScope.of(context).requestFocus(new FocusNode());
-                  });
+                  if (_formKey.currentState.validate()) {
+                    editProfile();
+                    setState(() {
+                      _status = true;
+                      FocusScope.of(context).requestFocus(new FocusNode());
+                    });
+                  }
                 },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
