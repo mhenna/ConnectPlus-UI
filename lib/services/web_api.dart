@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connect_plus/models/erg.dart';
+import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/login_request_params.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/register_request_params.dart';
@@ -19,6 +21,7 @@ class WebAPI {
   static final String _profilesURL = '/profiles';
   static final String _checkUserURL = '/users/me';
   static final String _offersURL = '/offers';
+  static final String _eventsURL = '/events';
 
   // TODO: remove this to a separate service
   static final localStorage = LocalStorage('Connect+');
@@ -175,5 +178,46 @@ class WebAPI {
     }
 
     return offers;
+  }
+
+  static Future<List<Event>> getEvents() async {
+    final response = await get(_eventsURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawEvents = json.decode(response.body);
+    final List<Event> events = [];
+    for (final eventJson in rawEvents) {
+      events.add(Event.fromJson(eventJson));
+    }
+
+    return events;
+  }
+
+  static Future<List<Event>> getEventsByERG(ERG erg) async {
+    final ergId = erg.id;
+    final ergURL = "$_eventsURL?erg_eq=$ergId";
+    final response = await get(ergURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final rawEvents = json.decode(response.body);
+    final List<Event> events = [];
+    for (final eventJson in rawEvents) {
+      events.add(Event.fromJson(eventJson));
+    }
+    return events;
+  }
+
+  static Future<List<Event>> getRecentEvents() async {
+    final recentURL = "$_eventsURL?_limit=5";
+    final response = await get(recentURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawEvents = json.decode(response.body);
+    final List<Event> events = [];
+    for (final eventJson in rawEvents) {
+      events.add(Event.fromJson(eventJson));
+    }
+
+    return events;
   }
 }

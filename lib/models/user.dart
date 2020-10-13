@@ -36,20 +36,21 @@ class User {
   String profileId;
   UserProfile profile;
 
-  User(
-      {this.confirmed,
-      this.blocked,
-      this.sId,
-      this.username,
-      this.email,
-      this.provider,
-      this.createdAt,
-      this.updatedAt,
-      this.iV,
-      this.role,
-      this.id,
-      this.profileId,
-      this.profile});
+  User({
+    this.confirmed,
+    this.blocked,
+    this.sId,
+    this.username,
+    this.email,
+    this.provider,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+    this.role,
+    this.id,
+    this.profileId,
+    this.profile,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     confirmed = json['confirmed'];

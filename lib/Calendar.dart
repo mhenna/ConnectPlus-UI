@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 import 'package:connect_plus/Navbar.dart';
-import 'package:connect_plus/Event.dart';
+import 'package:connect_plus/EventWidget.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -27,17 +27,11 @@ class _CalendarState extends State<Calendar> {
     super.initState();
     _events = {};
     _activities = {};
-    _all={};
+    _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
-    setEnv();
     getEvents();
     getActivities();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
   }
 
   void getEvents() async {
@@ -57,11 +51,11 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
-       _all.addAll(_events);
+      _all.addAll(_events);
     }
   }
 
-void getActivities() async {
+  void getActivities() async {
     var activities;
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/activity';
@@ -73,18 +67,18 @@ void getActivities() async {
       activities = json.decode(response.body);
       for (var activity in activities) {
         var dates = activity["recurrenceDates"];
-        for (var date in dates)
-        {
-           date = DateTime.parse(date);
-           if (_activities[date] != null)
-                _activities[date].add(activity);
+        for (var date in dates) {
+          date = DateTime.parse(date);
+          if (_activities[date] != null)
+            _activities[date].add(activity);
           else
-             _activities[date] = [activity];
-         }
+            _activities[date] = [activity];
+        }
       }
       _all.addAll(_activities);
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,12 +105,14 @@ void getActivities() async {
                 },
                 builders: CalendarBuilders(
                   singleMarkerBuilder: (context, date, event) {
-                     bool condition = _events.containsKey(DateTime.parse(event['startDate']));
-                     Color cor = Color(int.parse(event["ERG"]["color"]));
-                    return Container( 
-                      decoration:
-                          condition ? BoxDecoration(shape: BoxShape.circle, color: cor) 
-                           : BoxDecoration(shape: BoxShape.rectangle, color: Colors.blue) ,
+                    bool condition =
+                        _events.containsKey(DateTime.parse(event['startDate']));
+                    Color cor = Color(int.parse(event["ERG"]["color"]));
+                    return Container(
+                      decoration: condition
+                          ? BoxDecoration(shape: BoxShape.circle, color: cor)
+                          : BoxDecoration(
+                              shape: BoxShape.rectangle, color: Colors.blue),
                       width: 7.0,
                       height: 7.0,
                       margin: const EdgeInsets.symmetric(horizontal: 1.5),
@@ -127,16 +123,17 @@ void getActivities() async {
               ..._selectedEvents.map((event) => ListTile(
                   title: Text(event["name"]),
                   onTap: () {
-                    bool condition = _events.containsKey(DateTime.parse(event['startDate']));
-                    condition ?
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Event(
-                                event: event["name"],
-                                erg: event['ERG']["name"],
-                              )),
-                    ): /*Add Activities navigation route here*/ MaterialPageRoute(builder: (BuildContext context) {  }) ;
+                    bool condition =
+                        _events.containsKey(DateTime.parse(event['startDate']));
+                    condition
+                        ? Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EventWidget(event: event),
+                            ),
+                          )
+                        : /*Add Activities navigation route here*/ MaterialPageRoute(
+                            builder: (BuildContext context) {});
                   })),
             ])));
   }

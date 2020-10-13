@@ -167,15 +167,16 @@ class _OffersState extends State<Offers> {
             } else if (elem == 1) {
               return Column(children: [
                 Padding(
-                    padding: EdgeInsets.fromLTRB(0, height * 0.08, 0, 8.0),
-                    child: Text(
-                      "OFFERS",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          fontSize: size * 60,
-                          fontWeight: FontWeight.w600,
-                          color: Utils.header),
-                    )),
+                  padding: EdgeInsets.fromLTRB(0, height * 0.08, 0, 8.0),
+                  child: Text(
+                    "OFFERS",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontSize: size * 60,
+                        fontWeight: FontWeight.w600,
+                        color: Utils.header),
+                  ),
+                ),
                 Divider(
                   color: Utils.header,
                   thickness: 3,
@@ -190,7 +191,7 @@ class _OffersState extends State<Offers> {
                   (index, category) {
                     return Column(
                       children: <Widget>[
-                        if (!categoriesAndOffers[category].isEmpty)
+                        if (categoriesAndOffers[category].isNotEmpty)
                           if (index == 0)
                             Padding(
                                 padding: EdgeInsets.fromLTRB(width * 0.03,
