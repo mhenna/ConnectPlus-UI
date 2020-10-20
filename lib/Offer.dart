@@ -134,7 +134,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                base64ToImage(offer['logo']['fileData'].toString()),
+                base64ToImage(offer['logo']['fileData']),
                 ButtonBar(
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -259,7 +259,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
             SizedBox(
               width: MediaQuery.of(context).size.width,
               child: Image.memory(
-                  base64Decode(widget.offer['logo']['fileData'].toString())),
+                  base64Decode(widget.offer['logo']['fileData'])),
             )
           ],
         ),
@@ -315,7 +315,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                         Text(
                           "${widget.offer['discount']} OFF",
                           style: TextStyle(
-                              fontSize: size * 45,
+                              fontSize: size * 50,
                               color: Utils.headline,
                               fontWeight: FontWeight.w600),
                         )
@@ -339,7 +339,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                     ),
                     onTap: () async {
                       String pathPDF = await base64ToPDF(
-                          widget.offer['attachment']['fileData'].toString());
+                          widget.offer['attachment']['fileData']);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -399,7 +399,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
           widget.offer['details'],
           style: TextStyle(
             color: Utils.header,
-            fontSize: size * 27,
+            fontSize: size * 31,
           ),
         ),
         Text(
@@ -412,7 +412,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
               "\n",
           style: TextStyle(
             color: Colors.black87,
-            fontSize: size * 26,
+            fontSize: size * 30,
           ),
         ),
       ],

@@ -16,7 +16,8 @@ class _EventsVariablesState extends State<EventsVariables> {
   var ip, port;
   var event_list = [];
   var emptyList = false;
-  Uint8List mostRecentEvent;
+  var mostRecentEvent;
+  Uint8List mostRecentEventImg;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   @override
@@ -43,10 +44,11 @@ class _EventsVariablesState extends State<EventsVariables> {
     if (response.statusCode == 200) {
       setState(() {
         event_list = json.decode(response.body);
-        if(event_list.isEmpty)
+        if (event_list.isEmpty)
           emptyList = true;
         else
-        this.mostRecentEvent =
+          this.mostRecentEvent = event_list.elementAt(0);
+        this.mostRecentEventImg =
             base64Decode(event_list.elementAt(0)['poster']['fileData']);
       });
     }
@@ -56,25 +58,64 @@ class _EventsVariablesState extends State<EventsVariables> {
     var height = MediaQuery.of(context).size.height;
 
     if (mostRecentEvent == null) return CircularProgressIndicator();
-    return Container(
-        height: height,
-        decoration: BoxDecoration(
-          image: new DecorationImage(
-              image: MemoryImage(mostRecentEvent), fit: BoxFit.cover),
-        ));
+    return SizedBox(
+        child: Card(
+      child: Hero(
+        tag: mostRecentEvent['name'],
+        child: Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Event(
+                          event: mostRecentEvent['name'],
+                          erg: mostRecentEvent['ERG']["name"],
+                        )),
+              );
+            },
+            child: GridTile(
+                footer: Container(
+                  color: Colors.white70,
+                  child: ListTile(
+                    title: Column(children: <Widget>[
+                      Text(mostRecentEvent["name"].toString(),
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("Start Date: "),
+                            Text(mostRecentEvent['startDate'].toString().split("T")[0],
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w800)),
+                          ])
+                    ]),
+                  ),
+                ),
+                child: Container(
+                    height: height,
+                    decoration: BoxDecoration(
+                      image: new DecorationImage(
+                          image: MemoryImage(mostRecentEventImg),
+                          fit: BoxFit.cover),
+                    ))),
+          ),
+        ),
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     final _scrollController = ScrollController();
     var height = MediaQuery.of(context).size.height;
-    if(emptyList)
-      return Center(child: Text("No Events"));
+    if (emptyList) return Center(child: Text("No Events"));
     return Column(
       children: <Widget>[
         Padding(
             padding: EdgeInsets.only(left: 6, right: 6),
-            child: Container(height: height * 0.30, child: mostRecent())),
+            child: Container(height: height * 0.27, child: mostRecent())),
         Expanded(
             child: Padding(
                 padding: EdgeInsets.only(left: 6, right: 6),
@@ -94,8 +135,8 @@ class _EventsVariablesState extends State<EventsVariables> {
 
   List<Widget> constructEvents() {
     List<Widget> list = List<Widget>();
-
     for (var event in event_list) {
+      if(event['name'] != mostRecentEvent['name'])
       list.add(Single_Event(
           event_name: event['name'],
           event_picture: base64Decode(event['poster']['fileData']),
@@ -126,7 +167,7 @@ class Single_Event extends StatelessWidget {
 
     return SizedBox(
         height: height,
-        width: width * 0.60,
+        width: width * 0.65,
         child: Card(
           child: Hero(
             tag: event_name,

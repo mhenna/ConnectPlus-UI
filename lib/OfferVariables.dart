@@ -16,7 +16,8 @@ class _OfferVariables extends State<OfferVariables> {
   var ip, port;
   var offer_list = [];
   var emptyList = false;
-  Uint8List mostRecentOffer;
+  Uint8List mostRecentOfferImg;
+  var mostRecentOffer;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   @override
@@ -43,10 +44,11 @@ class _OfferVariables extends State<OfferVariables> {
     if (response.statusCode == 200) {
       setState(() {
         offer_list = json.decode(response.body);
-        if(offer_list.isEmpty)
+        if (offer_list.isEmpty)
           emptyList = true;
         else
-        this.mostRecentOffer =
+          this.mostRecentOffer = offer_list.elementAt(0);
+        this.mostRecentOfferImg =
             base64Decode(offer_list.elementAt(0)['logo']['fileData']);
       });
     }
@@ -56,25 +58,62 @@ class _OfferVariables extends State<OfferVariables> {
     var height = MediaQuery.of(context).size.height;
 
     if (mostRecentOffer == null) return CircularProgressIndicator();
-    return Container(
-        height: height,
-        decoration: BoxDecoration(
-          image: new DecorationImage(
-              image: MemoryImage(mostRecentOffer), fit: BoxFit.cover),
-        ));
+    return SizedBox(
+        child: Card(
+      child: Hero(
+        tag: mostRecentOffer['name'],
+        child: Material(
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => Offer(
+                          category: mostRecentOffer['category']['name'],
+                          offer: mostRecentOffer,
+                        )),
+              );
+            },
+            child: GridTile(
+                footer: Container(
+                  color: Colors.white70,
+                  child: ListTile(
+                    title: Column(children: <Widget>[
+                      Text(mostRecentOffer['name'],
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                              Text("Expiration Date: "),
+                            Text(
+                                mostRecentOffer['expiration'].toString().split("T")[0],
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w800)),
+                          ])
+                    ]),
+                  ),
+                ),
+                child: Image.memory(
+                  mostRecentOfferImg,
+                  fit: BoxFit.cover,
+                )),
+          ),
+        ),
+      ),
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     final _scrollController = ScrollController();
     var height = MediaQuery.of(context).size.height;
-    if(emptyList)
-      return Center(child: Text("No Offers"));
+    if (emptyList) return Center(child: Text("No Offers"));
     return Column(
       children: <Widget>[
         Padding(
             padding: EdgeInsets.only(left: 6, right: 6),
-            child: Container(height: height * 0.30, child: mostRecent())),
+            child: Container(height: height * 0.27, child: mostRecent())),
         Expanded(
             child: Padding(
                 padding: EdgeInsets.only(left: 6, right: 6),
@@ -95,6 +134,7 @@ class _OfferVariables extends State<OfferVariables> {
   List<Widget> constructOffers() {
     List<Widget> list = List<Widget>();
     for (var offer in offer_list) {
+      if(offer['name'] != mostRecentOffer['name']) 
       list.add(Single_Offer(
         offer_name: offer['name'],
         offer_picture: base64Decode(offer['logo']['fileData']),
@@ -122,7 +162,7 @@ class Single_Offer extends StatelessWidget {
 
     return SizedBox(
         height: height,
-        width: width * 0.60,
+        width: width * 0.65,
         child: Card(
           child: Hero(
             tag: offer_name,

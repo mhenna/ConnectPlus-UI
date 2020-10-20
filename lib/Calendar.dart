@@ -1,3 +1,5 @@
+import 'package:connect_plus/Activity.dart';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -27,7 +29,7 @@ class _CalendarState extends State<Calendar> {
     super.initState();
     _events = {};
     _activities = {};
-    _all={};
+    _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
     setEnv();
@@ -57,11 +59,11 @@ class _CalendarState extends State<Calendar> {
         else
           _events[date] = [event];
       }
-       _all.addAll(_events);
+      _all.addAll(_events);
     }
   }
 
-void getActivities() async {
+  void getActivities() async {
     var activities;
     String token = localStorage.getItem("token");
     var url = 'http://' + ip + ':' + port + '/activity';
@@ -73,34 +75,90 @@ void getActivities() async {
       activities = json.decode(response.body);
       for (var activity in activities) {
         var dates = activity["recurrenceDates"];
-        for (var date in dates)
-        {
-           date = DateTime.parse(date);
-           if (_activities[date] != null)
-                _activities[date].add(activity);
+        for (var date in dates) {
+          date = DateTime.parse(date);
+          if (_activities[date] != null)
+            _activities[date].add(activity);
           else
-             _activities[date] = [activity];
-         }
+            _activities[date] = [activity];
+        }
       }
       _all.addAll(_activities);
     }
   }
+
   @override
   Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
     return Scaffold(
         appBar: AppBar(
-          title: Text('Calendar'),
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("Calendar"),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+            ),
+          ),
         ),
         drawer: NavDrawer(),
         body: SingleChildScrollView(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+              Container(
+                  child: Padding(
+                padding: EdgeInsets.fromLTRB(
+                    width * 0.04, height * 0.02, width * 0.04, height * 0.02),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: Utils.headline),
+                          width: 10.0,
+                          height: 10.0,
+                        ),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        Text("Event")
+                      ],
+                    ),
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle, color: Utils.headline),
+                          width: 10.0,
+                          height: 10.0,
+                        ),
+                        SizedBox(
+                          width: width * 0.02,
+                        ),
+                        Text("Activity")
+                      ],
+                    )
+                  ],
+                ),
+              )),
               TableCalendar(
                 events: _all,
                 calendarController: _controller,
                 calendarStyle: CalendarStyle(
-                  todayColor: Color(0xFFE15F5F),
+                  todayColor: Utils.headline,
                   selectedColor: Colors.black,
                 ),
                 weekendDays: [5, 6],
@@ -111,32 +169,75 @@ void getActivities() async {
                 },
                 builders: CalendarBuilders(
                   singleMarkerBuilder: (context, date, event) {
-                     bool condition = _events.containsKey(DateTime.parse(event['startDate']));
-                     Color cor = Color(int.parse(event["ERG"]["color"]));
-                    return Container( 
-                      decoration:
-                          condition ? BoxDecoration(shape: BoxShape.circle, color: cor) 
-                           : BoxDecoration(shape: BoxShape.rectangle, color: Colors.blue) ,
-                      width: 7.0,
-                      height: 7.0,
-                      margin: const EdgeInsets.symmetric(horizontal: 1.5),
-                    );
+                    bool condition =
+                        _events.containsKey(DateTime.parse(event['startDate']));
+                    if (event['ERG'] == null) {
+                      return Container(
+                        decoration: BoxDecoration(
+                            shape: BoxShape.rectangle, color: Utils.headline),
+                        width: 7.0,
+                        height: 7.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      );
+                    } else
+                      return Container(
+                        decoration: condition
+                            ? BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Color(int.parse(event['ERG']['color'])))
+                            : BoxDecoration(
+                                shape: BoxShape.rectangle, color: Colors.blue),
+                        width: 7.0,
+                        height: 7.0,
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                      );
                   },
                 ),
               ),
               ..._selectedEvents.map((event) => ListTile(
-                  title: Text(event["name"]),
+                  title: Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(event['name']),
+                        if (event["ERG"] != null)
+                          Row(
+                            children: <Widget>[
+                              Container(
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:Color(int.parse(event['ERG']['color']))),
+                                width: 10.0,
+                                height: 10.0,
+                              ),
+                              SizedBox(
+                                width: width * 0.02,
+                              ),
+                              Text(event["ERG"]["name"])
+                            ],
+                          )
+                      ],
+                    ),
+                  ),
                   onTap: () {
-                    bool condition = _events.containsKey(DateTime.parse(event['startDate']));
-                    condition ?
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => Event(
-                                event: event["name"],
-                                erg: event['ERG']["name"],
-                              )),
-                    ): /*Add Activities navigation route here*/ MaterialPageRoute(builder: (BuildContext context) {  }) ;
+                    if (event['ERG'] != null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => Event(
+                                  event: event["name"],
+                                  erg: event['ERG']["name"],
+                                )),
+                      );
+                      
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                Activity(activity: event['name'])),
+                      );
+                    }
                   })),
             ])));
   }

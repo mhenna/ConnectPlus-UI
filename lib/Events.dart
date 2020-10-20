@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -59,11 +60,12 @@ class MyEventsPageState extends State<Events>
     if (response.statusCode == 200)
       setState(() {
         events = json.decode(response.body);
-        if (events.isEmpty) emptyEvents = true;
-        else
-        randIndex = Events._random.nextInt(events.length);
-
-      });
+        if (events.isEmpty)
+          emptyEvents = true;
+        else {
+          randIndex = Events._random.nextInt(events.length);
+          events.sort((b, a) => a['startDate'].compareTo(b['startDate']));
+        }});
   }
 
   Widget base64ToImageFeatured() {
@@ -90,90 +92,205 @@ class MyEventsPageState extends State<Events>
 
   Widget LoadingWidget() {
     return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
+      body: Center(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            new CircularProgressIndicator(),
+            new Text("Loading"),
+          ],
         ),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
+    var size = MediaQuery.of(context).size.aspectRatio;
     try {
-      if(emptyEvents)
-        return AppScaffold(body: Center(child: Text("No Events")));
+      if (emptyEvents)
+        return Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Events"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ),
+            body: Center(child: Text("No Events")));
       else
-      return AppScaffold(
-          body: ListView.builder(
-              shrinkWrap: true,
-              padding: const EdgeInsets.all(10),
-              itemCount: 2,
-              itemBuilder: (BuildContext context, int elem) {
-                if (elem == 0) {
-                  return Padding(
-                      padding: EdgeInsets.only(top: 40, bottom: 20),
-                      child: Text(
-                        "Events",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 32,
-                        ),
-                      ));
-                } else {
-                  return ListView.builder(
-                      shrinkWrap: true,
-                      physics: ScrollPhysics(),
-                      itemCount: events.length,
-                      itemBuilder: (BuildContext catContext, int cat) {
-                        return Center(
-                          child: Padding(
-                              padding: EdgeInsets.only(bottom: 20),
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    base64ToImage(events
-                                        .elementAt(cat)['poster']['fileData']
-                                        .toString()),
-                                    ButtonBar(
-                                      alignment: MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        FlatButton(
-                                          child: Text(
-                                            events
-                                                .elementAt(cat)['name']
-                                                .toString(),
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(fontSize: 22),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) => Event(
-                                                        event: events.elementAt(
-                                                            cat)['name'],
-                                                        erg: events.elementAt(
-                                                            cat)['ERG'])));
-                                          },
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )),
-                        );
-                      });
-                }
-              }));
+        return Scaffold(
+            appBar: AppBar(
+              // Here we take the value from the MyHomePage object that was created by
+              // the App.build method, and use it to set our appbar title.
+              title: Text("Events"),
+              centerTitle: true,
+              backgroundColor: Utils.header,
+              flexibleSpace: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+              ),
+            ),
+            body: ListView.builder(
+                shrinkWrap: true,
+                padding: const EdgeInsets.all(10),
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int elem) {
+                  if (elem == 0) {
+                    return Padding(
+                        padding: EdgeInsets.only(
+                            top: height * 0.03, bottom: height * 0.02),
+                        child: Text(
+                          "Events",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                              color: Utils.headline),
+                        ));
+                  } else {
+                    return GridView.count(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        // Create a grid with 2 columns. If you change the scrollDirection to
+                        // horizontal, this produces 2 rows.
+                        crossAxisCount: 1,
+                        addAutomaticKeepAlives: true,
+                        children: List.generate(events.length, (index) {
+                          return Center(
+                              child: Padding(
+                            padding: EdgeInsets.only(bottom: height * 0.02),
+                            child: Container(
+                                width: MediaQuery.of(context).size.width * 0.85,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.50,
+                                child: Card(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      base64ToImage(events
+                                          .elementAt(index)['poster']
+                                              ['fileData']
+                                          .toString()),
+                                      Container(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.1,
+                                        child: ButtonBar(
+                                          alignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            FlatButton(
+                                              child: Text(
+                                                events
+                                                    .elementAt(index)['name']
+                                                    .toString(),
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: size * 40,
+                                                    color: Utils.headline),
+                                              ),
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => Event(
+                                                            event: events
+                                                                    .elementAt(
+                                                                        index)[
+                                                                'name'],
+                                                            erg: events.elementAt(
+                                                                        index)[
+                                                                    'ERG']
+                                                                ["name"])));
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )),
+                          ));
+                        }));
+
+                    // ListView.builder(
+                    //     shrinkWrap: true,
+                    //     physics: ScrollPhysics(),
+                    //     itemCount: events.length,
+                    //     itemBuilder: (BuildContext catContext, int cat) {
+                    //       return Center(
+                    //         child: Padding(
+                    //           padding: EdgeInsets.only(bottom: height * 0.05),
+                    //           child: Container(
+                    //               width: MediaQuery.of(context).size.width * 0.80,
+                    //               height:
+                    //                   MediaQuery.of(context).size.height * 0.40,
+                    //               child: Card(
+                    //                 child: Column(
+                    //                   mainAxisSize: MainAxisSize.min,
+                    //                   crossAxisAlignment:
+                    //                       CrossAxisAlignment.center,
+                    //                   children: <Widget>[
+                    //                     base64ToImage(events
+                    //                         .elementAt(cat)['poster']
+                    //                             ['fileData']
+                    //                         .toString()),
+
+                    //                     ButtonBar(
+                    //                       alignment: MainAxisAlignment.center,
+                    //                       children: <Widget>[
+                    //                         FlatButton(
+                    //                           child: Text(
+                    //                             events
+                    //                                 .elementAt(cat)['name']
+                    //                                 .toString(),
+                    //                             textAlign: TextAlign.center,
+                    //                             style: TextStyle(
+                    //                                 fontSize: size * 45),
+                    //                           ),
+                    //                         onPressed: () {
+                    //                           Navigator.push(
+                    //                               context,
+                    //                               MaterialPageRoute(
+                    //                                   builder: (context) => Event(
+                    //                                       event: events.elementAt(
+                    //                                           cat)['name'],
+                    //                                       erg: events.elementAt(
+                    //                                           cat)['ERG'])));
+                    //                         },
+                    //                       )
+                    //                     ],
+                    //                   ),
+                    //                 ],
+                    //               ),
+                    //             )),
+                    //       ));
+                    //     });
+                  }
+                }));
     } catch (err) {
       return LoadingWidget();
     }
