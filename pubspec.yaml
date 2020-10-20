@@ -3,7 +3,7 @@ description: A new Flutter application.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -40,6 +40,7 @@ dependencies:
   load: ^0.1.6
   localstorage: ^3.0.2+5
   google_fonts: ^0.3.9
+  flutter_cached_pdfview: ^0.2.3+4
   flutter_typeahead: ^1.8.7
   table_calendar: ^2.2.3
   shared_preferences: ^0.5.10
@@ -47,8 +48,8 @@ dependencies:
   carousel_pro: ^1.0.0
   firebase_messaging: ^5.1.4 
   no_context_navigation: ^1.0.2
-  flutter_full_pdf_viewer: ^1.0.6 
-
+  flutter_full_pdf_viewer: ^1.0.6
+  intl: ^0.16.1
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -78,8 +79,6 @@ flutter:
     - .env
     - assets/Event1.jpg
     - assets/as.png
-
-
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

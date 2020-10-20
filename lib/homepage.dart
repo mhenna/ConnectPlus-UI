@@ -47,51 +47,52 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return new WillPopScope(
-        onWillPop: () async => false,
-        child: Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Home"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                ),
+      onWillPop: () async => false,
+      child: Scaffold(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text("Home"),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
               ),
             ),
-            drawer: NavDrawer(),
-            backgroundColor: Utils.background,
-            body: Stack(children: <Widget>[
-              SingleChildScrollView(
-                  child: Container(
-                      child: Column(
+          ),
+        ),
+        drawer: NavDrawer(),
+        backgroundColor: Utils.background,
+        body: Stack(children: <Widget>[
+          SingleChildScrollView(
+            child: Container(
+              child: Column(
                 children: <Widget>[
                   SizedBox(
-                      height: height * 0.42,
-                      width: width,
-                      child: Carousel(
-                        images: [
-                          Image.asset('./assets/logo2.png'),
-                          Image.asset('./assets/logo.png'),
-                        ],
-                        dotSize: 4.0,
-                        dotSpacing: 15.0,
-                        dotColor: Utils.header,
-                        indicatorBgPadding: 5.0,
-                        dotBgColor: Utils.header.withOpacity(0.1),
-                        overlayShadow: true,
-                        overlayShadowColors: Colors.white,
-                        overlayShadowSize: 0.7,
-                      )),
+                    height: height * 0.42,
+                    width: width,
+                    child: Carousel(
+                      images: [
+                        Image.asset('./assets/logo2.png'),
+                        Image.asset('./assets/logo.png'),
+                      ],
+                      dotSize: 4.0,
+                      dotSpacing: 15.0,
+                      dotColor: Utils.header,
+                      indicatorBgPadding: 5.0,
+                      dotBgColor: Utils.header.withOpacity(0.1),
+                      overlayShadow: true,
+                      overlayShadowColors: Colors.white,
+                      overlayShadowSize: 0.7,
+                    ),
+                  ),
                   new Padding(
                     padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.07,
                         width * 0.03, height * 0.01),
@@ -117,43 +118,44 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: EventsVariables(),
                   ),
                   Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(
-                            width * 0.03, height * 0.02, width * 0.03, 0),
-                        width: width * 0.4,
-                        height: height * 0.12,
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.04),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30.0),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Utils.secondaryColor,
-                                    Utils.primaryColor,
-                                  ],
-                                  begin: Alignment.topRight,
-                                  end: Alignment.bottomLeft,
-                                ),
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      padding: EdgeInsets.fromLTRB(
+                          width * 0.03, height * 0.02, width * 0.03, 0),
+                      width: width * 0.4,
+                      height: height * 0.12,
+                      child: Padding(
+                          padding: EdgeInsets.only(bottom: height * 0.04),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(30.0),
+                              gradient: LinearGradient(
+                                colors: [
+                                  Utils.secondaryColor,
+                                  Utils.primaryColor,
+                                ],
+                                begin: Alignment.topRight,
+                                end: Alignment.bottomLeft,
                               ),
-                              child: MaterialButton(
-                                minWidth: MediaQuery.of(context).size.width,
-                                padding:
-                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Events()),
-                                  );
-                                },
-                                child: Text("See More",
-                                    textAlign: TextAlign.center,
-                                    style: style.copyWith(color: Colors.white)),
-                              ),
-                            )),
-                      )),
+                            ),
+                            child: MaterialButton(
+                              minWidth: MediaQuery.of(context).size.width,
+                              padding:
+                                  EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Events()),
+                                );
+                              },
+                              child: Text("See More",
+                                  textAlign: TextAlign.center,
+                                  style: style.copyWith(color: Colors.white)),
+                            ),
+                          )),
+                    ),
+                  ),
                   new Padding(
                     padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.09,
                         width * 0.03, height * 0.01),
@@ -218,10 +220,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             )),
                       )),
                 ],
-              ))),
+              ),
+            ),
+          ),
 
 // This trailing comma makes auto-formatting nicer for build methods.
-            ])));
+        ]),
+      ),
+    );
   }
 }
 

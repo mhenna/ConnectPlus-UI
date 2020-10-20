@@ -1,12 +1,10 @@
-import 'dart:convert';
-import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/utils/map_indexed.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:connect_plus/Event.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:connect_plus/EventWidget.dart';
 import 'package:localstorage/localstorage.dart';
-import 'dart:typed_data';
 import 'dart:math';
 
 class Events extends StatefulWidget {
@@ -25,68 +23,42 @@ class MyEventsPageState extends State<Events>
   bool get wantKeepAlive => true;
 
 //  String token;
-  var ip;
-  var port;
-  var events = [];
-  var randIndex;
-  var emptyEvents = false;
+  List<Event> events = [];
+  num randIndex;
+  bool emptyEvents = false;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   void initState() {
     super.initState();
-    setEnv();
     getEvents();
   }
 
-  Future setEnv() async {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
-  }
-
   void getEvents() async {
-    //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
-//    print(ip)
-//    Working for android emulator -- set to actual ip for use with physical device
-//    ip = "10.0.2.2";
-//    port = '3300';
-    var url = 'http://' + ip + ':' + port + '/event';
-    var token = localStorage.getItem("token");
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
+    final allEvents = await WebAPI.getEvents();
+    setState(() {
+      events = allEvents;
+      randIndex = Events._random.nextInt(events.length);
     });
-
-    if (response.statusCode == 200)
-      setState(() {
-        events = json.decode(response.body);
-        if (events.isEmpty)
-          emptyEvents = true;
-        else {
-          randIndex = Events._random.nextInt(events.length);
-          events.sort((b, a) => a['startDate'].compareTo(b['startDate']));
-        }});
   }
 
-  Widget base64ToImageFeatured() {
+  Widget featuredImage() {
     try {
-      Uint8List bytes =
-          base64Decode(events.elementAt(randIndex)['poster']['fileData']);
+      final featuredEvent = events[randIndex];
+      final imageURL = WebAPI.baseURL + featuredEvent.poster.url;
       return FittedBox(
         fit: BoxFit.contain,
-        child: Image.memory(bytes),
+        child: Image.network(imageURL),
       );
     } catch (Exception) {
       return LoadingWidget();
     }
   }
 
-  Widget base64ToImage(String base64) {
-    Uint8List bytes = base64Decode(base64);
+  Widget urlToImage(String imageUrl) {
     return SizedBox(
       width:
           MediaQuery.of(context).size.width, // otherwise the logo will be tiny
-      child: Image.memory(bytes),
+      child: Image.network(imageUrl),
     );
   }
 
@@ -106,52 +78,12 @@ class MyEventsPageState extends State<Events>
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.height;
-    var size = MediaQuery.of(context).size.aspectRatio;
+    super.build(context);
     try {
-      if (emptyEvents)
-        return Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Events"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                ),
-              ),
-            ),
-            body: Center(child: Text("No Events")));
+      if (events.isEmpty)
+        return AppScaffold(body: Center(child: Text("No Events")));
       else
-        return Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Events"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
-                ),
-              ),
-            ),
+        return AppScaffold(
             body: ListView.builder(
                 shrinkWrap: true,
                 padding: const EdgeInsets.all(10),
@@ -159,136 +91,56 @@ class MyEventsPageState extends State<Events>
                 itemBuilder: (BuildContext context, int elem) {
                   if (elem == 0) {
                     return Padding(
-                        padding: EdgeInsets.only(
-                            top: height * 0.03, bottom: height * 0.02),
+                        padding: EdgeInsets.only(top: 40, bottom: 20),
                         child: Text(
                           "Events",
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600,
-                              color: Utils.headline),
+                            fontSize: 32,
+                          ),
                         ));
                   } else {
-                    return GridView.count(
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        // Create a grid with 2 columns. If you change the scrollDirection to
-                        // horizontal, this produces 2 rows.
-                        crossAxisCount: 1,
-                        addAutomaticKeepAlives: true,
-                        children: List.generate(events.length, (index) {
-                          return Center(
-                              child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.02),
-                            child: Container(
-                                width: MediaQuery.of(context).size.width * 0.85,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.50,
-                                child: Card(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      base64ToImage(events
-                                          .elementAt(index)['poster']
-                                              ['fileData']
-                                          .toString()),
-                                      Container(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                0.1,
-                                        child: ButtonBar(
-                                          alignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            FlatButton(
-                                              child: Text(
-                                                events
-                                                    .elementAt(index)['name']
-                                                    .toString(),
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: size * 40,
-                                                    color: Utils.headline),
+                    return ListView(
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                      children: mapIndexed(events, (index, event) {
+                        return Center(
+                          child: Padding(
+                              padding: EdgeInsets.only(bottom: 20),
+                              child: Card(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    urlToImage(
+                                        WebAPI.baseURL + event.poster.url),
+                                    ButtonBar(
+                                      alignment: MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        FlatButton(
+                                          child: Text(
+                                            event.name,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(fontSize: 22),
+                                          ),
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    EventWidget(event: event),
                                               ),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) => Event(
-                                                            event: events
-                                                                    .elementAt(
-                                                                        index)[
-                                                                'name'],
-                                                            erg: events.elementAt(
-                                                                        index)[
-                                                                    'ERG']
-                                                                ["name"])));
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )),
-                          ));
-                        }));
-
-                    // ListView.builder(
-                    //     shrinkWrap: true,
-                    //     physics: ScrollPhysics(),
-                    //     itemCount: events.length,
-                    //     itemBuilder: (BuildContext catContext, int cat) {
-                    //       return Center(
-                    //         child: Padding(
-                    //           padding: EdgeInsets.only(bottom: height * 0.05),
-                    //           child: Container(
-                    //               width: MediaQuery.of(context).size.width * 0.80,
-                    //               height:
-                    //                   MediaQuery.of(context).size.height * 0.40,
-                    //               child: Card(
-                    //                 child: Column(
-                    //                   mainAxisSize: MainAxisSize.min,
-                    //                   crossAxisAlignment:
-                    //                       CrossAxisAlignment.center,
-                    //                   children: <Widget>[
-                    //                     base64ToImage(events
-                    //                         .elementAt(cat)['poster']
-                    //                             ['fileData']
-                    //                         .toString()),
-
-                    //                     ButtonBar(
-                    //                       alignment: MainAxisAlignment.center,
-                    //                       children: <Widget>[
-                    //                         FlatButton(
-                    //                           child: Text(
-                    //                             events
-                    //                                 .elementAt(cat)['name']
-                    //                                 .toString(),
-                    //                             textAlign: TextAlign.center,
-                    //                             style: TextStyle(
-                    //                                 fontSize: size * 45),
-                    //                           ),
-                    //                         onPressed: () {
-                    //                           Navigator.push(
-                    //                               context,
-                    //                               MaterialPageRoute(
-                    //                                   builder: (context) => Event(
-                    //                                       event: events.elementAt(
-                    //                                           cat)['name'],
-                    //                                       erg: events.elementAt(
-                    //                                           cat)['ERG'])));
-                    //                         },
-                    //                       )
-                    //                     ],
-                    //                   ),
-                    //                 ],
-                    //               ),
-                    //             )),
-                    //       ));
-                    //     });
+                                            );
+                                          },
+                                        )
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      }).toList(),
+                    );
                   }
                 }));
     } catch (err) {

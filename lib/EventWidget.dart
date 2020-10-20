@@ -1,55 +1,45 @@
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/models/erg.dart';
+import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/services/web_api.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:typed_data';
 import 'widgets/Indicator.dart';
 
-class Event extends StatefulWidget {
-  Event({Key key, @required this.event, @required this.erg}) : super(key: key);
+class EventWidget extends StatefulWidget {
+  EventWidget({Key key, @required this.event}) : super(key: key);
 
-  final String event;
-  final String erg;
+  final Event event;
 
   @override
   State<StatefulWidget> createState() {
-    return new _EventState(this.event, this.erg);
+    return new _EventState(this.event);
   }
 }
 
-class _EventState extends State<Event> with TickerProviderStateMixin {
-  var ip;
-  var port;
-  var eventDetails;
-  var ergEvents;
-  final String event;
-  final String erg;
+class _EventState extends State<EventWidget> with TickerProviderStateMixin {
+  final Event event;
+
+  List<Event> ergEvents;
   bool loading = true;
 
   AnimationController controller;
   Animation<double> animation;
 
-  _EventState(this.event, this.erg);
+  _EventState(this.event);
 
   @override
   void initState() {
     super.initState();
-    getEvent();
-    setEnv();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
     animation = Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
     controller.forward();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
+    getERGEvents();
   }
 
   @override
@@ -58,46 +48,20 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
     super.dispose();
   }
 
-  Future getEvent() async {
-    final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString("token");
-    var url = 'http://' + ip + ':' + port + '/event/getEvent/$event';
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-
-    if (response.statusCode == 200)
-      setState(() {
-        eventDetails = json.decode(response.body);
-        getERGEvents();
-      });
-  }
-
   Future getERGEvents() async {
-    final prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString("token");
-    var url = 'http://' + ip + ':' + port + '/event/getByERG/$erg';
+    final events = await WebAPI.getEventsByERG(event.erg);
 
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
+    setState(() {
+      ergEvents = events.where((ev) => ev.id != event.id).toList();
+      loading = false;
     });
-
-    if (response.statusCode == 200)
-      setState(() {
-        ergEvents = json.decode(response.body);
-        loading = false;
-      });
   }
 
-  Widget base64ToImage(String base64) {
-    Uint8List bytes = base64Decode(base64);
+  Widget urlToImage(String imageURL) {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: Image.memory(bytes),
+        child: Image.network(imageURL),
       ),
     );
   }
@@ -108,44 +72,41 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
 
     List<Widget> list = List<Widget>();
     for (var ergEvent in ergEvents) {
-      if (ergEvent['_id'] != eventDetails['event']['_id']) {
-        list.add(Container(
-          padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
-          width: width * 0.45,
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                base64ToImage(ergEvent['poster']['fileData'].toString()),
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Event(
-                                event: ergEvent['name'],
-                                erg: ergEvent['ERG'],
-                              ),
-                            ));
-                      },
-                      child: Text(
-                        ergEvent['name'].toString(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            fontSize: size * 35, color: Utils.header),
-                      ),
-                    )
-                  ],
-                ),
-              ],
-            ),
+      list.add(Container(
+        padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
+        width: width * 0.45,
+        child: Card(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              urlToImage(WebAPI.baseURL + ergEvent.poster.url),
+              ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  FlatButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => EventWidget(
+                              event: ergEvent,
+                            ),
+                          ));
+                    },
+                    child: Text(
+                      ergEvent.name,
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: size * 35, color: Utils.header),
+                    ),
+                  )
+                ],
+              ),
+            ],
           ),
-        ));
-      }
+        ),
+      ));
     }
     return list;
   }
@@ -248,8 +209,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
           children: <Widget>[
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              child: Image.memory(
-                  base64Decode(eventDetails['poster']['fileData'].toString())),
+              child: Image.network(WebAPI.baseURL + event.poster.url),
             )
           ],
         ),
@@ -303,7 +263,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Utils.titleText(
-                            textString: eventDetails['event']['name'],
+                            textString: event.name,
                             fontSize: size * 45,
                             textcolor: Utils.header),
                       ],
@@ -325,7 +285,7 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
                       padding: EdgeInsets.fromLTRB(
                           0, height * 0.08, 0, height * 0.02),
                       child: Utils.titleText(
-                          textString: "Events by $erg",
+                          textString: "Events by ${event.erg.name}",
                           fontSize: size * 45,
                           textcolor: Utils.header)),
                   Padding(
@@ -370,10 +330,8 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
-    String fulltime =
-        eventDetails['event']['startDate'].toString().split("T")[1];
-    int index = fulltime.lastIndexOf(":");
-    String time = fulltime.toString().substring(0, index);
+    String time = DateFormat.Hm('en_US').format(event.startDate);
+    String date = DateFormat.yMMMMd('en_US').format(event.startDate);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -387,25 +345,38 @@ class _EventState extends State<Event> with TickerProviderStateMixin {
             "Venue: ",
             style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
-          Text(eventDetails['event']['venue'],
-              style: TextStyle(fontSize: size * 28))
+          Text(
+            event.venue,
+            style: TextStyle(fontSize: size * 28),
+          )
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Date: ",
-            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: size * 30,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          Text(eventDetails['event']['startDate'].toString().split("T")[0],
-              style: TextStyle(fontSize: size * 28))
+          Text(
+            date,
+            style: TextStyle(fontSize: size * 28),
+          )
         ]),
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
             "Time: ",
-            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontSize: size * 30,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          Text(time, style: TextStyle(fontSize: size * 28 ))
+          Text(
+            time,
+            style: TextStyle(fontSize: size * 28),
+          )
         ]),
       ],
     );
