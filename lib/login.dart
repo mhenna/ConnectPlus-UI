@@ -1,3 +1,6 @@
+import 'package:connect_plus/models/login_request_params.dart';
+import 'package:connect_plus/models/user_profile.dart';
+import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -5,8 +8,6 @@ import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:password/password.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'widgets/pushNotification.dart';
 
@@ -55,28 +56,19 @@ class _loginState extends State<login> {
   }
 
   void checkLoggedInStatus() async {
-    prefs = await SharedPreferences.getInstance();
-    var url = 'http://' + ip + ':' + port + '/user/validate';
-    var token = prefs.getString("token");
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    }).timeout(Duration(seconds: 5), onTimeout: () {
-      setState(() {
-        loading = false;
-      });
-      _showDialog("Internet connection problem");
-      return null;
-    });
-
     try {
-      if (response.statusCode == 200) {
-        setState(() {
-          loading = false;
-        });
+      prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString("token");
+      if (token != null) {
+        final user = await WebAPI.checkToken(token);
         localStorage.setItem("token", token);
-        localStorage.setItem("profile", json.decode(response.body)["profile"]);
+        UserProfile profile;
+        if (user.profile == null) {
+          profile = await WebAPI.getProfile(user.profileId);
+        } else {
+          profile = user.profile;
+        }
+        localStorage.setItem("profile", profile);
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage()),
@@ -86,25 +78,33 @@ class _loginState extends State<login> {
           loading = false;
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   void loginPressed() async {
-    //use these values in .env for android simulator, actual ip for iOS and physical devices
-    var url = 'http://' + ip + ':' + port + '/user/login';
-    final msg = jsonEncode({
-      'email': emController.text,
-      'password': hashPassword(),
-    });
+    try {
+      final loginParams = LoginRequestParams.fromJson({
+        'identifier': emController.text,
+        // TODO: encode password in app and decode password on server
+        'password': pwController.text
+      });
 
-    var response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: msg);
+      final userWithToken = await WebAPI.login(loginParams);
+      UserProfile profile;
+      if (userWithToken.user.profile == null) {
+        profile = await WebAPI.getProfile(userWithToken.user.profileId);
+      } else {
+        profile = userWithToken.user.profile;
+      }
 
-    if (response.statusCode == 200) {
-      localStorage.setItem("token", json.decode(response.body)["token"]);
-      localStorage.setItem("profile", json.decode(response.body)["profile"]);
+      localStorage.setItem("token", userWithToken.jwt);
+      localStorage.setItem("profile", profile);
 
-      prefs.setString("token", json.decode(response.body)["token"]);
+      prefs.setString("token", userWithToken.jwt);
       setState(() {
         asyncCall = false;
       });
@@ -112,11 +112,11 @@ class _loginState extends State<login> {
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
-    } else {
+    } catch (e) {
       setState(() {
         asyncCall = false;
       });
-      _showDialog(response.body);
+      _showDialog(e.toString());
     }
   }
 
@@ -155,10 +155,11 @@ class _loginState extends State<login> {
           TextSpan(
               text: ' Login ',
               style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Utils.header,
-                  fontSize: size * 55,
-                  fontFamily: "Arial"))
+                fontWeight: FontWeight.bold,
+                color: Utils.header,
+                fontSize: size * 55,
+                fontFamily: "Arial",
+              ))
         ]),
       );
       final register = Text.rich(

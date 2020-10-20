@@ -1,22 +1,21 @@
-import 'dart:io';
-
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/models/offer.dart';
+import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/pdf_viewer_from_url.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_full_pdf_viewer/full_pdf_viewer_scaffold.dart';
-import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
-import 'dart:convert';
-import 'dart:typed_data';
-import 'package:path_provider/path_provider.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
 import 'widgets/Indicator.dart';
 
-class Offer extends StatefulWidget {
-  Offer({Key key, @required this.offer, @required this.category})
-      : super(key: key);
+class OfferWidget extends StatefulWidget {
+  OfferWidget({
+    Key key,
+    @required this.offer,
+    @required this.category,
+  }) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -26,17 +25,15 @@ class Offer extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-  final String category;
-  final offer;
+  final OfferCategory category;
+  final Offer offer;
 
   @override
   _OfferState createState() => _OfferState();
 }
 
-class _OfferState extends State<Offer> with TickerProviderStateMixin {
-  var ip;
-  var port;
-  var relatedOffers = [];
+class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
+  List<Offer> relatedOffers = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   bool loading = true;
@@ -47,7 +44,6 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
 
   void initState() {
     super.initState();
-    setEnv();
     getOffers();
     controller =
         AnimationController(vsync: this, duration: Duration(milliseconds: 300));
@@ -56,51 +52,27 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
     controller.forward();
   }
 
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
-  }
-
   @override
   void dispose() {
     controller.dispose();
     super.dispose();
   }
 
-  Future getOffers() async {
-    String name = widget.category;
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/offers/getByCategory/$name';
-
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
+  Future<void> getOffers() async {
+    final offers = await WebAPI.getOffersByCategory(widget.category);
+    setState(() {
+      this.relatedOffers = offers;
+      loading = false;
     });
-
-    if (response.statusCode == 200)
-      setState(() {
-        relatedOffers = json.decode(response.body);
-        loading = false;
-      });
   }
 
-  Widget base64ToImage(String base64) {
-    Uint8List bytes = base64Decode(base64);
+  Widget urlToImage(String imageURL) {
     return Expanded(
       child: SizedBox(
         width: 220, // otherwise the logo will be tiny
-        child: Image.memory(bytes),
+        child: Image.network(imageURL),
       ),
     );
-  }
-
-  base64ToPDF(String base64) async {
-    Uint8List bytes = base64Decode(base64);
-    String dir = (await getApplicationDocumentsDirectory()).path;
-    File f = File(
-        "$dir/" + DateTime.now().millisecondsSinceEpoch.toString() + ".pdf");
-    await f.writeAsBytes(bytes);
-    return f.path;
   }
 
   Widget LoadingWidget() {
@@ -121,11 +93,10 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
 
-    relatedOffers.sort(
-        (b, a) => a['offer']['createdAt'].compareTo(b['offer']['createdAt']));
+    relatedOffers.sort((b, a) => b.createdAt.compareTo(a.createdAt));
 
     for (var offer in relatedOffers) {
-      if (offer['offer']['_id'] != widget.offer['_id'].toString()) {
+      if (offer.id != widget.offer.id) {
         list.add(Container(
           padding: EdgeInsets.fromLTRB(width * 0.01, 0.0, width * 0.01, 0.0),
           width: width * 0.48,
@@ -134,24 +105,23 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                base64ToImage(offer['logo']['fileData']),
+                urlToImage(WebAPI.baseURL + offer.logo.url),
                 ButtonBar(
                   alignment: MainAxisAlignment.center,
                   children: <Widget>[
                     FlatButton(
                       onPressed: () {
-                        offer['offer']['logo'] = offer['logo'];
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => Offer(
+                              builder: (context) => OfferWidget(
                                 category: widget.category,
-                                offer: offer['offer'],
+                                offer: offer,
                               ),
                             ));
                       },
                       child: Text(
-                        offer['offer']['name'].toString(),
+                        offer.name,
                         textAlign: TextAlign.center,
                         style:
                             TextStyle(fontSize: size * 30, color: Utils.header),
@@ -193,15 +163,17 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                    child: Text(
-                      widget.offer['name'],
-                      style: TextStyle(
-                          fontSize: size * 55,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600),
-                    ))
+                  padding:
+                      EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
+                  child: Text(
+                    widget.offer.name,
+                    style: TextStyle(
+                      fontSize: size * 55,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                )
               ],
             ),
           ),
@@ -258,8 +230,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
           children: <Widget>[
             SizedBox(
               width: MediaQuery.of(context).size.width,
-              child: Image.memory(
-                  base64Decode(widget.offer['logo']['fileData'])),
+              child: Image.network(WebAPI.baseURL + widget.offer.logo.url),
             )
           ],
         ),
@@ -313,7 +284,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
                         Text(
-                          "${widget.offer['discount']} OFF",
+                          "${widget.offer.discount.toString()} OFF",
                           style: TextStyle(
                               fontSize: size * 50,
                               color: Utils.headline,
@@ -338,23 +309,34 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
                       ),
                     ),
                     onTap: () async {
-                      String pathPDF = await base64ToPDF(
-                          widget.offer['attachment']['fileData']);
+                      String pathPDF =
+                          WebAPI.baseURL + widget.offer.attachment.url;
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                            builder: (context) => PDFScreen(pathPDF)),
+                        MaterialPageRoute<dynamic>(
+                          builder: (_) => PDFViewerCachedFromUrl(
+                            url: pathPDF,
+                            title: widget.offer.name,
+                          ),
+                        ),
                       );
                       // PDFViewer(document: file, indicatorBackground: Colors.red);
                     },
                   ),
+                  // TODO: Hide this section when we don't have related offers.
                   Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          0, height * 0.08, 0, height * 0.02),
-                      child: Utils.titleText(
-                          textString: " Related Offers",
-                          fontSize: size * 45,
-                          textcolor: Utils.header)),
+                    padding: EdgeInsets.fromLTRB(
+                      0,
+                      height * 0.08,
+                      0,
+                      height * 0.02,
+                    ),
+                    child: Utils.titleText(
+                      textString: " Related Offers",
+                      fontSize: size * 45,
+                      textcolor: Utils.header,
+                    ),
+                  ),
                   Padding(
                       padding: EdgeInsets.fromLTRB(
                           width * 0.02, 0, width * 0.02, height * 0.02),
@@ -396,7 +378,7 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text(
-          widget.offer['details'],
+          widget.offer.details,
           style: TextStyle(
             color: Utils.header,
             fontSize: size * 31,
@@ -404,11 +386,11 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
         ),
         Text(
           "\n\nLocation: " +
-              widget.offer['location'].toString() +
+              widget.offer.location.toString() +
               "\n\nContact: " +
-              widget.offer['contact'].toString() +
-              "\n\nExpiration: " +
-              widget.offer['expiration'].toString().substring(0,10) +
+              widget.offer.contact.toString() +
+              "\n\nExpires: " +
+              DateFormat.yMMMMd("en_US").format(widget.offer.expiration) +
               "\n",
           style: TextStyle(
             color: Colors.black87,
@@ -454,25 +436,5 @@ class _OfferState extends State<Offer> with TickerProviderStateMixin {
         ),
       ),
     );
-  }
-}
-
-class PDFScreen extends StatelessWidget {
-  String pathPDF = "";
-  PDFScreen(this.pathPDF);
-
-  @override
-  Widget build(BuildContext context) {
-    return PDFViewerScaffold(
-        appBar: AppBar(
-          title: Text("Details"),
-          actions: <Widget>[
-            IconButton(
-              icon: Icon(Icons.share),
-              onPressed: () {},
-            ),
-          ],
-        ),
-        path: pathPDF);
   }
 }

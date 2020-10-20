@@ -1,3 +1,4 @@
+import 'package:connect_plus/models/user_profile_request_params.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -6,7 +7,6 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:connect_plus/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
-
 
 class RegistrationProfile extends StatefulWidget {
   RegistrationProfile({Key key, this.title}) : super(key: key);
@@ -39,7 +39,6 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     ip = DotEnv().env['SERVER_IP'];
   }
 
-
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -59,7 +58,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Full Name",
           border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
     final addressField = TextField(
       controller: addressController,
@@ -69,7 +68,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "Building, 67 Street, Nasr City",
           border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
     final phoneField = TextField(
       controller: phoneController,
@@ -78,7 +77,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "01XXXXXXXX",
           border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
     final carPlateField = TextField(
       controller: carPlateController,
@@ -87,7 +86,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
           contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
           hintText: "wkd890",
           border:
-          OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
     final registerTitle = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -103,7 +102,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     final registerButton = Material(
       elevation: 5.0,
       borderRadius: BorderRadius.circular(30.0),
-      color:Utils.header,
+      color: Utils.header,
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
@@ -151,79 +150,77 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
 
     return Scaffold(
         body: ModalProgressHUD(
-          inAsyncCall: asyncCall,
-          opacity: 0.5,
-          progressIndicator: LoadingText(),
-          child: Center(
-            child: SingleChildScrollView(
+      inAsyncCall: asyncCall,
+      opacity: 0.5,
+      progressIndicator: LoadingText(),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xfffafafa),
+                image: DecorationImage(
+                  image: AssetImage("assets/logo2.png"),
+                  fit: BoxFit.fitWidth,
+                  alignment: Alignment.topCenter,
+                ),
+              ),
               child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xfffafafa),
-                    image: DecorationImage(
-                      image: AssetImage("assets/logo2.png"),
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
-                    child: Card(
-                      child: Column(
-                        children: <Widget>[
-                          SizedBox(height: 20.0),
-                          Container(
-                              alignment: Alignment.centerLeft,
-                              child: registerTitle),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: fullNameField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: addressField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: phoneField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: carPlateField,
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
-                            width: 250,
-                            child: Padding(
-                                padding: EdgeInsets.only(bottom: 20),
-                                child: registerButton),
-                          ),
-                        ],
+                padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
+                child: Card(
+                  child: Column(
+                    children: <Widget>[
+                      SizedBox(height: 20.0),
+                      Container(
+                          alignment: Alignment.centerLeft,
+                          child: registerTitle),
+                      SizedBox(height: 20.0),
+                      Container(
+                        width: 250,
+                        child: fullNameField,
                       ),
-                    ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        width: 250,
+                        child: addressField,
+                      ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        width: 250,
+                        child: phoneField,
+                      ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        width: 250,
+                        child: carPlateField,
+                      ),
+                      SizedBox(height: 20.0),
+                      Container(
+                        width: 250,
+                        child: Padding(
+                            padding: EdgeInsets.only(bottom: 20),
+                            child: registerButton),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    ));
   }
 
   void register() async {
-    var user = localStorage.getItem('user');
-    var url = 'http://' + ip + ':' + port + '/profile/addProfile';
-    final msg = jsonEncode({
-     "profile": { 'name': fnController.text, 'address': addressController.text, 'phoneNumber': phoneController.text, 'carPlate': carPlateController.text},
-      "userId": user['_id']
-    });
-    var response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: msg);
-    if (response.statusCode == 200) {
+    try {
+      final params = UserProfileRequestParams.fromJson({
+        'name': fnController.text,
+        'address': addressController.text,
+        'phoneNumber': phoneController.text,
+        'carPlate': carPlateController.text,
+      });
       setState(() {
         asyncCall = false;
       });
@@ -231,11 +228,11 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
         context,
         MaterialPageRoute(builder: (context) => login()),
       );
-    } else {
+    } catch (e) {
       setState(() {
         asyncCall = false;
       });
-      _showDialog(response.body);
+      _showDialog(e.toString());
     }
   }
 

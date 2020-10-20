@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'dart:convert';
 import 'package:connect_plus/Navbar.dart';
-import 'package:connect_plus/Event.dart';
+import 'package:connect_plus/EventWidget.dart';
 
 class Calendar extends StatefulWidget {
   @override
@@ -32,14 +32,8 @@ class _CalendarState extends State<Calendar> {
     _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
-    setEnv();
     getEvents();
     getActivities();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
   }
 
   void getEvents() async {
@@ -206,7 +200,8 @@ class _CalendarState extends State<Calendar> {
                               Container(
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color:Color(int.parse(event['ERG']['color']))),
+                                    color: Color(
+                                        int.parse(event['ERG']['color']))),
                                 width: 10.0,
                                 height: 10.0,
                               ),
@@ -224,12 +219,10 @@ class _CalendarState extends State<Calendar> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => Event(
+                            builder: (context) => EventWidget(
                                   event: event["name"],
-                                  erg: event['ERG']["name"],
                                 )),
                       );
-                      
                     } else {
                       Navigator.push(
                         context,

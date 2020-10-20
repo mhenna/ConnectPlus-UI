@@ -44,3 +44,5 @@ app.*.map.json
 ios/Runner.xcodeproj/project.pbxproj
 ios/Runner.xcworkspace/contents.xcworkspacedata
 .env
+google-services.json
+launch.json

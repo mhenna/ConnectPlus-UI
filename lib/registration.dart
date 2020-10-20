@@ -1,11 +1,12 @@
 import 'package:connect_plus/login.dart';
+import 'package:connect_plus/models/register_request_params.dart';
+import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:load/load.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:connect_plus/registrationProfile.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -39,11 +40,6 @@ class _registrationState extends State<registration> {
   setEnv() {
     port = DotEnv().env['PORT'];
     ip = DotEnv().env['SERVER_IP'];
-  }
-
-  String hashPassword() {
-    final hash = Password.hash(pwController.text, algorithm);
-    return hash;
   }
 
   @override
@@ -228,16 +224,14 @@ class _registrationState extends State<registration> {
   }
 
   void register() async {
-    var url = 'http://' + ip + ':' + port + '/user/register';
-    final msg = jsonEncode({
-      'name': fnController.text,
-      'email': emController.text,
-      'password': hashPassword(),
-    });
-    var response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: msg);
-    if (response.statusCode == 200) {
-      localStorage.setItem("user", json.decode(response.body)['user']);
+    try {
+      final registerParams = RegisterRequestParameters.fromJson({
+        'username': fnController.text,
+        'email': emController.text,
+        'password': pwController.text,
+      });
+      final registeredUser = WebAPI.register(registerParams);
+      localStorage.setItem("user", registeredUser);
       setState(() {
         asyncCall = false;
       });
@@ -245,11 +239,11 @@ class _registrationState extends State<registration> {
         context,
         MaterialPageRoute(builder: (context) => RegistrationProfile()),
       );
-    } else {
+    } catch (e) {
       setState(() {
         asyncCall = false;
       });
-      _showDialog(response.body);
+      _showDialog(e.toString);
     }
   }
 
