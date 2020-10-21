@@ -15,7 +15,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
 
 class WebAPI {
-  static final String baseURL = DotEnv().env["API_BASE_URL"];
+  static final String baseURL = "http://18.221.173.220:1337";
   static final String _registerURL = '/auth/local/register';
   static final String _loginURL = '/auth/local';
   static final String _profilesURL = '/profiles';
@@ -40,6 +40,23 @@ class WebAPI {
     Map<String, String> headers = generateHeaders();
 
     final response = await http.post(
+      requestURL,
+      headers: headers,
+      body: body,
+    );
+    // TODO: Implement better error handling approach
+    if (response.statusCode != 200) {
+      throw response;
+    }
+    return response;
+  }
+
+  static put<T>(String url, String body) async {
+    final requestURL = constructURL(url);
+
+    Map<String, String> headers = generateHeaders();
+
+    final response = await http.put(
       requestURL,
       headers: headers,
       body: body,
@@ -91,6 +108,7 @@ class WebAPI {
     final requestBody = jsonEncode(params);
     final response = await post(_registerURL, requestBody);
     final responseBody = json.decode(response.body);
+
     final registeredUser = UserWithToken.fromJson(responseBody);
 
     // reset the current user on register
@@ -114,10 +132,20 @@ class WebAPI {
   }
 
   static Future<UserProfile> setProfile(
-    UserProfileRequestParams params,
-  ) async {
+      UserProfileRequestParams params,
+      ) async {
     final requestBody = jsonEncode(params);
     final response = await post(_profilesURL, requestBody);
+    final responseBody = json.decode(response.body);
+    final profile = UserProfile.fromJson(responseBody);
+    return profile;
+  }
+
+  static Future<UserProfile> updateProfile(
+      UserProfileRequestParams params,
+      ) async {
+    final requestBody = jsonEncode(params);
+    final response = await put(_profilesURL, requestBody);
     final responseBody = json.decode(response.body);
     final profile = UserProfile.fromJson(responseBody);
     return profile;
