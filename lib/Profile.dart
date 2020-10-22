@@ -6,6 +6,9 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/models/user_profile.dart';
+import 'package:connect_plus/models/user_profile_request_params.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -24,28 +27,17 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  var ip;
-  var port;
-  Map<String, dynamic> profile = {
-    "name": "",
-    "address": "",
-    "phone": "",
-    "carPlate": ""
-  };
+  UserProfile profile;
+
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     setProfile();
-    setEnv();
-    getProfile(profile['phoneNumber']);
+    getProfile();
   }
 
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
-  }
 
   void setProfile() async {
     setState(() {
@@ -53,59 +45,33 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
-  void getProfile(phoneNumber) async {
-//    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
-//    print(ip)
-//    Working for android emulator -- set to actual ip for use with physical device
-    String token = localStorage.getItem("token");
-    var url =
-        'http://' + ip + ':' + port + '/profile/getProfile/' + phoneNumber;
-    print(url);
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-    print(response.statusCode);
-    if (response.statusCode == 200)
+  void getProfile() async {
       setState(() {
-        profile = json.decode(response.body)['Profile'];
-        nameController = TextEditingController(text: profile['name']);
-        addressController = TextEditingController(text: profile['address']);
-        carPlateController = TextEditingController(text: profile['carPlate']);
-        phoneController = TextEditingController(text: profile['phoneNumber']);
+        nameController = TextEditingController(text: profile.name);
+        addressController = TextEditingController(text: profile.address);
+        carPlateController = TextEditingController(text: profile.carPlate);
+        phoneController = TextEditingController(text: profile.phoneNumber);
       });
   }
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
-    //    var ip = await EnvironmentUtil.getEnvValueForKey('SERVER_IP');
-//    print(ip)
-//    Working for android emulator -- set to actual ip for use with physical device
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/profile/editProfile';
-    print(url);
     Map<String, dynamic> editedProfile = {
-      "name": nameController.text != "" ? nameController.text : profile['name'],
+      "name": nameController.text != "" ? nameController.text : profile.name,
       "address": addressController.text != ""
           ? addressController.text
-          : profile['address'],
+          : profile.address,
       "phoneNumber": phoneController.text != ""
           ? phoneController.text
-          : profile['phoneNumber'],
+          : profile.phoneNumber,
       "carPlate": carPlateController.text != ""
           ? carPlateController.text
-          : profile['carPlate']
+          : profile.carPlate
     };
-    var sentObj = jsonEncode(
-        {'profile': editedProfile, 'phoneNumber':  profile['phoneNumber']});
-    var response = await http.post(url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer $token"
-        },
-        body: sentObj);
-    print(response.statusCode);
-    localStorage.setItem('profile', editedProfile);
+
+    final updatedProfile = await WebAPI.updateProfile(UserProfileRequestParams.fromJson(editedProfile));
+
+    localStorage.setItem('profile', updatedProfile);
   }
 
   Widget _getLabel(String value) {
@@ -251,16 +217,16 @@ class MapScreenState extends State<ProfilePage>
                               children: <Widget>[
                                 _getLabel("Name"),
                                 _getField(
-                                    profile['name'].toString(), nameController),
+                                    profile.name.toString(), nameController),
                                 _getLabel("Address"),
-                                _getField(profile['address'].toString(),
+                                _getField(profile.address.toString(),
                                     addressController),
                                 _getLabel("Phone Number"),
-                                _getField(profile['phoneNumber'].toString(),
+                                _getField(profile.phoneNumber.toString(),
                                     phoneController),
                                 _getLabel(
                                     "Car Plate # (Please write letters in Arabic)"),
-                                _getField(profile['carPlate'].toString(),
+                                _getField(profile.carPlate.toString(),
                                     carPlateController)
                               ],
                             ),

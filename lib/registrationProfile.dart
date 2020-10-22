@@ -7,6 +7,8 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:connect_plus/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:connect_plus/services/web_api.dart';
+
 
 class RegistrationProfile extends StatefulWidget {
   RegistrationProfile({Key key, this.title}) : super(key: key);
@@ -221,10 +223,13 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
         'phoneNumber': phoneController.text,
         'carPlate': carPlateController.text,
       });
+
+      final registeredProfile = await WebAPI.setProfile(params);
+      localStorage.setItem("profile", registeredProfile);
       setState(() {
         asyncCall = false;
       });
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => login()),
       );
