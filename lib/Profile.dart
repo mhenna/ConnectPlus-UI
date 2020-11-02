@@ -27,7 +27,7 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  UserProfile profile;
+  UserProfile profile = new UserProfile();
 
 
   @override
@@ -41,7 +41,7 @@ class MapScreenState extends State<ProfilePage>
 
   void setProfile() async {
     setState(() {
-      profile = localStorage.getItem('profile');
+      profile = UserProfile.fromJson(localStorage.getItem('profile'));
     });
   }
 
