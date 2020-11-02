@@ -30,29 +30,15 @@ class _loginState extends State<login> {
 
   final emController = TextEditingController();
   final pwController = TextEditingController();
-  final algorithm = PBKDF2();
   TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
+  bool loading = true;
+  bool asyncCall = false;
   SharedPreferences prefs;
-  var ip;
-  var port;
-  var loading = true;
-  var asyncCall = false;
 
   void initState() {
     super.initState();
-    setEnv();
     pushNotification.initialize();
     checkLoggedInStatus();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
-  }
-
-  String hashPassword() {
-    final hash = Password.hash(pwController.text, algorithm);
-    return hash;
   }
 
   void checkLoggedInStatus() async {
@@ -61,7 +47,7 @@ class _loginState extends State<login> {
       final token = prefs.getString("token");
       if (token != null) {
         final user = await WebAPI.checkToken(token);
-        localStorage.setItem("token", token);
+        prefs.setString("token", token);
         UserProfile profile;
         if (user.profile == null) {
           profile = await WebAPI.getProfile(user.profileId);
@@ -104,7 +90,6 @@ class _loginState extends State<login> {
       localStorage.setItem("token", userWithToken.jwt);
       localStorage.setItem("profile", profile);
 
-      prefs.setString("token", userWithToken.jwt);
       setState(() {
         asyncCall = false;
       });
