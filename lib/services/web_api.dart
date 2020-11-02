@@ -13,6 +13,7 @@ import 'package:connect_plus/models/user_profile_request_params.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WebAPI {
   static final String baseURL = "http://18.221.173.220:1337";
@@ -22,9 +23,6 @@ class WebAPI {
   static final String _checkUserURL = '/users/me';
   static final String _offersURL = '/offers';
   static final String _eventsURL = '/events';
-
-  // TODO: remove this to a separate service
-  static final localStorage = LocalStorage('Connect+');
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -111,9 +109,6 @@ class WebAPI {
 
     final registeredUser = UserWithToken.fromJson(responseBody);
 
-    // reset the current user on register
-    currentUser = registeredUser.user;
-    currentToken = registeredUser.jwt;
     return registeredUser;
   }
 
@@ -132,8 +127,8 @@ class WebAPI {
   }
 
   static Future<UserProfile> setProfile(
-      UserProfileRequestParams params,
-      ) async {
+    UserProfileRequestParams params,
+  ) async {
     final requestBody = jsonEncode(params);
     final response = await post(_profilesURL, requestBody);
     final responseBody = json.decode(response.body);
@@ -142,8 +137,8 @@ class WebAPI {
   }
 
   static Future<UserProfile> updateProfile(
-      UserProfileRequestParams params,
-      ) async {
+    UserProfileRequestParams params,
+  ) async {
     final requestBody = jsonEncode(params);
     final response = await put(_profilesURL, requestBody);
     final responseBody = json.decode(response.body);
@@ -156,8 +151,10 @@ class WebAPI {
     final user = User.fromJson(json.decode(response.body));
     if (user != null) {
       currentUser = user;
+      currentToken = token;
+    } else {
+      currentToken = null;
     }
-    currentToken = token;
     return user;
   }
 
