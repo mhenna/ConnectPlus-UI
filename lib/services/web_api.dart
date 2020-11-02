@@ -116,14 +116,20 @@ class WebAPI {
     LoginRequestParams params,
   ) async {
     final requestBody = jsonEncode(params);
-    final response = await post(_loginURL, requestBody);
-    final responseBody = json.decode(response.body);
-    final loggedInUser = UserWithToken.fromJson(responseBody);
+    try {
+      final response = await post(_loginURL, requestBody);
+      final responseBody = json.decode(response.body);
+      final loggedInUser = UserWithToken.fromJson(responseBody);
 
-    // reset the current user on login
-    currentUser = loggedInUser.user;
-    currentToken = loggedInUser.jwt;
-    return loggedInUser;
+      // reset the current user on login
+      currentUser = loggedInUser.user;
+      currentToken = loggedInUser.jwt;
+      return loggedInUser;
+    } catch (e) {
+      currentUser = null;
+      currentToken = null;
+      throw e;
+    }
   }
 
   static Future<UserProfile> setProfile(

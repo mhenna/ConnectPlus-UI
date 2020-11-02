@@ -9,7 +9,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/services/web_api.dart';
 
-
 class RegistrationProfile extends StatefulWidget {
   RegistrationProfile({Key key, this.title}) : super(key: key);
   final String title;
@@ -234,6 +233,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
         MaterialPageRoute(builder: (context) => login()),
       );
     } catch (e) {
+      localStorage.setItem("profile", null);
       setState(() {
         asyncCall = false;
       });

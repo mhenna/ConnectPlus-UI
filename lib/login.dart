@@ -47,7 +47,6 @@ class _loginState extends State<login> {
       final token = prefs.getString("token");
       if (token != null) {
         final user = await WebAPI.checkToken(token);
-        prefs.setString("token", token);
         UserProfile profile;
         if (user.profile == null) {
           profile = await WebAPI.getProfile(user.profileId);
@@ -87,7 +86,7 @@ class _loginState extends State<login> {
         profile = userWithToken.user.profile;
       }
 
-      localStorage.setItem("token", userWithToken.jwt);
+      prefs.setString("token", userWithToken.jwt);
       localStorage.setItem("profile", profile);
 
       setState(() {
@@ -98,6 +97,8 @@ class _loginState extends State<login> {
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
     } catch (e) {
+      prefs.setString("token", null);
+      localStorage.setItem("profile", null);
       setState(() {
         asyncCall = false;
       });
