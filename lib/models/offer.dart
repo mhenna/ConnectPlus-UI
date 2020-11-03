@@ -20,7 +20,7 @@ class Offer {
   String name;
   OfferCategory category;
   String details;
-  int discount;
+  String discount;
   DateTime expiration;
   String contact;
   DateTime createdAt;
