@@ -51,7 +51,7 @@ class ImageFile {
     hash = json['hash'];
     ext = json['ext'];
     mime = json['mime'];
-    size = json['size'];
+    size = json['size'].toDouble();
     width = json['width'];
     height = json['height'];
     url = json['url'];

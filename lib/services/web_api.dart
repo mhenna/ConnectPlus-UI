@@ -10,10 +10,7 @@ import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/models/user_profile.dart';
 import 'package:connect_plus/models/user_profile_request_params.dart';
 
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:localstorage/localstorage.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class WebAPI {
   static final String baseURL = "http://18.221.173.220:1337";
@@ -115,6 +112,8 @@ class WebAPI {
   static Future<UserWithToken> login(
     LoginRequestParams params,
   ) async {
+    currentToken = null;
+    currentUser = null;
     final requestBody = jsonEncode(params);
     try {
       final response = await post(_loginURL, requestBody);
