@@ -1,5 +1,6 @@
 import 'package:connect_plus/models/user_profile_request_params.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -8,6 +9,7 @@ import 'package:connect_plus/login.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/login.dart';
 
 class RegistrationProfile extends StatefulWidget {
   RegistrationProfile({Key key, this.title}) : super(key: key);
@@ -23,8 +25,9 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
   final fnController = TextEditingController();
   final addressController = TextEditingController();
   final phoneController = TextEditingController();
-  final carPlateController = TextEditingController();
-
+  final carPlateLettersController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final carPlateNumController = TextEditingController();
   var asyncCall = false;
   var ip;
   var port;
@@ -51,41 +54,80 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
 
   @override
   Widget build(BuildContext context) {
-    final fullNameField = TextField(
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+
+    final fullNameField = TextFormField(
       controller: fnController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
           hintText: "Full Name",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your full name';
+        }
+        return null;
+      },
     );
-    final addressField = TextField(
+    final addressField = TextFormField(
       controller: addressController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
           hintText: "Building, 67 Street, Nasr City",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your address';
+        }
+        return null;
+      },
     );
-    final phoneField = TextField(
+    final phoneField = TextFormField(
       controller: phoneController,
+      obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "01XXXXXXXX",
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+          hintText: "01XXXXXXXXX",
+          border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your phone number';
+        }
+        return null;
+      },
+    );
+    final carPlateLettersField = TextFormField(
+      controller: carPlateLettersController,
+      obscureText: false,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.03, height * 0.015, width * 0.02, height * 0.015),
+          hintText: "رم",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
-    final carPlateField = TextField(
-      controller: carPlateController,
+    final carPlateNumField = TextFormField(
+      controller: carPlateNumController,
+      obscureText: false,
       style: style,
       decoration: InputDecoration(
-          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-          hintText: "wkd890",
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.03, height * 0.015, width * 0.02, height * 0.015),
+          hintText: "879",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
     );
@@ -95,59 +137,66 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
             text: ' Register ',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Color(0xfff7501e),
-                fontSize: 30.0,
+                color: Utils.header,
+                fontSize: size * 55,
                 fontFamily: "Arial"))
       ]),
     );
-    final registerButton = Material(
-      elevation: 5.0,
-      borderRadius: BorderRadius.circular(30.0),
-      color: Utils.header,
+    final registerButton = Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        gradient: LinearGradient(
+          colors: [
+            Utils.secondaryColor,
+            Utils.primaryColor,
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+      ),
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        padding: EdgeInsets.fromLTRB(
+            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
         onPressed: () {
-          FocusScope.of(context).unfocus();
-          setState(() {
-            asyncCall = true;
-          });
-          Future.delayed(Duration(seconds: 1), () {
-            register();
-          });
+          if (_formKey.currentState.validate()) {
+            FocusScope.of(context).unfocus();
+            setState(() {
+              asyncCall = true;
+            });
+            Future.delayed(Duration(seconds: 1), () {
+              register();
+            });
+          }
         },
         child: Text("Register",
             textAlign: TextAlign.center,
             style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
-
-//    final login = Text.rich(
-//      TextSpan(children: <TextSpan>[
-//        TextSpan(
-//            text: ' Already a user? ',
-//            style: TextStyle(
-//                color: Colors.black,
-//                fontSize: 15.0,
-//                fontFamily: "Arial")),
-//        TextSpan(
-//            text: ' Login ',
-//            style: TextStyle(
-//                fontWeight: FontWeight.bold,
-//                color: Color(0xfff7501e),
-//                fontSize: 15.0,
-//                fontFamily: "Arial"),
-//            recognizer: TapGestureRecognizer()
-//              ..onTap = () {
-//                Navigator.push(
-//                  context,
-//                  MaterialPageRoute(builder: (context) => login()),
-//                );
-//              }
-//        )
-//      ]),
-//    );
+    // final login = Text.rich(
+    //   TextSpan(children: <TextSpan>[
+    //     TextSpan(
+    //         text: ' Already a user? ',
+    //         style: TextStyle(
+    //             color: Colors.black, fontSize: 15.0, fontFamily: "Arial")),
+    //     TextSpan(
+    //         text: ' Login ',
+    //         style: TextStyle(
+    //             fontWeight: FontWeight.bold,
+    //             color: Color(0xfff7501e),
+    //             fontSize: 15.0,
+    //             fontFamily: "Arial"),
+    //         recognizer: TapGestureRecognizer()
+    //           ..onTap = () {
+    //             // Navigator.push(
+    //             //   context,
+    //             //   //  MaterialPageRoute(builder: (context) => login()),
+    //             // );
+    //           })
+    //   ]),
+    // );
 
     return Scaffold(
         body: ModalProgressHUD(
@@ -177,31 +226,55 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
                           alignment: Alignment.centerLeft,
                           child: registerTitle),
                       SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: fullNameField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: addressField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: phoneField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: carPlateField,
-                      ),
-                      SizedBox(height: 20.0),
-                      Container(
-                        width: 250,
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: 20),
-                            child: registerButton),
+                      Form(
+                        key: _formKey,
+                        child: Column(
+                          children: <Widget>[
+                            Container(
+                              width: width * 0.75,
+                              child: fullNameField,
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: width * 0.75,
+                              child: addressField,
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: width * 0.75,
+                              child: phoneField,
+                            ),
+                            SizedBox(height: 20.0),
+                            Center(
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    width: width * 0.30,
+                                    child: carPlateNumField,
+                                  ),
+                                  Container(
+                                    width: width * 0.30,
+                                    child: carPlateLettersField,
+                                  ),
+                                  Tooltip(
+                                    child: _getInfoIcon(),
+                                    message:
+                                        "It will be used for moveyourcar app",
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 20.0),
+                            Container(
+                              width: width * 0.75,
+                              child: Padding(
+                                  padding: EdgeInsets.only(bottom: 20),
+                                  child: registerButton),
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -214,13 +287,24 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     ));
   }
 
+  Widget _getInfoIcon() {
+    return new GestureDetector(
+      child: new Icon(
+        Icons.info,
+        color: Utils.header,
+        size: 20.0,
+      ),
+    );
+  }
+
   void register() async {
     try {
       final params = UserProfileRequestParams.fromJson({
         'name': fnController.text,
         'address': addressController.text,
         'phoneNumber': phoneController.text,
-        'carPlate': carPlateController.text,
+        'carPlate':
+            (carPlateNumController.text + carPlateLettersController.text),
       });
 
       final registeredProfile = await WebAPI.setProfile(params);

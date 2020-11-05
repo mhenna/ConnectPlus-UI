@@ -29,7 +29,6 @@ class MapScreenState extends State<ProfilePage>
 
   UserProfile profile = new UserProfile();
 
-
   @override
   void initState() {
     // TODO: implement initState
@@ -38,7 +37,6 @@ class MapScreenState extends State<ProfilePage>
     getProfile();
   }
 
-
   void setProfile() async {
     setState(() {
       profile = UserProfile.fromJson(localStorage.getItem('profile'));
@@ -46,12 +44,12 @@ class MapScreenState extends State<ProfilePage>
   }
 
   void getProfile() async {
-      setState(() {
-        nameController = TextEditingController(text: profile.name);
-        addressController = TextEditingController(text: profile.address);
-        carPlateController = TextEditingController(text: profile.carPlate);
-        phoneController = TextEditingController(text: profile.phoneNumber);
-      });
+    setState(() {
+      nameController = TextEditingController(text: profile.name);
+      addressController = TextEditingController(text: profile.address);
+      carPlateController = TextEditingController(text: profile.carPlate);
+      phoneController = TextEditingController(text: profile.phoneNumber);
+    });
   }
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
@@ -69,7 +67,8 @@ class MapScreenState extends State<ProfilePage>
           : profile.carPlate
     };
 
-    final updatedProfile = await WebAPI.updateProfile(UserProfileRequestParams.fromJson(editedProfile));
+    final updatedProfile = await WebAPI.updateProfile(
+        UserProfileRequestParams.fromJson(editedProfile));
 
     localStorage.setItem('profile', updatedProfile);
   }
@@ -169,13 +168,13 @@ class MapScreenState extends State<ProfilePage>
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
                                 new Container(
-                                    width: width * 0.22,
+                                    width: width * 0.20,
                                     height: height * 0.14,
                                     decoration: new BoxDecoration(
                                       image: new DecorationImage(
                                         image: new ExactAssetImage(
                                             'assets/as.png'),
-                                        fit: BoxFit.cover,
+                                        fit: BoxFit.contain,
                                       ),
                                     )),
                               ],
@@ -226,8 +225,27 @@ class MapScreenState extends State<ProfilePage>
                                     phoneController),
                                 _getLabel(
                                     "Car Plate # (Please write letters in Arabic)"),
-                                _getField(profile.carPlate.toString(),
-                                    carPlateController)
+                                Padding(
+                                    padding: EdgeInsets.only(
+                                        left: width * 0.08,
+                                        right: width * 0.08,
+                                        top: height * 0.01),
+                                    child: new Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: <Widget>[
+                                        new Flexible(
+                                          child: TextFormField(
+                                            controller: carPlateController,
+                                            decoration: InputDecoration(
+                                              hintText:
+                                                  profile.carPlate.toString(),
+                                            ),
+                                            enabled: !_status,
+                                            autofocus: !_status,
+                                          ),
+                                        ),
+                                      ],
+                                    )),
                               ],
                             ),
                           ),

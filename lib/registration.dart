@@ -31,6 +31,7 @@ class _registrationState extends State<registration> {
   var ip;
   var port;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+  final _formKey = GlobalKey<FormState>();
 
   void initState() {
     super.initState();
@@ -56,38 +57,56 @@ class _registrationState extends State<registration> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
-    final firstNameField = TextField(
+    final firstNameField = TextFormField(
       controller: fnController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
-              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
           hintText: "Full Name",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your full name';
+        }
+        return null;
+      },
     );
-    final emailField = TextField(
+    final emailField = TextFormField(
       controller: emController,
       obscureText: false,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
-              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
-          hintText: "Email(@dell.com)",
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+          hintText: "Email ( @dell.com)",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your email';
+        }
+        return null;
+      },
     );
-    final passwordField = TextField(
+    final passwordField = TextFormField(
       controller: pwController,
       obscureText: true,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
-              width * 0.05, height * 0.02, width * 0.02, height * 0.02),
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
           hintText: "Password",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your password';
+        }
+        return null;
+      },
     );
     final registerTitle = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -105,13 +124,13 @@ class _registrationState extends State<registration> {
         TextSpan(
             text: ' Already a user? ',
             style: TextStyle(
-                color: Colors.black, fontSize: size * 25, fontFamily: "Arial")),
+                color: Colors.black, fontSize: size * 30, fontFamily: "Arial")),
         TextSpan(
             text: ' Login',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Utils.header,
-                fontSize: size * 25,
+                fontSize: size * 30,
                 fontFamily: "Arial"),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
@@ -124,7 +143,7 @@ class _registrationState extends State<registration> {
     );
     final registerButton = Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(30.0),
+        borderRadius: BorderRadius.circular(25.0),
         gradient: LinearGradient(
           colors: [
             Utils.secondaryColor,
@@ -139,13 +158,15 @@ class _registrationState extends State<registration> {
         padding: EdgeInsets.fromLTRB(
             width * 0.02, height * 0.023, width * 0.02, height * 0.023),
         onPressed: () {
-          FocusScope.of(context).unfocus();
-          setState(() {
-            asyncCall = true;
-          });
-          Future.delayed(Duration(seconds: 1), () {
-            register();
-          });
+          if (_formKey.currentState.validate()) {
+            FocusScope.of(context).unfocus();
+            setState(() {
+              asyncCall = true;
+            });
+            Future.delayed(Duration(seconds: 1), () {
+              register();
+            });
+          }
         },
         child: Text("Register",
             textAlign: TextAlign.center,
@@ -188,26 +209,33 @@ class _registrationState extends State<registration> {
                                           EdgeInsets.only(left: width * 0.01),
                                       child: registerTitle)),
                               SizedBox(height: height * 0.03),
-                              Container(
-                                width: width * 0.65,
-                                child: firstNameField,
-                              ),
-                              SizedBox(height: height * 0.03),
-                              Container(
-                                width: width * 0.65,
-                                child: emailField,
-                              ),
-                              SizedBox(height: height * 0.03),
-                              Container(
-                                width: width * 0.65,
-                                child: passwordField,
-                              ),
-                              SizedBox(height: height * 0.027),
-                              Container(
-                                width: width * 0.6,
-                                child: Padding(
-                                    padding: EdgeInsets.only(bottom: 20),
-                                    child: registerButton),
+                              Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: <Widget>[
+                                    Container(
+                                      width: width * 0.75,
+                                      child: firstNameField,
+                                    ),
+                                    SizedBox(height: height * 0.03),
+                                    Container(
+                                      width: width * 0.75,
+                                      child: emailField,
+                                    ),
+                                    SizedBox(height: height * 0.03),
+                                    Container(
+                                      width: width * 0.75,
+                                      child: passwordField,
+                                    ),
+                                    SizedBox(height: height * 0.027),
+                                    Container(
+                                      width: width * 0.75,
+                                      child: Padding(
+                                          padding: EdgeInsets.only(bottom: 20),
+                                          child: registerButton),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),

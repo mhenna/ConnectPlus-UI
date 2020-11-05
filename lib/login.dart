@@ -120,8 +120,8 @@ class _loginState extends State<login> {
         style: style,
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(
-                width * 0.05, height * 0.02, width * 0.02, height * 0.02),
-            hintText: " Email (@dell.com)",
+                width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+            hintText: "Email (@dell.com)",
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
@@ -131,8 +131,8 @@ class _loginState extends State<login> {
         style: style,
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(
-                width * 0.05, height * 0.02, width * 0.02, height * 0.02),
-            hintText: " Password",
+                width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+            hintText: "Password",
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
@@ -154,14 +154,14 @@ class _loginState extends State<login> {
               text: ' Not a user? ',
               style: TextStyle(
                   color: Colors.black,
-                  fontSize: size * 25,
+                  fontSize: size * 30,
                   fontFamily: "Arial")),
           TextSpan(
               text: ' Register now ',
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Utils.header,
-                  fontSize: size * 25,
+                  fontSize: size * 30,
                   fontFamily: "Arial"),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
@@ -174,7 +174,7 @@ class _loginState extends State<login> {
       );
       final loginButton = Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
+          borderRadius: BorderRadius.circular(25.0),
           gradient: LinearGradient(
             colors: [
               Utils.secondaryColor,
@@ -238,17 +238,17 @@ class _loginState extends State<login> {
                                         child: loginTitle)),
                                 SizedBox(height: height * 0.03),
                                 Container(
-                                  width: width * 0.65,
+                                  width: width * 0.75,
                                   child: emailField,
                                 ),
                                 SizedBox(height: height * 0.03),
                                 Container(
-                                  width: width * 0.65,
+                                  width: width * 0.75,
                                   child: passwordField,
                                 ),
                                 SizedBox(height: height * 0.027),
                                 Container(
-                                  width: width * 0.6,
+                                  width: width * 0.75,
                                   child: Padding(
                                       padding: EdgeInsets.only(bottom: 20),
                                       child: loginButton),
