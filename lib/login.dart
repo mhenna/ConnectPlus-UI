@@ -37,7 +37,6 @@ class _loginState extends State<login> {
 
   void initState() {
     super.initState();
-    pushNotification.initialize();
     checkLoggedInStatus();
   }
 
@@ -96,6 +95,7 @@ class _loginState extends State<login> {
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
+      pushNotification.initialize();
     } catch (e) {
       prefs.setString("token", null);
       localStorage.setItem("profile", null);

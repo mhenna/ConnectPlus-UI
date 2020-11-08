@@ -25,6 +25,9 @@ class PushNotificationService {
         serializeAndNavigate(message);
       },
     );
+    // For testing purposes print the Firebase Messaging token
+    String token = await _fcm.getToken();
+    print("FirebaseMessaging token: $token");
   }
 
   void serializeAndNavigate(Map<String, dynamic> message) {
