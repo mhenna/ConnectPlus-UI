@@ -20,10 +20,10 @@ class _OfferVariables extends State<OfferVariables> {
   @override
   void initState() {
     super.initState();
-    getEvents();
+    getOffers();
   }
 
-  void getEvents() async {
+  void getOffers() async {
     try {
       final recentOffers = await WebAPI.getRecentOffers();
       recentOffers.sort((a, b) {
@@ -44,10 +44,14 @@ class _OfferVariables extends State<OfferVariables> {
     var height = MediaQuery.of(context).size.height;
 
     if (mostRecentOfferLogoURL == null) return CircularProgressIndicator();
-    return Image(
-      image: NetworkImage(mostRecentOfferLogoURL),
-      height: height,
-    );
+    return Container(
+        height: height,
+        decoration: BoxDecoration(
+          image: new DecorationImage(
+            image: NetworkImage(mostRecentOfferLogoURL),
+            fit: BoxFit.contain,
+          ),
+        ));
   }
 
   @override
@@ -60,7 +64,7 @@ class _OfferVariables extends State<OfferVariables> {
         Padding(
           padding: EdgeInsets.only(left: 6, right: 6),
           child: Container(
-            height: height * 0.30,
+            height: height * 0.28,
             child: _mostRecentOfferLogo(),
           ),
         ),
@@ -107,7 +111,7 @@ class Single_Offer extends StatelessWidget {
 
     return SizedBox(
       height: height,
-      width: width * 0.60,
+      width: width * 0.70,
       child: Card(
         child: Hero(
           tag: offer.name,
@@ -153,7 +157,7 @@ class Single_Offer extends StatelessWidget {
                   ),
                   child: Image.network(
                     WebAPI.baseURL + offer.logo.url,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   )),
             ),
           ),

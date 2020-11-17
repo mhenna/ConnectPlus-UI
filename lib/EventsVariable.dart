@@ -38,7 +38,7 @@ class _EventsVariablesState extends State<EventsVariables> {
         decoration: BoxDecoration(
           image: new DecorationImage(
             image: NetworkImage(mostRecentEventPosterUrl),
-            fit: BoxFit.cover,
+            fit: BoxFit.contain,
           ),
         ));
   }
@@ -96,7 +96,7 @@ class Single_Event extends StatelessWidget {
 
     return SizedBox(
         height: height,
-        width: width * 0.65,
+        width: width * 0.70,
         child: Card(
           child: Hero(
             tag: event.name,
@@ -136,7 +136,7 @@ class Single_Event extends StatelessWidget {
                     ),
                     child: Image.network(
                       WebAPI.baseURL + event.poster.url,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                     )),
               ),
             ),

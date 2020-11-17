@@ -280,7 +280,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                   SizedBox(
                     height: 20,
                   ),
-                  Center(child: _registerButton()),
+                  // Center(child: _registerButton()),
                   Padding(
                       padding: EdgeInsets.fromLTRB(
                           0, height * 0.08, 0, height * 0.02),

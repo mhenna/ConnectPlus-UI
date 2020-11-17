@@ -29,7 +29,8 @@ class Offers extends StatefulWidget {
 
 class _OffersState extends State<Offers> {
   List<Offer> offers = [];
-  Map<OfferCategory, List<Offer>> categoriesAndOffers = {};
+  Map<OfferCategory, List<Offer>> categoriesAndOffers =
+      new Map<OfferCategory, List<Offer>>();
   var randIndexCat;
   var randIndexOffer;
   List<Offer> searchData = [];
@@ -46,14 +47,20 @@ class _OffersState extends State<Offers> {
     setState(() {
       this.offers = allOffers;
       allOffers.forEach((offer) {
-        categoriesAndOffers[offer.category] != null
-            ? categoriesAndOffers[offer.category].add(offer)
-            : categoriesAndOffers[offer.category] = [offer];
+        print(categoriesAndOffers[offer.category].toString() +
+            offer.category.toString());
+        if (categoriesAndOffers[offer.category] != null) {
+          categoriesAndOffers[offer.category].add(offer);
+        } else
+          categoriesAndOffers[offer.category] = [offer];
       });
       randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
       randIndexOffer = Offers._random.nextInt(allOffers.length);
     });
     getSearchData();
+
+    // print(categoriesAndOffers.keys);
+    // print(categoriesAndOffers.values);
   }
 
   getSearchData() {
@@ -101,7 +108,27 @@ class _OffersState extends State<Offers> {
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
     if (this.offers.isEmpty) {
-      return AppScaffold(body: Center(child: Text("No Offers")));
+      return Scaffold(
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text("Offers"),
+            centerTitle: true,
+            backgroundColor: Utils.header,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
+                  ],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+              ),
+            ),
+          ),
+          body: Center(child: Text("No Offers")));
     }
     try {
       return Scaffold(
@@ -172,7 +199,7 @@ class _OffersState extends State<Offers> {
                     "OFFERS",
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                        fontSize: size * 60,
+                        fontSize: size * 50,
                         fontWeight: FontWeight.w600,
                         color: Utils.header),
                   ),
@@ -192,38 +219,21 @@ class _OffersState extends State<Offers> {
                     return Column(
                       children: <Widget>[
                         if (categoriesAndOffers[category].isNotEmpty)
-                          if (index == 0)
-                            Padding(
-                                padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.06),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: Text(
-                                      category.toString(),
-                                      style: TextStyle(
-                                          fontSize: size * 45,
-                                          fontWeight: FontWeight.w600,
-                                          color: Utils.header),
-                                    ),
+                          Padding(
+                              padding: EdgeInsets.fromLTRB(width * 0.03,
+                                  height * 0.03, width * 0.03, height * 0.06),
+                              child: Align(
+                                alignment: Alignment.centerLeft,
+                                child: Container(
+                                  child: Text(
+                                    category.toString(),
+                                    style: TextStyle(
+                                        fontSize: size * 45,
+                                        fontWeight: FontWeight.w600,
+                                        color: Utils.header),
                                   ),
-                                ))
-                          else
-                            Padding(
-                                padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.06),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: Text(
-                                      category.toString(),
-                                      style: TextStyle(
-                                          fontSize: size * 45,
-                                          fontWeight: FontWeight.w600,
-                                          color: Utils.header),
-                                    ),
-                                  ),
-                                )),
+                                ),
+                              )),
                         GridView.count(
                           shrinkWrap: true,
                           physics: ScrollPhysics(),
