@@ -1,11 +1,13 @@
-import 'package:connect_plus/Activity.dart';
+import 'package:connect_plus/ActivityWidget.dart';
+import 'package:connect_plus/WebinarWidget.dart';
+import 'package:connect_plus/models/activity.dart';
+import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/webinar.dart';
+import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
-import 'dart:convert';
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/EventWidget.dart';
 
@@ -18,67 +20,59 @@ class _CalendarState extends State<Calendar> {
   CalendarController _controller;
   Map<DateTime, List<dynamic>> _events;
   Map<DateTime, List<dynamic>> _activities;
+  Map<DateTime, List<dynamic>> _webinars;
   Map<DateTime, List<dynamic>> _all;
   List<dynamic> _selectedEvents;
-  var ip;
-  var port;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
   @override
   void initState() {
-    super.initState();
     _events = {};
     _activities = {};
+    _webinars = {};
     _all = {};
     _selectedEvents = [];
     _controller = CalendarController();
+    super.initState();
     getEvents();
     getActivities();
+    getWebinars();
   }
 
   void getEvents() async {
-    var events;
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/event';
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-    if (response.statusCode == 200) {
-      events = json.decode(response.body);
-      for (var event in events) {
-        var date = DateTime.parse(event["startDate"]);
-        if (_events[date] != null)
-          _events[date].add(event);
-        else
-          _events[date] = [event];
-      }
-      _all.addAll(_events);
+    var events = await WebAPI.getEvents();
+    for (var event in events) {
+      var date = DateTime.parse(event.startDate.toString());
+      if (_events[date] != null)
+        _events[date].add(event);
+      else
+        _events[date] = [event];
     }
+    _all.addAll(_events);
   }
 
   void getActivities() async {
-    var activities;
-    String token = localStorage.getItem("token");
-    var url = 'http://' + ip + ':' + port + '/activity';
-    var response = await http.get(url, headers: {
-      "Content-Type": "application/json",
-      "Authorization": "Bearer $token"
-    });
-    if (response.statusCode == 200) {
-      activities = json.decode(response.body);
-      for (var activity in activities) {
-        var dates = activity["recurrenceDates"];
-        for (var date in dates) {
-          date = DateTime.parse(date);
-          if (_activities[date] != null)
-            _activities[date].add(activity);
-          else
-            _activities[date] = [activity];
-        }
-      }
-      _all.addAll(_activities);
+    var activities = await WebAPI.getActivities();
+    for (var activity in activities) {
+      var date = DateTime.parse(activity.startDate.toString());
+      if (_activities[date] != null)
+        _activities[date].add(activity);
+      else
+        _activities[date] = [activity];
     }
+    _all.addAll(_activities);
+  }
+
+  void getWebinars() async {
+    var webinars = await WebAPI.getWebinars();
+    for (var webinar in webinars) {
+      var date = DateTime.parse(webinar.date.toString());
+      if (_webinars[date] != null)
+        _webinars[date].add(webinar);
+      else
+        _webinars[date] = [webinar];
+    }
+    _all.addAll(_webinars);
   }
 
   @override
@@ -128,7 +122,7 @@ class _CalendarState extends State<Calendar> {
                         SizedBox(
                           width: width * 0.02,
                         ),
-                        Text("Event")
+                        Text("Event & Webinar")
                       ],
                     ),
                     Row(
@@ -163,9 +157,7 @@ class _CalendarState extends State<Calendar> {
                 },
                 builders: CalendarBuilders(
                   singleMarkerBuilder: (context, date, event) {
-                    bool condition =
-                        _events.containsKey(DateTime.parse(event['startDate']));
-                    if (event['ERG'] == null) {
+                    if (event.runtimeType == Activity) {
                       return Container(
                         decoration: BoxDecoration(
                             shape: BoxShape.rectangle, color: Utils.headline),
@@ -175,12 +167,10 @@ class _CalendarState extends State<Calendar> {
                       );
                     } else
                       return Container(
-                        decoration: condition
-                            ? BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: Color(int.parse(event['ERG']['color'])))
-                            : BoxDecoration(
-                                shape: BoxShape.rectangle, color: Colors.blue),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Color(int.parse(
+                                event.erg.color.replaceFirst('#', '0xFF')))),
                         width: 7.0,
                         height: 7.0,
                         margin: const EdgeInsets.symmetric(horizontal: 1.5),
@@ -193,42 +183,51 @@ class _CalendarState extends State<Calendar> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: <Widget>[
-                        Text(event['name']),
-                        if (event["ERG"] != null)
+                        Text(event.name),
+                        if (event.runtimeType == Event ||
+                            event.runtimeType == Webinar)
                           Row(
                             children: <Widget>[
                               Container(
                                 decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    color: Color(
-                                        int.parse(event['ERG']['color']))),
+                                    color: Color(int.parse(event.erg.color
+                                        .replaceFirst('#', '0xFF')))),
                                 width: 10.0,
                                 height: 10.0,
                               ),
                               SizedBox(
                                 width: width * 0.02,
                               ),
-                              Text(event["ERG"]["name"])
+                              Text(event.erg.name)
                             ],
                           )
                       ],
                     ),
                   ),
                   onTap: () {
-                    if (event['ERG'] != null) {
+                    if (event.runtimeType == Event) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => EventWidget(
-                                  event: event["name"],
-                                )),
+                          builder: (context) => EventWidget(
+                            event: event,
+                          ),
+                        ),
                       );
-                    } else {
+                    } else if (event.runtimeType == Activity) {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) =>
-                                Activity(activity: event['name'])),
+                                ActivityWidget(activity: event)),
+                      );
+                    } else if (event.runtimeType == Webinar) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                WebinarWidget(webinar: event)),
                       );
                     }
                   })),
