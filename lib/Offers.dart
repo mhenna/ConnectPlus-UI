@@ -1,5 +1,6 @@
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
@@ -43,24 +44,19 @@ class _OffersState extends State<Offers> {
 
   Future getOffers() async {
     final allOffers = await WebAPI.getOffers();
-
-    setState(() {
-      this.offers = allOffers;
-      allOffers.forEach((offer) {
-        print(categoriesAndOffers[offer.category].toString() +
-            offer.category.toString());
-        if (categoriesAndOffers[offer.category] != null) {
-          categoriesAndOffers[offer.category].add(offer);
-        } else
-          categoriesAndOffers[offer.category] = [offer];
+    if (this.mounted)
+      setState(() {
+        this.offers = allOffers;
+        allOffers.forEach((offer) {
+          if (categoriesAndOffers[offer.category] != null) {
+            categoriesAndOffers[offer.category].add(offer);
+          } else
+            categoriesAndOffers[offer.category] = [offer];
+        });
+        randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
+        randIndexOffer = Offers._random.nextInt(allOffers.length);
       });
-      randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
-      randIndexOffer = Offers._random.nextInt(allOffers.length);
-    });
     getSearchData();
-
-    // print(categoriesAndOffers.keys);
-    // print(categoriesAndOffers.values);
   }
 
   getSearchData() {
@@ -74,19 +70,6 @@ class _OffersState extends State<Offers> {
         child: Image.network(imageURL),
       ),
     );
-  }
-
-  Widget LoadingWidget() {
-    return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
   }
 
   Widget base64ToImageFeatured() {
@@ -219,21 +202,38 @@ class _OffersState extends State<Offers> {
                     return Column(
                       children: <Widget>[
                         if (categoriesAndOffers[category].isNotEmpty)
-                          Padding(
-                              padding: EdgeInsets.fromLTRB(width * 0.03,
-                                  height * 0.03, width * 0.03, height * 0.06),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  child: Text(
-                                    category.toString(),
-                                    style: TextStyle(
-                                        fontSize: size * 45,
-                                        fontWeight: FontWeight.w600,
-                                        color: Utils.header),
+                          if (index == 0)
+                            Padding(
+                                padding: EdgeInsets.fromLTRB(width * 0.03,
+                                    height * 0.03, width * 0.03, height * 0.06),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: Text(
+                                      category.toString(),
+                                      style: TextStyle(
+                                          fontSize: size * 45,
+                                          fontWeight: FontWeight.w600,
+                                          color: Utils.header),
+                                    ),
                                   ),
-                                ),
-                              )),
+                                ))
+                          else
+                            Padding(
+                                padding: EdgeInsets.fromLTRB(width * 0.03,
+                                    height * 0.03, width * 0.03, height * 0.06),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Container(
+                                    child: Text(
+                                      category.toString(),
+                                      style: TextStyle(
+                                          fontSize: size * 45,
+                                          fontWeight: FontWeight.w600,
+                                          color: Utils.header),
+                                    ),
+                                  ),
+                                )),
                         GridView.count(
                           shrinkWrap: true,
                           physics: ScrollPhysics(),
@@ -294,7 +294,9 @@ class _OffersState extends State<Offers> {
       );
     } catch (Exception) {
       print(Exception);
-      return LoadingWidget();
+      return Scaffold(
+        body: ImageRotate(),
+      );
     }
   }
 

@@ -1,89 +1,85 @@
 import 'package:connect_plus/Navbar.dart';
-import 'package:connect_plus/models/erg.dart';
-import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/activity.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:typed_data';
 import 'widgets/Indicator.dart';
 
-class EventWidget extends StatefulWidget {
-  EventWidget({Key key, @required this.event}) : super(key: key);
+class ActivityWidget extends StatefulWidget {
+  ActivityWidget({Key key, @required this.activity}) : super(key: key);
 
-  final Event event;
+  final Activity activity;
 
   @override
   State<StatefulWidget> createState() {
-    return new _EventState(this.event);
+    return new _ActivityState(this.activity);
   }
 }
 
-class _EventState extends State<EventWidget> with TickerProviderStateMixin {
-  final Event event;
+class _ActivityState extends State<ActivityWidget>
+    with TickerProviderStateMixin {
+  final Activity activity;
 
-  List<Event> ergEvents;
+  List<Activity> ergActivities;
   bool loading = true;
 
   AnimationController controller;
   Animation<double> animation;
 
-  _EventState(this.event);
+  _ActivityState(this.activity);
 
   @override
   void initState() {
     super.initState();
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    animation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
-    controller.forward();
-    getERGEvents();
+    getERGActivities();
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 
-  Future getERGEvents() async {
-    final events = await WebAPI.getEventsByERG(event.erg);
-    if (this.mounted)
-      setState(() {
-        ergEvents = events.where((ev) => ev.id != event.id).toList();
-        loading = false;
-      });
+  Future getERGActivities() async {
+    final activities = await WebAPI.getActivitiesByERG(activity.erg);
+
+    setState(() {
+      ergActivities = activities.where((ev) => ev.id != activity.id).toList();
+      loading = false;
+    });
   }
 
   Widget urlToImage(String imageURL) {
     return Expanded(
       child: SizedBox(
-        width: MediaQuery.of(context)
-            .size
-            .width, // otherwise the logo will be tiny
+        width: 250, // otherwise the logo will be tiny
         child: Image.network(imageURL),
       ),
     );
   }
 
-  List<Widget> eventsByERG() {
+  List<Widget> activitiesByERG() {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
 
     List<Widget> list = List<Widget>();
-    for (var ergEvent in ergEvents) {
+    for (var ergActivity in ergActivities) {
       list.add(Container(
-        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
-        width: width * 0.50,
+        padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
+        width: width * 0.45,
         child: Card(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              urlToImage(WebAPI.baseURL + ergEvent.poster.url),
+              urlToImage(WebAPI.baseURL + ergActivity.poster.url),
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -92,13 +88,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EventWidget(
-                              event: ergEvent,
+                            builder: (context) => ActivityWidget(
+                              activity: ergActivity,
                             ),
                           ));
                     },
                     child: Text(
-                      ergEvent.name,
+                      ergActivity.name,
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: size * 35, color: Utils.header),
@@ -143,7 +139,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                         EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
                     child: SizedBox(
                         child: new Text(
-                      event.name,
+                      activity.name,
                       style: TextStyle(
                           fontSize: size * 53,
                           color: Utils.background,
@@ -188,43 +184,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     }, borderRadius: BorderRadius.all(Radius.circular(13)));
   }
 
-  Widget _registerButton() {
-    return RaisedButton(
-      onPressed: () {},
-      color: Utils.iconColor,
-      textColor: Colors.white,
-      padding: const EdgeInsets.all(0.0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: Utils.iconColor)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
-          gradient: LinearGradient(
-            colors: [
-              Utils.secondaryColor,
-              Utils.primaryColor,
-            ],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-        child: Text(
-          'Register',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-
-  Widget _eventPoster() {
-    return Stack(
+  Widget _activityPoster() {
+    Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Image.network(WebAPI.baseURL + event.poster.url),
+          child: Image.network(WebAPI.baseURL + activity.poster.url),
         )
       ],
     );
@@ -274,19 +240,18 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                 SizedBox(
                   height: 20,
                 ),
-                // Center(child: _registerButton()),
                 Padding(
                     padding:
                         EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
                     child: Utils.titleText(
-                        textString: "Events by ${event.erg.name}",
+                        textString: "Activities by ${activity.erg.name}",
                         fontSize: size * 39,
                         textcolor: Utils.header)),
                 Padding(
                     padding: EdgeInsets.fromLTRB(
                         width * 0.02, 0, width * 0.02, height * 0.02),
                     child: SizedBox(
-                        height: height * 0.25,
+                        height: height * 0.28,
                         child: Scrollbar(
                             controller: _scrollController,
                             isAlwaysShown: true,
@@ -295,7 +260,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                               physics: ClampingScrollPhysics(),
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
-                              children: eventsByERG(),
+                              children: activitiesByERG(),
                             )))),
               ],
             ),
@@ -323,13 +288,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
-    String time = DateFormat.Hm('en_US').format(event.startDate);
-    String date = DateFormat.yMMMMd('en_US').format(event.startDate);
+    String time = DateFormat.Hm('en_US').format(activity.startDate);
+    String date = DateFormat.yMMMMd('en_US').format(activity.startDate);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Utils.titleText(
-            textString: "Event Details",
+            textString: "Activity Details",
             fontSize: size * 39,
             textcolor: Utils.header),
         SizedBox(height: 15),
@@ -339,7 +304,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
             style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
           ),
           Text(
-            event.venue,
+            activity.venue,
             style: TextStyle(fontSize: size * 30),
           )
         ]),
@@ -371,6 +336,14 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
             style: TextStyle(fontSize: size * 30),
           )
         ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Reccurence: ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+          ),
+          Text(activity.recurrence, style: TextStyle(fontSize: size * 28))
+        ]),
       ],
     );
   }
@@ -378,12 +351,11 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    var width = MediaQuery.of(context).size.width;
     if (loading == true) {
       return Scaffold(
         body: ImageRotate(),
       );
-    } else
+    } else {
       return Scaffold(
         backgroundColor: Utils.background,
         drawer: NavDrawer(),
@@ -406,7 +378,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                     _appBar(),
                     Container(
                       height: height * 0.3,
-                      child: _eventPoster(),
+                      child: _activityPoster(),
                     )
                   ],
                 ),
@@ -416,5 +388,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           ),
         ),
       );
+    }
   }
 }

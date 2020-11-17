@@ -1,6 +1,7 @@
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/webinar.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
@@ -9,51 +10,43 @@ import 'Navbar.dart';
 import 'widgets/Utils.dart';
 import 'dart:convert';
 import 'widgets/Indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class EventWidget extends StatefulWidget {
-  EventWidget({Key key, @required this.event}) : super(key: key);
+class WebinarWidget extends StatefulWidget {
+  WebinarWidget({Key key, @required this.webinar}) : super(key: key);
 
-  final Event event;
+  final Webinar webinar;
 
   @override
   State<StatefulWidget> createState() {
-    return new _EventState(this.event);
+    return new _WebinarState(this.webinar);
   }
 }
 
-class _EventState extends State<EventWidget> with TickerProviderStateMixin {
-  final Event event;
+class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
+  final Webinar webinar;
 
-  List<Event> ergEvents;
+  List<Webinar> ergWebinars;
   bool loading = true;
 
-  AnimationController controller;
-  Animation<double> animation;
-
-  _EventState(this.event);
+  _WebinarState(this.webinar);
 
   @override
   void initState() {
     super.initState();
-    controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    animation = Tween<double>(begin: 0, end: 1).animate(
-        CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
-    controller.forward();
-    getERGEvents();
+    getERGWebinars();
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 
-  Future getERGEvents() async {
-    final events = await WebAPI.getEventsByERG(event.erg);
+  Future getERGWebinars() async {
+    final webinars = await WebAPI.getWebinarsByERG(webinar.erg);
     if (this.mounted)
       setState(() {
-        ergEvents = events.where((ev) => ev.id != event.id).toList();
+        ergWebinars = webinars.where((ev) => ev.id != webinar.id).toList();
         loading = false;
       });
   }
@@ -61,29 +54,27 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
   Widget urlToImage(String imageURL) {
     return Expanded(
       child: SizedBox(
-        width: MediaQuery.of(context)
-            .size
-            .width, // otherwise the logo will be tiny
+        width: 250, // otherwise the logo will be tiny
         child: Image.network(imageURL),
       ),
     );
   }
 
-  List<Widget> eventsByERG() {
+  List<Widget> webinarsByERG() {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
 
     List<Widget> list = List<Widget>();
-    for (var ergEvent in ergEvents) {
+    for (var ergwebinar in ergWebinars) {
       list.add(Container(
-        padding: EdgeInsets.fromLTRB(5.0, 0.0, 5.0, 0.0),
+        padding: EdgeInsets.fromLTRB(7.0, 0.0, 7.0, 0.0),
         width: width * 0.50,
         child: Card(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              urlToImage(WebAPI.baseURL + ergEvent.poster.url),
+              urlToImage(WebAPI.baseURL + ergwebinar.poster.url),
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -92,13 +83,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                       Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EventWidget(
-                              event: ergEvent,
+                            builder: (context) => WebinarWidget(
+                              webinar: ergwebinar,
                             ),
                           ));
                     },
                     child: Text(
-                      ergEvent.name,
+                      ergwebinar.name,
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: size * 35, color: Utils.header),
@@ -143,7 +134,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                         EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
                     child: SizedBox(
                         child: new Text(
-                      event.name,
+                      webinar.name,
                       style: TextStyle(
                           fontSize: size * 53,
                           color: Utils.background,
@@ -188,43 +179,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     }, borderRadius: BorderRadius.all(Radius.circular(13)));
   }
 
-  Widget _registerButton() {
-    return RaisedButton(
-      onPressed: () {},
-      color: Utils.iconColor,
-      textColor: Colors.white,
-      padding: const EdgeInsets.all(0.0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: Utils.iconColor)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
-          gradient: LinearGradient(
-            colors: [
-              Utils.secondaryColor,
-              Utils.primaryColor,
-            ],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-        child: Text(
-          'Register',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-
-  Widget _eventPoster() {
+  Widget _webinarPoster() {
     return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Image.network(WebAPI.baseURL + event.poster.url),
+          child: Image.network(WebAPI.baseURL + webinar.poster.url),
         )
       ],
     );
@@ -274,12 +235,11 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                 SizedBox(
                   height: 20,
                 ),
-                // Center(child: _registerButton()),
                 Padding(
                     padding:
                         EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
                     child: Utils.titleText(
-                        textString: "Events by ${event.erg.name}",
+                        textString: "Webinars by ${webinar.erg.name}",
                         fontSize: size * 39,
                         textcolor: Utils.header)),
                 Padding(
@@ -295,7 +255,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                               physics: ClampingScrollPhysics(),
                               shrinkWrap: true,
                               scrollDirection: Axis.horizontal,
-                              children: eventsByERG(),
+                              children: webinarsByERG(),
                             )))),
               ],
             ),
@@ -305,42 +265,26 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     );
   }
 
-  Widget _dateWidget(String text) {
-    return Container(
-      padding: EdgeInsets.all(10),
-//      decoration: BoxDecoration(
-//        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
-//        borderRadius: BorderRadius.all(Radius.circular(13)),
-//        color: Utils.iconColor,
-//      ),
-      child: Utils.titleText(
-        textString: text,
-        fontSize: 16,
-        textcolor: Colors.black,
-      ),
-    );
-  }
-
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
-    String time = DateFormat.Hm('en_US').format(event.startDate);
-    String date = DateFormat.yMMMMd('en_US').format(event.startDate);
+    String time = DateFormat.Hm('en_US').format(webinar.date);
+    String date = DateFormat.yMMMMd('en_US').format(webinar.date);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Utils.titleText(
-            textString: "Event Details",
+            textString: "Webinar Details",
             fontSize: size * 39,
             textcolor: Utils.header),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(
-            "Venue: ",
-            style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
+            "Committee: ",
+            style: TextStyle(fontSize: size * 35, fontWeight: FontWeight.bold),
           ),
           Text(
-            event.venue,
-            style: TextStyle(fontSize: size * 30),
+            webinar.erg.name,
+            style: TextStyle(fontSize: size * 32),
           )
         ]),
         SizedBox(height: 5),
@@ -348,13 +292,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           Text(
             "Date: ",
             style: TextStyle(
-              fontSize: size * 32,
+              fontSize: size * 35,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             date,
-            style: TextStyle(fontSize: size * 30),
+            style: TextStyle(fontSize: size * 32),
           )
         ]),
         SizedBox(height: 5),
@@ -362,17 +306,70 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           Text(
             "Time: ",
             style: TextStyle(
-              fontSize: size * 32,
+              fontSize: size * 35,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             time,
-            style: TextStyle(fontSize: size * 30),
+            style: TextStyle(fontSize: size * 32),
           )
         ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Duration: ",
+            style: TextStyle(
+              fontSize: size * 35,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            webinar.duration.toString() + " Hour(s)",
+            style: TextStyle(fontSize: size * 32),
+          )
+        ]),
+        SizedBox(height: 20),
+        Center(
+          child: RaisedButton(
+            onPressed: _launchURL,
+            color: Utils.iconColor,
+            textColor: Colors.white,
+            padding: const EdgeInsets.all(0.0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(color: Utils.iconColor)),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30.0),
+                gradient: LinearGradient(
+                  colors: [
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
+                  ],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+              ),
+              padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+              child: Text(
+                'Webinar Link',
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+        )
       ],
     );
+  }
+
+  _launchURL() async {
+    var url = webinar.url;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -383,7 +380,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       return Scaffold(
         body: ImageRotate(),
       );
-    } else
+    } else {
       return Scaffold(
         backgroundColor: Utils.background,
         drawer: NavDrawer(),
@@ -406,7 +403,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                     _appBar(),
                     Container(
                       height: height * 0.3,
-                      child: _eventPoster(),
+                      child: _webinarPoster(),
                     )
                   ],
                 ),
@@ -416,5 +413,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           ),
         ),
       );
+    }
   }
 }

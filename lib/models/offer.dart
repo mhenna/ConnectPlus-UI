@@ -8,11 +8,14 @@ class OfferCategory {
   const OfferCategory.fromString(this._value);
   toString() => '$_value';
 
-  static const TECH = const OfferCategory._internal('tech');
-  static const FOOD = const OfferCategory._internal('food');
-  static const HEALTH = const OfferCategory._internal('health');
+  static const FOOD = const OfferCategory._internal('Food');
+  static const HEALTH = const OfferCategory._internal('Health');
+  static const CARS = const OfferCategory._internal('Cars');
+  static const SPORTS = const OfferCategory._internal('Sports');
+  static const FAMILY = const OfferCategory._internal('Family');
+  static const TRAVEL = const OfferCategory._internal('Travel');
 
-  static const asArray = const [TECH, FOOD, HEALTH];
+  static const asArray = const [FOOD, HEALTH, CARS, SPORTS, FAMILY, TRAVEL];
 }
 
 class Offer {

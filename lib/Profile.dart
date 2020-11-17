@@ -68,7 +68,7 @@ class MapScreenState extends State<ProfilePage>
     };
 
     final updatedProfile = await WebAPI.updateProfile(
-        UserProfileRequestParams.fromJson(editedProfile));
+        UserProfileRequestParams.fromJson(editedProfile), profile.id);
 
     localStorage.setItem('profile', updatedProfile);
   }

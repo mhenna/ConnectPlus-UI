@@ -1,5 +1,7 @@
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
+import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
@@ -31,16 +33,11 @@ class _EventsVariablesState extends State<EventsVariables> {
   }
 
   Widget mostRecent() {
-    var height = MediaQuery.of(context).size.height;
-    if (mostRecentEventPosterUrl == null) return CircularProgressIndicator();
-    return Container(
-        height: height,
-        decoration: BoxDecoration(
-          image: new DecorationImage(
-            image: NetworkImage(mostRecentEventPosterUrl),
-            fit: BoxFit.contain,
-          ),
-        ));
+    if (mostRecentEventPosterUrl == null)
+      return Scaffold(
+        body: ImageRotate(),
+      );
+    return Single_Event(event: events.first);
   }
 
   @override
@@ -72,11 +69,21 @@ class _EventsVariablesState extends State<EventsVariables> {
 
   List<Widget> constructEvents() {
     List<Widget> list = List<Widget>();
+    bool first = true;
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
 
     for (var event in events) {
-      list.add(
-        Single_Event(event: event),
-      );
+      if (!first) {
+        list.add(
+          SizedBox(
+            height: height,
+            width: width * 0.54,
+            child: Single_Event(event: event),
+          ),
+        );
+      }
+      first = false;
     }
     return list;
   }
@@ -96,7 +103,6 @@ class Single_Event extends StatelessWidget {
 
     return SizedBox(
         height: height,
-        width: width * 0.70,
         child: Card(
           child: Hero(
             tag: event.name,
@@ -122,12 +128,11 @@ class Single_Event extends StatelessWidget {
                           Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                Text("Start Date: "),
                                 Text(
                                   DateFormat.yMMMMd('en_US')
                                       .format(event.startDate),
                                   style: TextStyle(
-                                      color: Colors.red,
+                                      color: Utils.header,
                                       fontWeight: FontWeight.w800),
                                 ),
                               ])
