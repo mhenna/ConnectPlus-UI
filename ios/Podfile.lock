@@ -151,8 +151,6 @@ SPEC REPOS:
   https://cdn.cocoapods.org/:
     - FirebaseCore
     - FirebaseInstallations
-    - GoogleUtilities
-    - nanopb
   https://github.com/cocoapods/specs.git:
     - Firebase
     - FirebaseAnalytics

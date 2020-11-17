@@ -1,6 +1,7 @@
 import 'package:connect_plus/models/login_request_params.dart';
 import 'package:connect_plus/models/user_profile.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -53,6 +54,7 @@ class _loginState extends State<login> {
           profile = user.profile;
         }
         localStorage.setItem("profile", profile);
+        pushNotification.initialize();
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => MyHomePage()),
@@ -112,7 +114,9 @@ class _loginState extends State<login> {
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
     if (loading)
-      return LoadingWidget();
+      return Scaffold(
+        body: ImageRotate(),
+      );
     else {
       final emailField = TextField(
         controller: emController,
@@ -204,17 +208,18 @@ class _loginState extends State<login> {
         ),
       );
       return Scaffold(
+        backgroundColor: Colors.white,
         body: ModalProgressHUD(
             inAsyncCall: asyncCall,
             opacity: 0.5,
-            progressIndicator: LoadingText(),
+            progressIndicator: ImageRotate(),
             child: Center(
               child: SingleChildScrollView(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Utils.background,
+                      color: Colors.white,
                       image: DecorationImage(
                         image: AssetImage("assets/logo2.png"),
                         fit: BoxFit.fitWidth,
@@ -238,17 +243,17 @@ class _loginState extends State<login> {
                                         child: loginTitle)),
                                 SizedBox(height: height * 0.03),
                                 Container(
-                                  width: width * 0.75,
+                                  width: width * 0.85,
                                   child: emailField,
                                 ),
                                 SizedBox(height: height * 0.03),
                                 Container(
-                                  width: width * 0.75,
+                                  width: width * 0.85,
                                   child: passwordField,
                                 ),
                                 SizedBox(height: height * 0.027),
                                 Container(
-                                  width: width * 0.75,
+                                  width: width * 0.85,
                                   child: Padding(
                                       padding: EdgeInsets.only(bottom: 20),
                                       child: loginButton),
@@ -289,37 +294,5 @@ class _loginState extends State<login> {
         );
       },
     );
-  }
-
-  Widget LoadingWidget() {
-    return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
-  }
-
-  Widget LoadingText() {
-    var size = MediaQuery.of(context).size.aspectRatio;
-
-    return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              new Text(
-                "Loading...",
-                style:
-                    TextStyle(fontSize: size * 55, color: Colors.orangeAccent),
-              ),
-            ],
-          ),
-        ));
   }
 }
