@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/homepage.dart';
@@ -15,7 +16,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'Flutter Demo',
       navigatorKey: NavigationService.navigationKey,
       initialRoute: '/',

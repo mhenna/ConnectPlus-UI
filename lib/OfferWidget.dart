@@ -1,6 +1,7 @@
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/pdf_viewer_from_url.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -60,10 +61,11 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
 
   Future<void> getOffers() async {
     final offers = await WebAPI.getOffersByCategory(widget.category);
-    setState(() {
-      this.relatedOffers = offers;
-      loading = false;
-    });
+    if (this.mounted)
+      setState(() {
+        this.relatedOffers = offers;
+        loading = false;
+      });
   }
 
   Widget urlToImage(String imageURL) {
@@ -73,19 +75,6 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         child: Image.network(imageURL),
       ),
     );
-  }
-
-  Widget LoadingWidget() {
-    return Scaffold(
-        body: Center(
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          new CircularProgressIndicator(),
-          new Text("Loading"),
-        ],
-      ),
-    ));
   }
 
   List<Widget> constructRelatedOffers() {
@@ -213,29 +202,15 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
   }
 
   Widget _offerPoster() {
-    if (loading == true) {
-      return CircularIndicator();
-    } else {
-      return AnimatedBuilder(
-        builder: (context, child) {
-          return AnimatedOpacity(
-            duration: Duration(milliseconds: 500),
-            opacity: animation.value,
-            child: child,
-          );
-        },
-        animation: animation,
-        child: Stack(
-          alignment: Alignment.bottomCenter,
-          children: <Widget>[
-            SizedBox(
-              width: MediaQuery.of(context).size.width,
-              child: Image.network(WebAPI.baseURL + widget.offer.logo.url),
-            )
-          ],
-        ),
-      );
-    }
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Image.network(WebAPI.baseURL + widget.offer.logo.url),
+        )
+      ],
+    );
   }
 
   Widget _detailWidget() {
@@ -244,73 +219,71 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     var size = MediaQuery.of(context).size.aspectRatio;
     final _scrollController = ScrollController();
 
-    if (loading == true) {
-      return CircularIndicator();
-    } else {
-      return DraggableScrollableSheet(
-        maxChildSize: .6,
-        initialChildSize: .5,
-        minChildSize: .4,
-        builder: (context, scrollController) {
-          return Container(
-            padding: Utils.padding.copyWith(bottom: 0),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(40),
-                  topRight: Radius.circular(40),
+    return DraggableScrollableSheet(
+      maxChildSize: .6,
+      initialChildSize: .5,
+      minChildSize: .4,
+      builder: (context, scrollController) {
+        return Container(
+          padding: Utils.padding.copyWith(bottom: 0),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+              color: Utils.background),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.max,
+              children: <Widget>[
+                SizedBox(height: 5),
+                Container(
+                  alignment: Alignment.center,
+                  child: Container(
+                    width: width * 0.1,
+                    height: 5,
+                    decoration: BoxDecoration(
+                        color: Utils.header,
+                        borderRadius: BorderRadius.all(Radius.circular(10))),
+                  ),
                 ),
-                color: Utils.background),
-            child: SingleChildScrollView(
-              controller: scrollController,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.max,
-                children: <Widget>[
-                  SizedBox(height: 5),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Container(
-                      width: width * 0.1,
-                      height: 5,
-                      decoration: BoxDecoration(
-                          color: Utils.header,
-                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                SizedBox(height: 15),
+                Container(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        "${widget.offer.discount.toString()} OFF",
+                        style: TextStyle(
+                            fontSize: size * 50,
+                            color: Utils.headline,
+                            fontWeight: FontWeight.w600),
+                      )
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 15,
+                ),
+                _description(),
+                SizedBox(
+                  height: 20,
+                ),
+                InkWell(
+                  child: Text(
+                    "More Details",
+                    style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 16.0,
                     ),
                   ),
-                  SizedBox(height: 15),
-                  Container(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "${widget.offer.discount.toString()} OFF",
-                          style: TextStyle(
-                              fontSize: size * 50,
-                              color: Utils.headline,
-                              fontWeight: FontWeight.w600),
-                        )
-                      ],
-                    ),
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  _description(),
-                  SizedBox(
-                    height: 20,
-                  ),
-                  InkWell(
-                    child: Text(
-                      "More Details",
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16.0,
-                      ),
-                    ),
-                    onTap: () async {
-                      String pathPDF =
-                          WebAPI.baseURL + widget.offer.attachment.url;
+                  onTap: () async {
+                    String pathPDF =
+                        WebAPI.baseURL + widget.offer.attachment.url;
+                    if (widget.offer.attachment.url != null)
                       Navigator.push(
                         context,
                         MaterialPageRoute<dynamic>(
@@ -320,60 +293,59 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                           ),
                         ),
                       );
-                      // PDFViewer(document: file, indicatorBackground: Colors.red);
-                    },
+                  },
+                ),
+                // TODO: Hide this section when we don't have related offers.
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    0,
+                    height * 0.08,
+                    0,
+                    height * 0.02,
                   ),
-                  // TODO: Hide this section when we don't have related offers.
-                  Padding(
+                  child: Utils.titleText(
+                    textString: " Related Offers",
+                    fontSize: size * 45,
+                    textcolor: Utils.header,
+                  ),
+                ),
+                Padding(
                     padding: EdgeInsets.fromLTRB(
-                      0,
-                      height * 0.08,
-                      0,
-                      height * 0.02,
-                    ),
-                    child: Utils.titleText(
-                      textString: " Related Offers",
-                      fontSize: size * 45,
-                      textcolor: Utils.header,
-                    ),
-                  ),
-                  Padding(
-                      padding: EdgeInsets.fromLTRB(
-                          width * 0.02, 0, width * 0.02, height * 0.02),
-                      child: SizedBox(
-                          height: height * 0.28,
-                          child: Scrollbar(
+                        width * 0.02, 0, width * 0.02, height * 0.02),
+                    child: SizedBox(
+                        height: height * 0.28,
+                        child: Scrollbar(
+                            controller: _scrollController,
+                            isAlwaysShown: true,
+                            child: ListView(
                               controller: _scrollController,
-                              isAlwaysShown: true,
-                              child: ListView(
-                                controller: _scrollController,
-                                physics: ClampingScrollPhysics(),
-                                shrinkWrap: true,
-                                scrollDirection: Axis.horizontal,
-                                children: constructRelatedOffers(),
-                              )))),
-                ],
-              ),
+                              physics: ClampingScrollPhysics(),
+                              shrinkWrap: true,
+                              scrollDirection: Axis.horizontal,
+                              children: constructRelatedOffers(),
+                            )))),
+              ],
             ),
-          );
-        },
-      );
-    }
-  }
-
-  Widget _dateWidget(String text) {
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Utils.titleText(
-        textString: text,
-        fontSize: 16,
-        textcolor: Colors.black,
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
+    var text = "";
+    if (widget.offer.location != null) {
+      text += "\n\nLocation: " + widget.offer.location.toString();
+    }
+    if (widget.offer.contact != null) {
+      text += "\n\nContact: " + widget.offer.contact.toString();
+    }
+    if (widget.offer.expiration != null) {
+      text += "\n\nExpires: " +
+          DateFormat.yMMMMd("en_US").format(widget.offer.expiration) +
+          "\n";
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -385,13 +357,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
           ),
         ),
         Text(
-          "\n\nLocation: " +
-              widget.offer.location.toString() +
-              "\n\nContact: " +
-              widget.offer.contact.toString() +
-              "\n\nExpires: " +
-              DateFormat.yMMMMd("en_US").format(widget.offer.expiration) +
-              "\n",
+          text,
           style: TextStyle(
             color: Colors.black87,
             fontSize: size * 30,
@@ -404,37 +370,43 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    return Scaffold(
-      backgroundColor: Utils.background,
-      drawer: NavDrawer(),
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Utils.secondaryColor,
-                Utils.primaryColor,
+    if (loading == true) {
+      return Scaffold(
+        body: ImageRotate(),
+      );
+    } else {
+      return Scaffold(
+        backgroundColor: Utils.background,
+        drawer: NavDrawer(),
+        body: SafeArea(
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+            ),
+            child: Stack(
+              children: <Widget>[
+                Column(
+                  children: <Widget>[
+                    _appBar(),
+                    Container(
+                      height: height * 0.3,
+                      child: _offerPoster(),
+                    )
+                  ],
+                ),
+                _detailWidget(),
               ],
-              begin: Alignment.topRight,
-              end: Alignment.bottomLeft,
             ),
           ),
-          child: Stack(
-            children: <Widget>[
-              Column(
-                children: <Widget>[
-                  _appBar(),
-                  Container(
-                    height: height * 0.3,
-                    child: _offerPoster(),
-                  )
-                ],
-              ),
-              _detailWidget(),
-            ],
-          ),
         ),
-      ),
-    );
+      );
+    }
   }
 }

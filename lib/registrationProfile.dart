@@ -1,4 +1,6 @@
+import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/models/user_profile_request_params.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -13,9 +15,7 @@ import 'package:connect_plus/login.dart';
 
 class RegistrationProfile extends StatefulWidget {
   RegistrationProfile({Key key, this.title}) : super(key: key);
-  final String title;
-
-  // This widget is the root of your application.
+  final String title; // This widget is the root of your application.
   @override
   _RegistrationProfileState createState() => _RegistrationProfileState();
 }
@@ -29,26 +29,20 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
   final _formKey = GlobalKey<FormState>();
   final carPlateNumController = TextEditingController();
   var asyncCall = false;
-  var ip;
-  var port;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   void initState() {
     super.initState();
-    setEnv();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
   }
 
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
-    fnController.dispose();
     addressController.dispose();
+    fnController.dispose();
     phoneController.dispose();
+    carPlateLettersController.dispose();
+    carPlateNumController.dispose();
     super.dispose();
   }
 
@@ -57,7 +51,6 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
-
     final fullNameField = TextFormField(
       controller: fnController,
       obscureText: false,
@@ -95,6 +88,7 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
     final phoneField = TextFormField(
       controller: phoneController,
       obscureText: false,
+      maxLength: 11,
       style: style,
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
@@ -105,6 +99,11 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter your phone number';
+        }
+        bool emailValid =
+            RegExp("^[0][1][0-9]{2,10}").hasMatch(value.toString());
+        if (!emailValid || value.length < 11) {
+          return "Please enter a valid phone number";
         }
         return null;
       },
@@ -175,116 +174,95 @@ class _RegistrationProfileState extends State<RegistrationProfile> {
                 color: Colors.white, fontWeight: FontWeight.normal)),
       ),
     );
-    // final login = Text.rich(
-    //   TextSpan(children: <TextSpan>[
-    //     TextSpan(
-    //         text: ' Already a user? ',
-    //         style: TextStyle(
-    //             color: Colors.black, fontSize: 15.0, fontFamily: "Arial")),
-    //     TextSpan(
-    //         text: ' Login ',
-    //         style: TextStyle(
-    //             fontWeight: FontWeight.bold,
-    //             color: Color(0xfff7501e),
-    //             fontSize: 15.0,
-    //             fontFamily: "Arial"),
-    //         recognizer: TapGestureRecognizer()
-    //           ..onTap = () {
-    //             // Navigator.push(
-    //             //   context,
-    //             //   //  MaterialPageRoute(builder: (context) => login()),
-    //             // );
-    //           })
-    //   ]),
-    // );
 
     return Scaffold(
+        backgroundColor: Colors.white,
         body: ModalProgressHUD(
-      inAsyncCall: asyncCall,
-      opacity: 0.5,
-      progressIndicator: LoadingText(),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color(0xfffafafa),
-                image: DecorationImage(
-                  image: AssetImage("assets/logo2.png"),
-                  fit: BoxFit.fitWidth,
-                  alignment: Alignment.topCenter,
-                ),
-              ),
+          inAsyncCall: asyncCall,
+          opacity: 0.5,
+          progressIndicator: ImageRotate(),
+          child: Center(
+            child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
-                child: Card(
-                  child: Column(
-                    children: <Widget>[
-                      SizedBox(height: 20.0),
-                      Container(
-                          alignment: Alignment.centerLeft,
-                          child: registerTitle),
-                      SizedBox(height: 20.0),
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          children: <Widget>[
-                            Container(
-                              width: width * 0.75,
-                              child: fullNameField,
-                            ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: width * 0.75,
-                              child: addressField,
-                            ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: width * 0.75,
-                              child: phoneField,
-                            ),
-                            SizedBox(height: 20.0),
-                            Center(
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: <Widget>[
-                                  Container(
-                                    width: width * 0.30,
-                                    child: carPlateNumField,
+                padding: const EdgeInsets.only(top: 10.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    image: DecorationImage(
+                      image: AssetImage("assets/logo2.png"),
+                      fit: BoxFit.fitWidth,
+                      alignment: Alignment.topCenter,
+                    ),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(36.0, 220.0, 36.0, 50.0),
+                    child: Card(
+                      child: Column(
+                        children: <Widget>[
+                          SizedBox(height: 20.0),
+                          Container(
+                              alignment: Alignment.centerLeft,
+                              child: registerTitle),
+                          SizedBox(height: 20.0),
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  width: width * 0.75,
+                                  child: fullNameField,
+                                ),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: width * 0.75,
+                                  child: addressField,
+                                ),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: width * 0.75,
+                                  child: phoneField,
+                                ),
+                                SizedBox(height: 20.0),
+                                Center(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: <Widget>[
+                                      Container(
+                                        width: width * 0.30,
+                                        child: carPlateNumField,
+                                      ),
+                                      Container(
+                                        width: width * 0.30,
+                                        child: carPlateLettersField,
+                                      ),
+                                      Tooltip(
+                                        child: _getInfoIcon(),
+                                        message:
+                                            "It will be used for moveyourcar feature",
+                                      ),
+                                    ],
                                   ),
-                                  Container(
-                                    width: width * 0.30,
-                                    child: carPlateLettersField,
-                                  ),
-                                  Tooltip(
-                                    child: _getInfoIcon(),
-                                    message:
-                                        "It will be used for moveyourcar app",
-                                  ),
-                                ],
-                              ),
+                                ),
+                                SizedBox(height: 20.0),
+                                Container(
+                                  width: width * 0.75,
+                                  child: Padding(
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      child: registerButton),
+                                ),
+                              ],
                             ),
-                            SizedBox(height: 20.0),
-                            Container(
-                              width: width * 0.75,
-                              child: Padding(
-                                  padding: EdgeInsets.only(bottom: 20),
-                                  child: registerButton),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
-    ));
+        ));
   }
 
   Widget _getInfoIcon() {

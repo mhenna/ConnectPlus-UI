@@ -1,6 +1,7 @@
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -35,12 +36,6 @@ class _registrationState extends State<registration> {
 
   void initState() {
     super.initState();
-    setEnv();
-  }
-
-  setEnv() {
-    port = DotEnv().env['PORT'];
-    ip = DotEnv().env['SERVER_IP'];
   }
 
   @override
@@ -87,6 +82,12 @@ class _registrationState extends State<registration> {
       validator: (value) {
         if (value.isEmpty) {
           return 'Please enter your email';
+        }
+        bool emailValid =
+            RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dell.com")
+                .hasMatch(value.toString());
+        if (!emailValid) {
+          return "Please enter a valid email";
         }
         return null;
       },
@@ -176,17 +177,18 @@ class _registrationState extends State<registration> {
     );
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: ModalProgressHUD(
           inAsyncCall: asyncCall,
           opacity: 0.5,
-          progressIndicator: LoadingText(),
+          progressIndicator: ImageRotate(),
           child: Center(
             child: SingleChildScrollView(
               child: Padding(
                 padding: const EdgeInsets.only(top: 10.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Utils.background,
+                    color: Colors.white,
                     image: DecorationImage(
                       image: AssetImage("assets/logo2.png"),
                       fit: BoxFit.fitWidth,
@@ -214,22 +216,22 @@ class _registrationState extends State<registration> {
                                 child: Column(
                                   children: <Widget>[
                                     Container(
-                                      width: width * 0.75,
+                                      width: width * 0.85,
                                       child: firstNameField,
                                     ),
                                     SizedBox(height: height * 0.03),
                                     Container(
-                                      width: width * 0.75,
+                                      width: width * 0.85,
                                       child: emailField,
                                     ),
                                     SizedBox(height: height * 0.03),
                                     Container(
-                                      width: width * 0.75,
+                                      width: width * 0.85,
                                       child: passwordField,
                                     ),
                                     SizedBox(height: height * 0.027),
                                     Container(
-                                      width: width * 0.75,
+                                      width: width * 0.85,
                                       child: Padding(
                                           padding: EdgeInsets.only(bottom: 20),
                                           child: registerButton),

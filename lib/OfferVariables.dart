@@ -1,6 +1,7 @@
 import 'package:connect_plus/OfferWidget.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
@@ -41,17 +42,11 @@ class _OfferVariables extends State<OfferVariables> {
   }
 
   Widget _mostRecentOfferLogo() {
-    var height = MediaQuery.of(context).size.height;
-
-    if (mostRecentOfferLogoURL == null) return CircularProgressIndicator();
-    return Container(
-        height: height,
-        decoration: BoxDecoration(
-          image: new DecorationImage(
-            image: NetworkImage(mostRecentOfferLogoURL),
-            fit: BoxFit.contain,
-          ),
-        ));
+    if (mostRecentOfferLogoURL == null)
+      return Scaffold(
+        body: ImageRotate(),
+      );
+    return Single_Offer(offer: offers.first);
   }
 
   @override
@@ -90,10 +85,21 @@ class _OfferVariables extends State<OfferVariables> {
 
   List<Widget> constructOffers() {
     List<Widget> list = List<Widget>();
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    bool first = true;
+
     for (var offer in offers) {
-      list.add(Single_Offer(
-        offer: offer,
-      ));
+      if (!first) {
+        list.add(
+          SizedBox(
+            height: height,
+            width: width * 0.70,
+            child: Single_Offer(offer: offer),
+          ),
+        );
+      }
+      first = false;
     }
     return list;
   }
@@ -106,12 +112,10 @@ class Single_Offer extends StatelessWidget {
   Single_Offer({this.offer});
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
 
     return SizedBox(
       height: height,
-      width: width * 0.70,
       child: Card(
         child: Hero(
           tag: offer.name,
