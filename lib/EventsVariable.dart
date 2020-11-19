@@ -141,7 +141,7 @@ class Single_Event extends StatelessWidget {
                     ),
                     child: Image.network(
                       WebAPI.baseURL + event.poster.url,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.cover,
                     )),
               ),
             ),

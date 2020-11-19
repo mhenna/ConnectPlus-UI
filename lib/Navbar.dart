@@ -198,7 +198,7 @@ class NavDrawerState extends State<NavDrawer>
           ),
           ListTile(
             leading: Icon(Icons.add_to_home_screen),
-            title: Text('About us'),
+            title: Text('Who is Included'),
             onTap: () => {
               // prefs.remove("token"),
               // Navigator.of(context).pushAndRemoveUntil(

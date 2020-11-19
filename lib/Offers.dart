@@ -2,6 +2,7 @@ import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'dart:math';
@@ -36,8 +37,25 @@ class _OffersState extends State<Offers> {
   var randIndexOffer;
   List<Offer> searchData = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
+  List<String> selectedCountList = [
+    "Lifestyle",
+    "Cars",
+    "Family",
+    "Food",
+    "Travel"
+  ];
+  List<String> categoriesList = [
+    "Lifestyle",
+    "Cars",
+    "Family",
+    "Food",
+    "Travel"
+  ];
+  List<dynamic> _filteredData;
 
   void initState() {
+    _filteredData = [];
+    selectedCountList = [];
     super.initState();
     getOffers();
   }
@@ -56,6 +74,8 @@ class _OffersState extends State<Offers> {
         randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
         randIndexOffer = Offers._random.nextInt(allOffers.length);
       });
+    _filteredData.addAll(offers);
+
     getSearchData();
   }
 
@@ -81,8 +101,40 @@ class _OffersState extends State<Offers> {
       );
     } catch (Exception) {
       print(Exception);
-      return Center(child: Text("No Offers"));
+      return ImageRotate();
     }
+  }
+
+  void filterData() async {
+    _filteredData = [];
+    for (final data in offers) {
+      print(data.category);
+      if (selectedCountList.indexOf(data.category.toString()) != -1) {
+        _filteredData.add(data);
+      }
+    }
+    setState(() {});
+  }
+
+  void _openFilterDialog() async {
+    await FilterListDialog.display(context,
+        allTextList: categoriesList,
+        height: 480,
+        borderRadius: 20,
+        headlineText: "Select Categories",
+        applyButonTextBackgroundColor: Utils.header,
+        allResetButonColor: Utils.header,
+        selectedTextBackgroundColor: Utils.header,
+        searchFieldHintText: "Search Here",
+        selectedTextList: selectedCountList, onApplyButtonClick: (list) {
+      if (list != null) {
+        setState(() {
+          selectedCountList = List.from(list);
+          filterData();
+        });
+      }
+      Navigator.pop(context);
+    });
   }
 
   @override
@@ -111,7 +163,7 @@ class _OffersState extends State<Offers> {
               ),
             ),
           ),
-          body: Center(child: Text("No Offers")));
+          body: Container(child: ImageRotate()));
     }
     try {
       return Scaffold(
@@ -133,6 +185,10 @@ class _OffersState extends State<Offers> {
               ),
             ),
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _openFilterDialog,
+          child: Icon(Icons.filter_list),
         ),
         body: ListView.builder(
           shrinkWrap: true,

@@ -10,6 +10,8 @@ class Activity {
   DateTime startDate;
   DateTime endDate;
   String venue;
+  String zoomID;
+  String days;
   DateTime createdAt;
   DateTime updatedAt;
   int iV;
@@ -25,7 +27,9 @@ class Activity {
     this.name,
     this.startDate,
     this.endDate,
+    this.zoomID,
     this.venue,
+    this.days,
     this.createdAt,
     this.updatedAt,
     this.iV,
@@ -42,6 +46,8 @@ class Activity {
     }
     sId = json['_id'];
     name = json['name'];
+    zoomID = json['zoomID'];
+    days = json['days'];
     endDate =
         json['endDate'] != null ? DateTime.parse((json['endDate'])) : null;
     startDate =
@@ -73,6 +79,8 @@ class Activity {
     data['startDate'] = this.startDate;
     data['endDate'] = this.endDate;
     data['venue'] = this.venue;
+    data['zoomID'] = this.zoomID;
+    data['days'] = this.days;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;

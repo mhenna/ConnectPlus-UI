@@ -4,6 +4,7 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -311,7 +312,21 @@ class _ActivityState extends State<ActivityWidget>
         SizedBox(height: 5),
         Row(children: <Widget>[
           Text(
-            "Date: ",
+            "Zoom ID: ",
+            style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
+          ),
+          InkWell(
+            child: Text(
+              activity.zoomID,
+              style: TextStyle(fontSize: size * 30, color: Colors.blue),
+            ),
+            onTap: _launchURL,
+          )
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Start Date: ",
             style: TextStyle(
               fontSize: size * 32,
               fontWeight: FontWeight.bold,
@@ -343,6 +358,14 @@ class _ActivityState extends State<ActivityWidget>
             style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
           ),
           Text(activity.recurrence, style: TextStyle(fontSize: size * 28))
+        ]),
+        SizedBox(height: 5),
+        Row(children: <Widget>[
+          Text(
+            "Day(s): ",
+            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
+          ),
+          Text(activity.days, style: TextStyle(fontSize: size * 28))
         ]),
       ],
     );
@@ -388,6 +411,15 @@ class _ActivityState extends State<ActivityWidget>
           ),
         ),
       );
+    }
+  }
+
+  _launchURL() async {
+    var url = activity.zoomID;
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
   }
 }

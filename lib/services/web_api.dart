@@ -24,6 +24,7 @@ class WebAPI {
   static final String _eventsURL = '/events';
   static final String _activitiesURL = '/activities';
   static final String _webinarsURL = '/webinars';
+  static final String _ergsURL = '/ergs';
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -170,6 +171,18 @@ class WebAPI {
     final response = await get(_profilesURL + "/$id");
     final profile = UserProfile.fromJson(json.decode(response.body));
     return profile;
+  }
+
+  static Future<List<ERG>> getERGS() async {
+    final response = await get(_ergsURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawERGS = json.decode(response.body);
+    final List<ERG> ergs = [];
+    for (final ergJson in rawERGS) {
+      ergs.add(ERG.fromJson(ergJson));
+    }
+    return ergs;
   }
 
   static Future<List<Offer>> getOffers() async {

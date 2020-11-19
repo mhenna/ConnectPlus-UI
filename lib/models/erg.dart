@@ -1,3 +1,5 @@
+import 'package:connect_plus/models/admin_user.dart';
+
 class ERG {
   String color;
   String sId;
@@ -5,8 +7,6 @@ class ERG {
   DateTime createdAt;
   DateTime updatedAt;
   int iV;
-  String createdBy;
-  String updatedBy;
   String id;
 
   ERG({
@@ -16,8 +16,6 @@ class ERG {
     this.createdAt,
     this.updatedAt,
     this.iV,
-    this.createdBy,
-    this.updatedBy,
     this.id,
   });
 
@@ -30,8 +28,6 @@ class ERG {
     updatedAt =
         json['updatedAt'] != null ? DateTime.parse((json['updatedAt'])) : null;
     iV = json['__v'];
-    createdBy = json['created_by'];
-    updatedBy = json['updated_by'];
     id = json['id'];
   }
 
@@ -43,8 +39,6 @@ class ERG {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
-    data['created_by'] = this.createdBy;
-    data['updated_by'] = this.updatedBy;
     data['id'] = this.id;
     return data;
   }

@@ -1,10 +1,12 @@
 import 'package:connect_plus/WebinarWidget.dart';
+import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/webinar.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/utils/map_indexed.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/EventWidget.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -31,18 +33,25 @@ class MyEventsPageState extends State<Events>
   List<Webinar> webinars = [];
   List<Event> searchDataEvents = [];
   List<Webinar> searchDataWebinars = [];
+  List<dynamic> searchAll;
   num randIndex;
   num randIndexWeb;
   bool emptyEvents = true;
   bool emptyWebinars = true;
   List<dynamic> _all;
   final LocalStorage localStorage = new LocalStorage("Connect+");
+  List<String> selectedCountList = [];
+  List<String> ergsList;
+  List<dynamic> _filteredData;
 
   void initState() {
     _all = [];
+    _filteredData = [];
+    ergsList = [];
     super.initState();
     getEvents();
     getWebinars();
+    getERGS();
   }
 
   void getEvents() async {
@@ -55,7 +64,10 @@ class MyEventsPageState extends State<Events>
         }
         randIndex = Events._random.nextInt(events.length);
       });
-    if (!emptyEvents) _all.addAll(events);
+    if (!emptyEvents) {
+      _all.addAll(events);
+      _filteredData.addAll(events);
+    }
   }
 
   void getWebinars() async {
@@ -68,13 +80,36 @@ class MyEventsPageState extends State<Events>
         }
         //randIndexWeb = Webinars._random.nextInt(webinars.length);
       });
-    if (!emptyWebinars) _all.addAll(webinars);
+    if (!emptyWebinars) {
+      _all.addAll(webinars);
+      _filteredData.addAll(webinars);
+    }
     getSearchData();
   }
 
   getSearchData() {
     searchDataEvents = this.events;
     searchDataWebinars = this.webinars;
+    searchAll = this._all;
+  }
+
+  void getERGS() async {
+    final ergs = await WebAPI.getERGS();
+    ergsList = [];
+    for (final erg in ergs) {
+      ergsList.add(erg.name);
+    }
+    selectedCountList = List.from(ergsList);
+  }
+
+  void filterData() async {
+    _filteredData = [];
+    for (final data in _all) {
+      if (selectedCountList.indexOf(data.erg.name) != -1) {
+        _filteredData.add(data);
+      }
+    }
+    setState(() {});
   }
 
   Widget featuredImage() {
@@ -102,75 +137,64 @@ class MyEventsPageState extends State<Events>
   }
 
   Widget search() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: <Widget>[
-        Column(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width * 0.45,
-              child: TypeAheadField(
-                textFieldConfiguration: TextFieldConfiguration(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: "Search Events")),
-                suggestionsCallback: (pattern) async {
-                  return getEventsSuggestions(pattern);
-                },
-                itemBuilder: (context, Event suggestedEvent) {
-                  return ListTile(
-                    leading: Icon(Icons.event),
-                    title: Text(suggestedEvent.name),
-                  );
-                },
-                onSuggestionSelected: (suggestion) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => EventWidget(
-                        event: suggestion,
-                      ),
-                    ),
-                  );
-                },
+    return Container(
+      child: TypeAheadField(
+        textFieldConfiguration: TextFieldConfiguration(
+            decoration: InputDecoration(
+                border: OutlineInputBorder(), hintText: "Search ")),
+        suggestionsCallback: (pattern) async {
+          return getEventsSuggestions(pattern);
+        },
+        itemBuilder: (context, dynamic suggestedObject) {
+          return ListTile(
+            leading: Icon(Icons.event),
+            title: Text(suggestedObject.name),
+          );
+        },
+        onSuggestionSelected: (suggestion) {
+          if (suggestion.runtimeType == Event) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => EventWidget(
+                  event: suggestion,
+                ),
               ),
-            )
-          ],
-        ),
-        Column(
-          children: <Widget>[
-            Container(
-              width: MediaQuery.of(context).size.width * 0.45,
-              child: TypeAheadField(
-                textFieldConfiguration: TextFieldConfiguration(
-                    decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: "Search Webinars")),
-                suggestionsCallback: (pattern) async {
-                  return getWebinarsSuggestions(pattern);
-                },
-                itemBuilder: (context, Webinar suggestedWebinar) {
-                  return ListTile(
-                    leading: Icon(Icons.videocam),
-                    title: Text(suggestedWebinar.name),
-                  );
-                },
-                onSuggestionSelected: (suggestion) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => WebinarWidget(
-                        webinar: suggestion,
-                      ),
-                    ),
-                  );
-                },
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => WebinarWidget(
+                  webinar: suggestion,
+                ),
               ),
-            )
-          ],
-        )
-      ],
+            );
+          }
+        },
+      ),
     );
+  }
+
+  void _openFilterDialog() async {
+    await FilterListDialog.display(context,
+        allTextList: ergsList,
+        height: 480,
+        borderRadius: 20,
+        headlineText: "Select Committees",
+        applyButonTextBackgroundColor: Utils.header,
+        allResetButonColor: Utils.header,
+        selectedTextBackgroundColor: Utils.header,
+        searchFieldHintText: "Search Here",
+        selectedTextList: selectedCountList, onApplyButtonClick: (list) {
+      if (list != null) {
+        setState(() {
+          selectedCountList = List.from(list);
+          filterData();
+        });
+      }
+      Navigator.pop(context);
+    });
   }
 
   @override
@@ -203,7 +227,7 @@ class MyEventsPageState extends State<Events>
                 ),
               ),
             ),
-            body: Center(child: Text("No Events or Webinars")));
+            body: Container(child: ImageRotate()));
       else
         return Scaffold(
             appBar: AppBar(
@@ -225,9 +249,13 @@ class MyEventsPageState extends State<Events>
                 ),
               ),
             ),
+            floatingActionButton: FloatingActionButton(
+              onPressed: _openFilterDialog,
+              child: Icon(Icons.filter_list),
+            ),
             body: Padding(
                 padding: EdgeInsets.only(
-                    top: height * 0.04,
+                    top: height * 0.02,
                     bottom: height * 0.02,
                     left: width * 0.02,
                     right: width * 0.02),
@@ -235,10 +263,13 @@ class MyEventsPageState extends State<Events>
                     child: SingleChildScrollView(
                         child: Column(children: <Widget>[
                   search(),
+                  SizedBox(
+                    height: height * 0.03,
+                  ),
                   ListView(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
-                    children: mapIndexed(_all, (index, event) {
+                    children: mapIndexed(_filteredData, (index, event) {
                       return Center(
                         child: Padding(
                             padding: EdgeInsets.only(bottom: height * 0.02),
@@ -305,19 +336,9 @@ class MyEventsPageState extends State<Events>
     }
   }
 
-  List<Event> getEventsSuggestions(String pattern) {
+  List<dynamic> getEventsSuggestions(String pattern) {
     if (pattern == "") return null;
-    final filter = searchDataEvents
-        .where(
-          (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
-        )
-        .toList();
-    return filter;
-  }
-
-  List<Webinar> getWebinarsSuggestions(String pattern) {
-    if (pattern == "") return null;
-    final filter = searchDataWebinars
+    final filter = searchAll
         .where(
           (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
         )

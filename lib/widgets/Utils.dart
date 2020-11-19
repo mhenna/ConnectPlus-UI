@@ -28,7 +28,7 @@ class Utils {
 
   static const Color header = Color(0xffF54132);
   static const Color headline = Color(0xfff54132);
-  static const Color background = Color(0xfff6f6f6);
+  static const Color background = Color(0xfff4f4f4);
   static const Color primaryColor = Color(0xffF7501E);
   static const Color secondaryColor = Color(0xffED136E);
 
