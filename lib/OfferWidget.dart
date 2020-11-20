@@ -1,4 +1,5 @@
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
@@ -26,7 +27,7 @@ class OfferWidget extends StatefulWidget {
   // case the title) provided by the parent (in this case the App widget) and
   // used by the build method of the State. Fields in a Widget subclass are
   // always marked "final".
-  final OfferCategory category;
+  final Category category;
   final Offer offer;
 
   @override

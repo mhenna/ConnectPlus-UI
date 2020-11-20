@@ -1,3 +1,4 @@
+import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
@@ -31,10 +32,9 @@ class Offers extends StatefulWidget {
 
 class _OffersState extends State<Offers> {
   List<Offer> offers = [];
-  Map<OfferCategory, List<Offer>> categoriesAndOffers =
-      new Map<OfferCategory, List<Offer>>();
-  var randIndexCat;
-  var randIndexOffer;
+  List<Category> categories = [];
+  bool emptyCategories = true;
+  Map<String, List<Offer>> categoriesAndOffers = new Map<String, List<Offer>>();
   List<Offer> searchData = [];
   final LocalStorage localStorage = new LocalStorage("Connect+");
   List<String> selectedCountList = [
@@ -52,6 +52,8 @@ class _OffersState extends State<Offers> {
     "Travel"
   ];
   List<dynamic> _filteredData;
+  var randIndexCat;
+  var randIndexOffer;
 
   void initState() {
     _filteredData = [];
@@ -60,22 +62,33 @@ class _OffersState extends State<Offers> {
     getOffers();
   }
 
+  Future getCategories() async {
+    final allCat = await WebAPI.getCategories();
+    if (this.mounted) {
+      setState(() {
+        this.categories = allCat;
+        if (categories.length != 0) {
+          emptyCategories = false;
+        }
+      });
+    }
+  }
+
   Future getOffers() async {
     final allOffers = await WebAPI.getOffers();
     if (this.mounted)
       setState(() {
         this.offers = allOffers;
         allOffers.forEach((offer) {
-          if (categoriesAndOffers[offer.category] != null) {
-            categoriesAndOffers[offer.category].add(offer);
+          if (categoriesAndOffers[offer.category.name] == null) {
+            categoriesAndOffers[offer.category.name] = [offer];
           } else
-            categoriesAndOffers[offer.category] = [offer];
+            categoriesAndOffers[offer.category.name].add(offer);
         });
         randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
         randIndexOffer = Offers._random.nextInt(allOffers.length);
       });
     _filteredData.addAll(offers);
-
     getSearchData();
   }
 
@@ -252,7 +265,7 @@ class _OffersState extends State<Offers> {
               ]);
             } else {
               return ListView(
-                children: mapIndexed<Widget, OfferCategory>(
+                children: mapIndexed<Widget, String>(
                   categoriesAndOffers.keys,
                   (index, category) {
                     return Column(
@@ -322,7 +335,7 @@ class _OffersState extends State<Offers> {
                                               MaterialPageRoute(
                                                 builder: (context) =>
                                                     OfferWidget(
-                                                  category: category,
+                                                  category: offer.category,
                                                   offer: offer,
                                                 ),
                                               ),

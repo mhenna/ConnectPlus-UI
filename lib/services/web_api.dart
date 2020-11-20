@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:connect_plus/models/activity.dart';
+import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/login_request_params.dart';
@@ -25,6 +26,7 @@ class WebAPI {
   static final String _activitiesURL = '/activities';
   static final String _webinarsURL = '/webinars';
   static final String _ergsURL = '/ergs';
+  static final String _categoriesURL = '/categories';
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -185,6 +187,18 @@ class WebAPI {
     return ergs;
   }
 
+  static Future<List<Category>> getCategories() async {
+    final response = await get(_categoriesURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawCategories = json.decode(response.body);
+    final List<Category> categories = [];
+    for (final categoryJson in rawCategories) {
+      categories.add(Category.fromJson(categoryJson));
+    }
+    return categories;
+  }
+
   static Future<List<Offer>> getOffers() async {
     final response = await get(_offersURL);
 
@@ -192,22 +206,24 @@ class WebAPI {
     final List<dynamic> rawOffers = json.decode(response.body);
     final List<Offer> offers = [];
     for (final offerJson in rawOffers) {
-      offers.add(Offer.fromJson(offerJson));
+      if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
+        offers.add(Offer.fromJson(offerJson));
     }
 
     return offers;
   }
 
-  static Future<List<Offer>> getOffersByCategory(OfferCategory category) async {
-    final categoryName = category.toString();
-    final categoryURL = "$_offersURL?category_eq=$categoryName";
+  static Future<List<Offer>> getOffersByCategory(Category category) async {
+    final categoryId = category.id;
+    final categoryURL = "$_offersURL?category_eq=$categoryId";
     final response = await get(categoryURL);
 
     // TODO: Add this logic to a seperate transformer service
     final rawOffers = json.decode(response.body);
     final List<Offer> offers = [];
     for (final offerJson in rawOffers) {
-      offers.add(Offer.fromJson(offerJson));
+      if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
+        offers.add(Offer.fromJson(offerJson));
     }
     return offers;
   }
@@ -231,7 +247,8 @@ class WebAPI {
     final List<dynamic> rawOffers = json.decode(response.body);
     final List<Offer> offers = [];
     for (final offerJson in rawOffers) {
-      offers.add(Offer.fromJson(offerJson));
+      if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
+        offers.add(Offer.fromJson(offerJson));
     }
 
     return offers;
