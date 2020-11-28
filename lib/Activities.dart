@@ -34,7 +34,7 @@ class MyActivitiesPageState extends State<Activities>
   List<String> selectedCountList = [];
   List<String> ergsList;
   List<dynamic> _filteredData;
-
+  bool activitiesLoaded = false;
   void initState() {
     _filteredData = [];
     ergsList = [];
@@ -51,6 +51,7 @@ class MyActivitiesPageState extends State<Activities>
         activities = allActivities;
         if (activities.length != 0) {
           emptyActivities = false;
+          activitiesLoaded = true;
         }
         randIndex = Activities._rand.nextInt(activities.length);
       });
@@ -126,10 +127,27 @@ class MyActivitiesPageState extends State<Activities>
 
   Widget search() {
     return Container(
+      decoration: BoxDecoration(
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+              color: Utils.header, blurRadius: 5.0, offset: Offset(0.30, 0.10))
+        ],
+      ),
       child: TypeAheadField(
         textFieldConfiguration: TextFieldConfiguration(
             decoration: InputDecoration(
-                border: OutlineInputBorder(), hintText: "Search")),
+                fillColor: Colors.white,
+                filled: true,
+                suffixIcon: Icon(Icons.search),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Utils.header),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Utils.header),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                hintText: "Search for Activities")),
         suggestionsCallback: (pattern) async {
           return getActivitySuggestions(pattern);
         },
@@ -160,12 +178,16 @@ class MyActivitiesPageState extends State<Activities>
     var size = MediaQuery.of(context).size.aspectRatio;
 
     try {
-      if (emptyActivities)
+      if (!activitiesLoaded) {
+        return Scaffold(
+          body: ImageRotate(),
+        );
+      } else if (activitiesLoaded && emptyActivities)
         return Scaffold(
             appBar: AppBar(
               // Here we take the value from the MyHomePage object that was created by
               // the App.build method, and use it to set our appbar title.
-              title: Text("Activities"),
+              title: Text("Events & Webinars"),
               centerTitle: true,
               backgroundColor: Utils.header,
               flexibleSpace: Container(
@@ -181,7 +203,7 @@ class MyActivitiesPageState extends State<Activities>
                 ),
               ),
             ),
-            body: Container(child: ImageRotate()));
+            body: Center(child: Text("No Recent Activities.")));
       else
         return Scaffold(
             appBar: AppBar(
@@ -218,59 +240,56 @@ class MyActivitiesPageState extends State<Activities>
                   child: Column(children: <Widget>[
                     search(),
                     SizedBox(
-                      height: height * 0.03,
+                      height: 30,
                     ),
                     ListView(
                       shrinkWrap: true,
                       physics: ScrollPhysics(),
                       children: mapIndexed(_filteredData, (index, activity) {
                         return Center(
-                          child: Padding(
-                              padding: EdgeInsets.only(bottom: height * 0.02),
-                              child: Container(
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.85,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.40,
-                                  child: Card(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        urlToImage(WebAPI.baseURL +
-                                            activity.poster.url),
-                                        Container(
-                                          height: 50,
-                                          child: ButtonBar(
-                                            alignment: MainAxisAlignment.center,
-                                            children: <Widget>[
-                                              FlatButton(
-                                                child: Text(
-                                                  activity.name,
-                                                  textAlign: TextAlign.center,
-                                                  style:
-                                                      TextStyle(fontSize: 22),
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          ActivityWidget(
-                                                              activity:
-                                                                  activity),
-                                                    ),
-                                                  );
-                                                },
-                                              )
-                                            ],
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ))),
-                        );
+                            child: SizedBox(
+                          width: width * 0.8,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                activity.name.toString(),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 23,
+                                    color: Colors.black87,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                              Card(
+                                  elevation: 7.0,
+                                  clipBehavior: Clip.antiAlias,
+                                  margin: EdgeInsets.all(12.0),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(10.0))),
+                                  child: InkWell(
+                                    child: urlToImage(
+                                        WebAPI.baseURL + activity.poster.url),
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ActivityWidget(
+                                              activity: activity),
+                                        ),
+                                      );
+                                    },
+                                  )),
+                              SizedBox(
+                                height: 30,
+                              )
+                            ],
+                          ),
+                        ));
                       }).toList(),
                     ),
                   ]),

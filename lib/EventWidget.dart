@@ -117,11 +117,11 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
   Widget _appBar() {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
-    var height = MediaQuery.of(context).size.height;
+    var name = "";
+    name += "\n " + event.name.toString();
     return Container(
       padding: Utils.padding,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           _icon(
             Icons.arrow_back_ios,
@@ -133,28 +133,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
               Navigator.of(context).pop();
             },
           ),
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                    child: SizedBox(
-                        child: new Text(
-                      event.name,
-                      style: TextStyle(
-                          fontSize: size * 53,
-                          color: Utils.background,
-                          fontWeight: FontWeight.w600),
-                    )))
-              ],
-            ),
-          ),
-          SizedBox(
-            width: width * 0.12,
-          )
         ],
       ),
     );
@@ -271,13 +249,10 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                   height: 20,
                 ),
                 _description(),
-                SizedBox(
-                  height: 20,
-                ),
                 // Center(child: _registerButton()),
                 Padding(
                     padding:
-                        EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
+                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
                     child: Utils.titleText(
                         textString: "Events by ${event.erg.name}",
                         fontSize: size * 39,
@@ -305,72 +280,42 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     );
   }
 
-  Widget _dateWidget(String text) {
-    return Container(
-      padding: EdgeInsets.all(10),
-//      decoration: BoxDecoration(
-//        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
-//        borderRadius: BorderRadius.all(Radius.circular(13)),
-//        color: Utils.iconColor,
-//      ),
-      child: Utils.titleText(
-        textString: text,
-        fontSize: 16,
-        textcolor: Colors.black,
-      ),
-    );
-  }
-
   Widget _description() {
-    var size = MediaQuery.of(context).size.aspectRatio;
     String time = DateFormat.Hm('en_US').format(event.startDate);
     String date = DateFormat.yMMMMd('en_US').format(event.startDate);
+    var size = MediaQuery.of(context).size.aspectRatio;
+    var text = "";
+    if (event.venue != null) {
+      text += "\n\nVenue: " + event.venue.toString();
+    }
+    text += "\n\nDate: " + date;
+
+    text += "\n\nTime: " + time + "\n";
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Utils.titleText(
-            textString: "Event Details",
-            fontSize: size * 39,
-            textcolor: Utils.header),
-        SizedBox(height: 15),
-        Row(children: <Widget>[
-          Text(
-            "Venue: ",
-            style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
+        Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                event.name,
+                style: TextStyle(
+                    fontSize: size * 50,
+                    color: Utils.headline,
+                    fontWeight: FontWeight.w600),
+              )
+            ],
           ),
-          Text(
-            event.venue,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Date: ",
-            style: TextStyle(
-              fontSize: size * 32,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.black87,
+            fontSize: size * 30,
           ),
-          Text(
-            date,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Time: ",
-            style: TextStyle(
-              fontSize: size * 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            time,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
+        ),
       ],
     );
   }

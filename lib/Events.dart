@@ -38,6 +38,9 @@ class MyEventsPageState extends State<Events>
   num randIndexWeb;
   bool emptyEvents = true;
   bool emptyWebinars = true;
+  bool webinarsLoaded = false;
+  bool eventsLoaded = false;
+
   List<dynamic> _all;
   final LocalStorage localStorage = new LocalStorage("Connect+");
   List<String> selectedCountList = [];
@@ -61,8 +64,9 @@ class MyEventsPageState extends State<Events>
         events = allEvents;
         if (events.length != 0) {
           emptyEvents = false;
+          eventsLoaded = true;
+          randIndex = Events._random.nextInt(events.length);
         }
-        randIndex = Events._random.nextInt(events.length);
       });
     if (!emptyEvents) {
       _all.addAll(events);
@@ -75,6 +79,7 @@ class MyEventsPageState extends State<Events>
     if (this.mounted)
       setState(() {
         webinars = allWebinars;
+        webinarsLoaded = true;
         if (webinars.length != 0) {
           emptyWebinars = false;
         }
@@ -132,16 +137,33 @@ class MyEventsPageState extends State<Events>
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width *
           0.50, // otherwise the logo will be tiny
-      child: Image.network(imageUrl),
+      child: FittedBox(fit: BoxFit.cover, child: Image.network(imageUrl)),
     );
   }
 
   Widget search() {
     return Container(
+      decoration: BoxDecoration(
+        boxShadow: <BoxShadow>[
+          BoxShadow(
+              color: Utils.header, blurRadius: 3.0, offset: Offset(0.30, 0.10))
+        ],
+      ),
       child: TypeAheadField(
         textFieldConfiguration: TextFieldConfiguration(
             decoration: InputDecoration(
-                border: OutlineInputBorder(), hintText: "Search ")),
+                fillColor: Colors.white,
+                filled: true,
+                suffixIcon: Icon(Icons.search),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Utils.header),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Utils.header),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                hintText: "Search ")),
         suggestionsCallback: (pattern) async {
           return getEventsSuggestions(pattern);
         },
@@ -203,10 +225,14 @@ class MyEventsPageState extends State<Events>
     var width = MediaQuery.of(context).size.width;
 
     try {
-      Scaffold(
-        body: ImageRotate(),
-      );
-      if (emptyEvents)
+      if (!webinarsLoaded && !eventsLoaded)
+        return Scaffold(
+          body: ImageRotate(),
+        );
+      else if (events.isEmpty &&
+          eventsLoaded &&
+          webinarsLoaded &&
+          webinars.isEmpty)
         return Scaffold(
             appBar: AppBar(
               // Here we take the value from the MyHomePage object that was created by
@@ -227,7 +253,7 @@ class MyEventsPageState extends State<Events>
                 ),
               ),
             ),
-            body: Container(child: ImageRotate()));
+            body: Center(child: Text("No Recent Events or Webinars.")));
       else
         return Scaffold(
             appBar: AppBar(
@@ -264,68 +290,66 @@ class MyEventsPageState extends State<Events>
                         child: Column(children: <Widget>[
                   search(),
                   SizedBox(
-                    height: height * 0.03,
+                    height: 30,
                   ),
                   ListView(
                     shrinkWrap: true,
                     physics: ScrollPhysics(),
                     children: mapIndexed(_filteredData, (index, event) {
                       return Center(
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.02),
-                            child: Container(
-                                width: MediaQuery.of(context).size.width * 0.85,
-                                height:
-                                    MediaQuery.of(context).size.height * 0.40,
-                                child: Card(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: <Widget>[
-                                      urlToImage(
-                                          WebAPI.baseURL + event.poster.url),
-                                      Container(
-                                        height: 50,
-                                        child: ButtonBar(
-                                          alignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            FlatButton(
-                                              child: Text(
-                                                event.name,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(fontSize: 22),
-                                              ),
-                                              onPressed: () {
-                                                if (event.runtimeType ==
-                                                    Event) {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          EventWidget(
-                                                              event: event),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          WebinarWidget(
-                                                              webinar: event),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                            )
-                                          ],
+                          child: SizedBox(
+                        width: width * 0.8,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: <Widget>[
+                            Text(
+                              event.name.toString(),
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 23,
+                                  color: Colors.black87,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                            SizedBox(
+                              height: 5,
+                            ),
+                            Card(
+                                elevation: 7.0,
+                                clipBehavior: Clip.antiAlias,
+                                margin: EdgeInsets.all(12.0),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.all(
+                                        Radius.circular(10.0))),
+                                child: InkWell(
+                                  child: urlToImage(
+                                      WebAPI.baseURL + event.poster.url),
+                                  onTap: () {
+                                    if (event.runtimeType == Event) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EventWidget(event: event),
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                ))),
-                      );
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              WebinarWidget(webinar: event),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                )),
+                            SizedBox(
+                              height: 30,
+                            )
+                          ],
+                        ),
+                      ));
                     }).toList(),
                   ),
                 ])))));

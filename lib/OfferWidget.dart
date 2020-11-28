@@ -252,7 +252,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                 ),
                 SizedBox(height: 15),
                 Container(
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[

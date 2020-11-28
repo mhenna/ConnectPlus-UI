@@ -124,28 +124,6 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
               Navigator.of(context).pop();
             },
           ),
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                    child: SizedBox(
-                        child: new Text(
-                      webinar.name,
-                      style: TextStyle(
-                          fontSize: size * 53,
-                          color: Utils.background,
-                          fontWeight: FontWeight.w600),
-                    )))
-              ],
-            ),
-          ),
-          SizedBox(
-            width: width * 0.12,
-          )
         ],
       ),
     );
@@ -232,9 +210,6 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                   height: 20,
                 ),
                 _description(),
-                SizedBox(
-                  height: 20,
-                ),
                 Padding(
                     padding:
                         EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
@@ -267,15 +242,26 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
-    String time = DateFormat.Hm('en_US').format(webinar.date);
-    String date = DateFormat.yMMMMd('en_US').format(webinar.date);
+    String time = DateFormat.Hm('en_US').format(webinar.startDate);
+    String date = DateFormat.yMMMMd('en_US').format(webinar.startDate);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Utils.titleText(
-            textString: "Webinar Details",
-            fontSize: size * 39,
-            textcolor: Utils.header),
+        Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                webinar.name,
+                style: TextStyle(
+                    fontSize: size * 50,
+                    color: Utils.headline,
+                    fontWeight: FontWeight.w600),
+              )
+            ],
+          ),
+        ),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(

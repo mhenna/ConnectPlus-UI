@@ -34,7 +34,7 @@ class _ActivityState extends State<ActivityWidget>
 
   AnimationController controller;
   Animation<double> animation;
-
+  bool activityLoaded = false;
   _ActivityState(this.activity);
 
   @override
@@ -54,6 +54,7 @@ class _ActivityState extends State<ActivityWidget>
     setState(() {
       ergActivities = activities.where((ev) => ev.id != activity.id).toList();
       loading = false;
+      activityLoaded = true;
     });
   }
 
@@ -130,28 +131,6 @@ class _ActivityState extends State<ActivityWidget>
               Navigator.of(context).pop();
             },
           ),
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                    child: SizedBox(
-                        child: new Text(
-                      activity.name,
-                      style: TextStyle(
-                          fontSize: size * 53,
-                          color: Utils.background,
-                          fontWeight: FontWeight.w600),
-                    )))
-              ],
-            ),
-          ),
-          SizedBox(
-            width: width * 0.12,
-          )
         ],
       ),
     );
@@ -186,7 +165,7 @@ class _ActivityState extends State<ActivityWidget>
   }
 
   Widget _activityPoster() {
-    Stack(
+    return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
         SizedBox(
@@ -239,7 +218,7 @@ class _ActivityState extends State<ActivityWidget>
                 ),
                 _description(),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Padding(
                     padding:
@@ -271,22 +250,6 @@ class _ActivityState extends State<ActivityWidget>
     );
   }
 
-  Widget _dateWidget(String text) {
-    return Container(
-      padding: EdgeInsets.all(10),
-//      decoration: BoxDecoration(
-//        border: Border.all(color: Utils.iconColor, style: BorderStyle.solid),
-//        borderRadius: BorderRadius.all(Radius.circular(13)),
-//        color: Utils.iconColor,
-//      ),
-      child: Utils.titleText(
-        textString: text,
-        fontSize: 16,
-        textcolor: Colors.black,
-      ),
-    );
-  }
-
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
     String time = DateFormat.Hm('en_US').format(activity.startDate);
@@ -294,10 +257,21 @@ class _ActivityState extends State<ActivityWidget>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Utils.titleText(
-            textString: "Activity Details",
-            fontSize: size * 39,
-            textcolor: Utils.header),
+        Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              Text(
+                activity.name,
+                style: TextStyle(
+                    fontSize: size * 50,
+                    color: Utils.headline,
+                    fontWeight: FontWeight.w600),
+              )
+            ],
+          ),
+        ),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(
@@ -374,7 +348,7 @@ class _ActivityState extends State<ActivityWidget>
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
-    if (loading == true) {
+    if (loading == true && !activityLoaded) {
       return Scaffold(
         body: ImageRotate(),
       );
