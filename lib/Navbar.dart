@@ -1,5 +1,6 @@
 import 'package:connect_plus/Activities.dart';
 import 'package:connect_plus/events.dart';
+import 'package:connect_plus/included.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
@@ -46,16 +47,6 @@ class NavDrawerState extends State<NavDrawer>
             child: Image.asset(
               './assets/logo2.png',
             ),
-            // decoration: BoxDecoration(
-            //   gradient: LinearGradient(
-            //     colors: [
-            //       Utils.secondaryColor.withAlpha(255),
-            //       Utils.primaryColor.withAlpha(255),
-            //     ],
-            //     begin: Alignment.topCenter,
-            //     end: Alignment.bottomCenter,
-            //   ),
-            // ),
           ),
           ListTile(
             leading: Icon(Icons.home),
@@ -77,65 +68,6 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-          // ExpansionTile(
-          //     leading: Icon(Icons.person),
-          //     title: Text('Committees'),
-          //     children: <Widget>[
-          //       ExpansionTile(
-          //         leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-          //         title: Text("ERGs", style: TextStyle(color: Colors.black)),
-          //         children: <Widget>[
-          //           ListTile(
-          //             leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //             title:
-          //                 Text('GENNEXT', style: TextStyle(color: Colors.grey)),
-          //             onTap: () => print(""),
-          //           ),
-          //           ListTile(
-          //             leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //             title: Text('DT Belmasry',
-          //                 style: TextStyle(color: Colors.grey)),
-          //             onTap: () => print(""),
-          //           ),
-          //           ListTile(
-          //             leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //             title: Text('WIA', style: TextStyle(color: Colors.grey)),
-          //             onTap: () => print(""),
-          //           ),
-          //           ListTile(
-          //             leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //             title:
-          //                 Text('MOSAIC', style: TextStyle(color: Colors.grey)),
-          //             onTap: () => print(""),
-          //           )
-          //         ],
-          //       ),
-          //       ListTile(
-          //         leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-          //         title: Text('Internal Comms',
-          //             style: TextStyle(color: Colors.grey)),
-          //         onTap: () => print(""),
-          //       ),
-          //       // ExpansionTile(
-          //       //   leading: Padding(padding: EdgeInsets.only(left: 60.0)),
-          //       //   title: Text("Engagement Teams",
-          //       //       style: TextStyle(color: Colors.black)),
-          //       //   children: <Widget>[
-          //       //     ListTile(
-          //       //       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //       //       title: Text('Wezaret ELSAADA (Deploy)',
-          //       //           style: TextStyle(color: Colors.grey)),
-          //       //       onTap: () => print(""),
-          //       //     ),
-          //       //     ListTile(
-          //       //       leading: Padding(padding: EdgeInsets.only(left: 75.0)),
-          //       //       title: Text('FUN CREW (CS)',
-          //       //           style: TextStyle(color: Colors.grey)),
-          //       //       onTap: () => print(""),
-          //       //     ),
-          //       //   ],
-          //       // ),
-          //     ]),
           ListTile(
             leading: Icon(Icons.local_offer),
             title: Text('Offers'),
@@ -166,16 +98,6 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-          // ListTile(
-          //   leading: Icon(Icons.ondemand_video),
-          //   title: Text('Webinars'),
-          //   onTap: () => {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => WebinarWidget()),
-          //     )
-          //   },
-          // ),
           ListTile(
             leading: Icon(Icons.calendar_today),
             title: Text('Calendar'),
@@ -192,7 +114,7 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => emergencyContact()),
+                MaterialPageRoute(builder: (context) => Emergency()),
               )
             },
           ),
@@ -200,10 +122,9 @@ class NavDrawerState extends State<NavDrawer>
             leading: Icon(Icons.add_to_home_screen),
             title: Text('Who is Included'),
             onTap: () => {
-              // prefs.remove("token"),
-              // Navigator.of(context).pushAndRemoveUntil(
-              //     MaterialPageRoute(builder: (context) => login()),
-              //     (Route<dynamic> route) => false)
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => Included()),
+                  (Route<dynamic> route) => false)
             },
           ),
           ListTile(
