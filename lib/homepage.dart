@@ -1,4 +1,9 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/offer.dart';
+import 'package:connect_plus/models/webinar.dart';
+import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:ui' as ui;
@@ -15,15 +20,6 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'EventsVariable.dart';
 
-final List<String> imgList = [
-  'https://mainvibes.com/wp-content/uploads/2020/05/Party.jpeg',
-  'https://identity-mag.com/wp-content/uploads/2020/01/My-Post-19.jpg',
-  'https://img.freepik.com/free-photo/senior-businesswoman-young-business-people-work-modern-office_52137-28330.jpg?size=626&ext=jpg',
-  'https://www.potential.com/wp-content/uploads/2018/01/teamwork-.jpg',
-  'https://www.csregypt.com/wp-content/uploads/2019/07/Feature-Image-1.jpg',
-  'https://corporate.delltechnologies.com/is/image/content/dam/delltechnologies/assets/home/images/photos/MichaelDell.jpg?fit=constrain&wid=640'
-];
-
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
@@ -33,246 +29,283 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 16.0);
+  TextStyle style = TextStyle(fontFamily: 'Roboto', fontSize: 16.0);
+
+  List<dynamic> recentEvents;
+  List<Event> events = [];
+  List<Offer> offers = [];
+  List<Webinar> webinars = [];
+  bool webinarsLoaded = false;
+  bool eventsLoaded = false;
+  bool offersLoaded = false;
+  bool highlightsLoaded = false;
+
+  void initState() {
+    recentEvents = [];
+    events = [];
+    offers = [];
+    webinars = [];
+    super.initState();
+    getEvents();
+    getWebinars();
+    getOffers();
+    getRecentEventsPosters();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> getEvents() async {
+    final allEvents = await WebAPI.getEvents();
+    if (this.mounted) {
+      setState(() {
+        events = allEvents;
+        eventsLoaded = true;
+      });
+    }
+  }
+
+  Future<void> getWebinars() async {
+    final allWebinars = await WebAPI.getWebinars();
+    if (this.mounted) {
+      setState(() {
+        webinars = allWebinars;
+        webinarsLoaded = true;
+      });
+    }
+  }
+
+  Future<void> getOffers() async {
+    try {
+      final recentOffers = await WebAPI.getRecentOffers();
+      if (this.mounted) {
+        recentOffers.sort((a, b) {
+          return a.createdAt.compareTo(b.createdAt);
+        });
+        setState(() {
+          this.offers = recentOffers;
+          offersLoaded = true;
+        });
+      }
+    } catch (e) {}
+  }
+
+  Future<void> getRecentEventsPosters() async {
+    var recent = await WebAPI.getEventHighlights();
+    if (this.mounted) {
+      setState(() {
+        recent.forEach((element) {
+          element.highlight.forEach((h) {
+            recentEvents.add(Image.network(WebAPI.baseURL + h.url));
+          });
+        });
+        highlightsLoaded = true;
+      });
+    }
+  }
+
+  Widget seeMore(String view) {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Container(
+        padding:
+            EdgeInsets.fromLTRB(width * 0.03, height * 0.02, width * 0.03, 0),
+        width: width * 0.30,
+        height: height * 0.06,
+        child: Padding(
+            padding: EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(15.0),
+                gradient: LinearGradient(
+                  colors: [
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
+                  ],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
+              ),
+              child: MaterialButton(
+                minWidth: MediaQuery.of(context).size.width,
+                padding: EdgeInsets.fromLTRB(15.0, 0.0, 15.0, 0.0),
+                onPressed: () {
+                  if (view == 'Events') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Events()),
+                    );
+                  } else {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Offers()),
+                    );
+                  }
+                },
+                child: Text("View All",
+                    textAlign: TextAlign.center,
+                    style: style.copyWith(
+                        color: Colors.white,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600)),
+              ),
+            )),
+      ),
+    );
+  }
+
+  Widget title(String title) {
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    return new Padding(
+      padding: EdgeInsets.fromLTRB(0, height * 0.07, 0, height * 0.07),
+      child: Row(children: <Widget>[
+        Expanded(
+          child: new Container(
+              margin: const EdgeInsets.only(left: 45.0, right: 10.0),
+              child: Divider(
+                color: Colors.black87,
+                thickness: 2,
+                height: 30,
+              )),
+        ),
+        Text(
+          title.toUpperCase(),
+          style: TextStyle(
+            fontSize: size * 37,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        Expanded(
+          child: new Container(
+              margin: const EdgeInsets.only(left: 10.0, right: 45.0),
+              child: Divider(
+                color: Colors.black87,
+                thickness: 2,
+                height: 30,
+              )),
+        ),
+      ]),
+    );
+  }
+
+  List<Widget> getContent() {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    List<Widget> list = [];
+    if (webinarsLoaded && eventsLoaded && offersLoaded) {
+      if (recentEvents.isNotEmpty) {
+        list.add(
+          SizedBox(
+            height: height * 0.35,
+            width: width * 1,
+            child: Carousel(
+              images: recentEvents,
+              boxFit: BoxFit.fill,
+              dotSize: 4.0,
+              dotSpacing: 15.0,
+              dotColor: Colors.grey,
+              indicatorBgPadding: 5.0,
+              dotBgColor: Colors.grey.withOpacity(0.2),
+              overlayShadow: true,
+              overlayShadowColors: Colors.white,
+              overlayShadowSize: 0.7,
+            ),
+          ),
+        );
+      }
+
+      if (events.isNotEmpty || webinars.isNotEmpty) {
+        list.add(
+          title('Recent Events \n   & Webinars'),
+          //gridview
+        );
+        list.add(Container(
+          width: width * 0.97,
+          height: height * 0.50,
+          child: EventsVariables(events: events, webinars: webinars),
+        ));
+        list.add(
+          seeMore('Events'),
+        );
+      }
+      if (offers.isNotEmpty) {
+        list.add(title('Recent Offers'));
+        list.add(
+
+            //gridview
+            Container(
+          width: width * 0.97,
+          height: height * 0.50,
+          child: OfferVariables(
+            offers: offers,
+          ),
+        ));
+        list.add(seeMore('Offers'));
+      } else if (offers.isEmpty && events.isEmpty && webinars.isEmpty) {
+        list.add(Text('No Recent Data, Coming Soon!'));
+      }
+      list.add(SizedBox(
+        height: 15,
+      ));
+      return list;
+    } else {
+      list.add(Center(child: Text("Loading...")));
+      return list;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    var size = MediaQuery.of(context).size.aspectRatio;
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    return new WillPopScope(
-      onWillPop: () async => false,
-      child: Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("Home"),
-          centerTitle: true,
-          backgroundColor: Utils.header,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Utils.secondaryColor,
-                  Utils.primaryColor,
-                ],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
+    if (highlightsLoaded && webinarsLoaded && eventsLoaded && offersLoaded)
+      return new WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          appBar: AppBar(
+            // Here we take the value from the MyHomePage object that was created by
+            // the App.build method, and use it to set our appbar title.
+            title: Text("Home"),
+            centerTitle: true,
+            backgroundColor: Utils.header,
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Utils.secondaryColor,
+                    Utils.primaryColor,
+                  ],
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
+                ),
               ),
             ),
           ),
+          drawer: NavDrawer(),
+          backgroundColor: Utils.background,
+          body: Stack(children: <Widget>[
+            SingleChildScrollView(
+              child: Container(
+                child: Column(
+                  children: getContent(),
+                ),
+              ),
+            ),
+          ]),
         ),
-        drawer: NavDrawer(),
-        backgroundColor: Utils.background,
-        body: Stack(children: <Widget>[
-          SingleChildScrollView(
-            child: Container(
-              child: Column(
-                children: <Widget>[
-                  SizedBox(
-                    height: height * 0.42,
-                    width: width,
-                    child: Carousel(
-                      images: [
-                        Image.asset('./assets/logo2.png'),
-                        Image.asset('./assets/logo.png'),
-                      ],
-                      dotSize: 4.0,
-                      dotSpacing: 15.0,
-                      dotColor: Utils.header,
-                      indicatorBgPadding: 5.0,
-                      dotBgColor: Utils.header.withOpacity(0.1),
-                      overlayShadow: true,
-                      overlayShadowColors: Colors.white,
-                      overlayShadowSize: 0.7,
-                    ),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.07,
-                        width * 0.03, height * 0.01),
-                    child: new Text(
-                      'Recent Events',
-                      style: TextStyle(
-                        fontSize: size * 48,
-                        fontWeight: FontWeight.bold,
-                        color: Utils.header,
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color: Utils.header,
-                    thickness: 3,
-                    indent: width * 0.25,
-                    endIndent: width * 0.25,
-                  ),
-                  //gridview
-                  Container(
-                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
-                    height: height * 0.50,
-                    child: EventsVariables(),
-                  ),
-                  Align(
-                    alignment: Alignment.bottomRight,
-                    child: Container(
-                      padding: EdgeInsets.fromLTRB(
-                          width * 0.03, height * 0.02, width * 0.03, 0),
-                      width: width * 0.4,
-                      height: height * 0.12,
-                      child: Padding(
-                          padding: EdgeInsets.only(bottom: height * 0.04),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30.0),
-                              gradient: LinearGradient(
-                                colors: [
-                                  Utils.secondaryColor,
-                                  Utils.primaryColor,
-                                ],
-                                begin: Alignment.topRight,
-                                end: Alignment.bottomLeft,
-                              ),
-                            ),
-                            child: MaterialButton(
-                              minWidth: MediaQuery.of(context).size.width,
-                              padding:
-                                  EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Events()),
-                                );
-                              },
-                              child: Text("See More",
-                                  textAlign: TextAlign.center,
-                                  style: style.copyWith(color: Colors.white)),
-                            ),
-                          )),
-                    ),
-                  ),
-                  new Padding(
-                    padding: EdgeInsets.fromLTRB(width * 0.03, height * 0.09,
-                        width * 0.03, height * 0.01),
-                    child: new Text(
-                      'Recent Offers',
-                      style: TextStyle(
-                        fontSize: size * 48,
-                        fontWeight: FontWeight.bold,
-                        color: Utils.header,
-                      ),
-                    ),
-                  ),
-                  Divider(
-                    color: Utils.header,
-                    thickness: 3,
-                    indent: width * 0.25,
-                    endIndent: width * 0.25,
-                  ),
-
-                  //gridview
-                  Container(
-                    padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0),
-                    height: height * 0.50,
-                    child: OfferVariables(),
-                  ),
-                  Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(
-                            width * 0.03, height * 0.02, width * 0.03, 0),
-                        width: width * 0.4,
-                        height: height * 0.12,
-                        child: Padding(
-                            padding: EdgeInsets.only(bottom: height * 0.04),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(30.0),
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Utils.secondaryColor,
-                                    Utils.primaryColor,
-                                  ],
-                                  begin: Alignment.topRight,
-                                  end: Alignment.bottomLeft,
-                                ),
-                              ),
-                              child: MaterialButton(
-                                minWidth: MediaQuery.of(context).size.width,
-                                padding:
-                                    EdgeInsets.fromLTRB(20.0, 0.0, 20.0, 0.0),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Offers()),
-                                  );
-                                },
-                                child: Text("See More",
-                                    textAlign: TextAlign.center,
-                                    style: style.copyWith(color: Colors.white)),
-                              ),
-                            )),
-                      )),
-                ],
-              ),
-            ),
-          ),
-
-// This trailing comma makes auto-formatting nicer for build methods.
-        ]),
-      ),
-    );
+      );
+    else {
+      return Scaffold(body: ImageRotate());
+    }
   }
 }
-
-// final Iterable<Image> imageSliders = imgList.map(
-//   (item) => Image.network(item),
-// );
-
-// final List<Widget> imageSliders = imgList
-//     .map((item) => Container(
-//           child: Container(
-//             margin: EdgeInsets.all(5.0),
-//             child: ClipRRect(
-//                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
-//                 child: Stack(
-//                   children: <Widget>[
-//                     Image.network(item, fit: BoxFit.cover, width: 1000.0),
-//                     Positioned(
-//                       bottom: 0.0,
-//                       left: 0.0,
-//                       right: 0.0,
-//                       child: Container(
-//                         decoration: BoxDecoration(
-//                           gradient: LinearGradient(
-//                             colors: [
-//                               Color.fromARGB(200, 0, 0, 0),
-//                               Color.fromARGB(0, 0, 0, 0)
-//                             ],
-//                             begin: Alignment.bottomCenter,
-//                             end: Alignment.topCenter,
-//                           ),
-//                         ),
-//                         padding: EdgeInsets.symmetric(
-//                             vertical: 10.0, horizontal: 20.0),
-//                         child: Text(
-//                           'No. ${imgList.indexOf(item)} image',
-//                           style: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: 20.0,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 )),
-//           ),
-//         ))
-//     .toList();
