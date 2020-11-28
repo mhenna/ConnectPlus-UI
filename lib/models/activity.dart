@@ -1,3 +1,4 @@
+import 'package:connect_plus/models/activityDate.dart';
 import 'package:connect_plus/models/admin_user.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/image_file.dart';
@@ -18,7 +19,9 @@ class Activity {
   AdminUser createdBy;
   AdminUser updatedBy;
   String id;
+  List<DateTime> recurrenceDates;
   ERG erg;
+  List<ActivityDate> activityDates;
 
   Activity({
     this.recurrence,
@@ -33,10 +36,12 @@ class Activity {
     this.createdAt,
     this.updatedAt,
     this.iV,
+    this.recurrenceDates,
     this.createdBy,
     this.updatedBy,
     this.id,
     this.erg,
+    this.activityDates,
   });
 
   Activity.fromJson(Map<String, dynamic> json) {
@@ -48,6 +53,10 @@ class Activity {
     name = json['name'];
     zoomID = json['zoomID'];
     days = json['days'];
+    recurrenceDates = json['recurrenceDates'] != null
+        ? json['recurrenceDates'].cast<DateTime>()
+        : null;
+
     endDate =
         json['endDate'] != null ? DateTime.parse((json['endDate'])) : null;
     startDate =
@@ -65,6 +74,12 @@ class Activity {
         ? new AdminUser.fromJson(json['updated_by'])
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
+    if (json['activity_dates'] != null) {
+      activityDates = new List<ActivityDate>();
+      json['activity_dates'].forEach((v) {
+        activityDates.add(new ActivityDate.fromJson(v));
+      });
+    }
     id = json['id'];
   }
 
@@ -83,6 +98,9 @@ class Activity {
     data['days'] = this.days;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
+    if (this.recurrenceDates != null) {
+      data['recurrenceDates'] = this.recurrenceDates;
+    }
     data['__v'] = this.iV;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();
@@ -92,6 +110,10 @@ class Activity {
     }
     if (this.erg != null) {
       data['erg'] = this.erg.toJson();
+    }
+    if (this.activityDates != null) {
+      data['activity_dates'] =
+          this.activityDates.map((v) => v.toJson()).toList();
     }
     data['id'] = this.id;
     return data;

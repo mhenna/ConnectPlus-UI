@@ -1,25 +1,30 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:connect_plus/emergencyContact.dart';
 import 'package:connect_plus/models/activity.dart';
+import 'package:connect_plus/models/activityDate.dart';
 import 'package:connect_plus/models/category.dart';
+import 'package:connect_plus/models/emergencyContact.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/eventHighlight.dart';
 import 'package:connect_plus/models/login_request_params.dart';
 import 'package:connect_plus/models/offer.dart';
+import 'package:connect_plus/models/offerHighlight.dart';
+import 'package:connect_plus/models/profile.dart';
 import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/models/user.dart';
-import 'package:connect_plus/models/user_profile.dart';
-import 'package:connect_plus/models/user_profile_request_params.dart';
 import 'package:connect_plus/models/webinar.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:rrule/rrule.dart';
+import 'package:time_machine/time_machine.dart';
 
 class WebAPI {
   static final String baseURL = "http://18.221.173.220:1337";
   static final String _registerURL = '/auth/local/register';
   static final String _loginURL = '/auth/local';
-  static final String _profilesURL = '/profiles';
   static final String _checkUserURL = '/users/me';
   static final String _offersURL = '/offers';
   static final String _eventsURL = '/events';
@@ -27,6 +32,7 @@ class WebAPI {
   static final String _webinarsURL = '/webinars';
   static final String _ergsURL = '/ergs';
   static final String _categoriesURL = '/categories';
+  static final String _eventHighlightsURL = "/event-highlights";
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -75,6 +81,7 @@ class WebAPI {
 
     // create default headers
     Map<String, String> headers = generateHeaders(token);
+    print(requestURL);
     final response = await http.get(
       requestURL,
       headers: headers,
@@ -82,7 +89,7 @@ class WebAPI {
 
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
-      throw response;
+      throw response.body;
     }
     return response;
   }
@@ -125,8 +132,8 @@ class WebAPI {
     try {
       final response = await post(_loginURL, requestBody);
       final responseBody = json.decode(response.body);
-      final loggedInUser = UserWithToken.fromJson(responseBody);
 
+      final loggedInUser = UserWithToken.fromJson(responseBody);
       // reset the current user on login
       currentUser = loggedInUser.user;
       currentToken = loggedInUser.jwt;
@@ -136,25 +143,6 @@ class WebAPI {
       currentToken = null;
       throw e;
     }
-  }
-
-  static Future<UserProfile> setProfile(
-    UserProfileRequestParams params,
-  ) async {
-    final requestBody = jsonEncode(params);
-    final response = await post(_profilesURL, requestBody);
-    final responseBody = json.decode(response.body);
-    final profile = UserProfile.fromJson(responseBody);
-    return profile;
-  }
-
-  static Future<UserProfile> updateProfile(
-      UserProfileRequestParams params, String id) async {
-    final requestBody = jsonEncode(params);
-    final response = await put(_profilesURL + "/$id", requestBody);
-    final responseBody = json.decode(response.body);
-    final profile = UserProfile.fromJson(responseBody);
-    return profile;
   }
 
   static Future<User> checkToken(String token) async {
@@ -169,9 +157,11 @@ class WebAPI {
     return user;
   }
 
-  static Future<UserProfile> getProfile(String id) async {
-    final response = await get(_profilesURL + "/$id");
-    final profile = UserProfile.fromJson(json.decode(response.body));
+  static Future<Profile> updateProfile(Profile params, String id) async {
+    final requestBody = jsonEncode(params);
+    final response = await put(_checkUserURL + "/$id", requestBody);
+    final responseBody = json.decode(response.body);
+    final profile = Profile.fromJson(responseBody);
     return profile;
   }
 
@@ -187,10 +177,42 @@ class WebAPI {
     return ergs;
   }
 
+  static Future<List<EventHighlight>> getEventHighlights() async {
+    final response = await get('/event-highlights');
+
+    final List<dynamic> rawHighlights = json.decode(response.body);
+    final List<EventHighlight> highlights = [];
+    for (final highlightJson in rawHighlights) {
+      highlights.add(EventHighlight.fromJson(highlightJson));
+    }
+    return highlights;
+  }
+
+  static Future<List<OfferHighlight>> getOfferHighlights() async {
+    final response = await get('/offer-highlights');
+
+    final List<dynamic> rawHighlights = json.decode(response.body);
+    final List<OfferHighlight> highlights = [];
+    for (final highlightJson in rawHighlights) {
+      highlights.add(OfferHighlight.fromJson(highlightJson));
+    }
+    return highlights;
+  }
+
+  static Future<List<EmergencyContact>> getEmergencyContacts() async {
+    final response = await get('/emergency-contacts');
+
+    final List<dynamic> rawContacts = json.decode(response.body);
+    final List<EmergencyContact> contacts = [];
+    for (final contactJson in rawContacts) {
+      contacts.add(EmergencyContact.fromJson(contactJson));
+    }
+    return contacts;
+  }
+
   static Future<List<Category>> getCategories() async {
     final response = await get(_categoriesURL);
 
-    // TODO: Add this logic to a seperate transformer service
     final List<dynamic> rawCategories = json.decode(response.body);
     final List<Category> categories = [];
     for (final categoryJson in rawCategories) {
@@ -254,6 +276,88 @@ class WebAPI {
     return offers;
   }
 
+  static List<DateTime> getActivityRecurrence(String frequency,
+      DateTime endDate, DateTime startDate, List<ActivityDate> dates) {
+    RecurrenceRule rrule;
+
+    Set<ByWeekDayEntry> days = {};
+    dates.forEach((element) {
+      if (element.day == 'Sunday') {
+        days.add(ByWeekDayEntry(DayOfWeek.sunday));
+      }
+      if (element.day == 'Monday') {
+        days.add(ByWeekDayEntry(DayOfWeek.monday));
+      }
+      if (element.day == 'Tuesday') {
+        days.add(ByWeekDayEntry(DayOfWeek.tuesday));
+      }
+      if (element.day == 'Wednesday') {
+        days.add(ByWeekDayEntry(DayOfWeek.wednesday));
+      }
+      if (element.day == 'Thursday') {
+        days.add(ByWeekDayEntry(DayOfWeek.thursday));
+      }
+      if (element.day == 'Friday') {
+        days.add(ByWeekDayEntry(DayOfWeek.friday));
+      }
+      if (element.day == 'Saturday') {
+        days.add(ByWeekDayEntry(DayOfWeek.saturday));
+      }
+    });
+    if (frequency == 'daily') {
+      rrule = RecurrenceRule(
+        frequency: Frequency.daily,
+        until: LocalDateTime.dateTime(endDate),
+        byWeekDays: days,
+        weekStart: DayOfWeek.sunday,
+      );
+    } else if (frequency == 'weekly') {
+      rrule = RecurrenceRule(
+        frequency: Frequency.weekly,
+        until: LocalDateTime.dateTime(endDate),
+        byWeekDays: days,
+        weekStart: DayOfWeek.sunday,
+      );
+    } else if (frequency == 'biweekly') {
+      rrule = RecurrenceRule(
+        frequency: Frequency.weekly,
+        interval: 2,
+        until: LocalDateTime.dateTime(endDate),
+        byWeekDays: days,
+        weekStart: DayOfWeek.sunday,
+      );
+    } else if (frequency == 'monthly') {
+      rrule = RecurrenceRule(
+        frequency: Frequency.monthly,
+        until: LocalDateTime.dateTime(endDate),
+        byWeekDays: days,
+        weekStart: DayOfWeek.sunday,
+      );
+    }
+    // Every two weeks on Tuesday and Thursday, but only in December.
+
+    Iterable<LocalDateTime> instances = rrule.getInstances(
+      start: LocalDateTime.dateTime(startDate),
+    );
+    List<DateTime> dateTimeInstances = [];
+    instances.forEach((element) {
+      dateTimeInstances.add(element.toDateTimeLocal());
+    });
+    print(dateTimeInstances);
+    return dateTimeInstances;
+  }
+
+  static Future<List<Activity>> getActivitiesDates() async {
+    List<Activity> activities = await getActivities();
+
+    activities.forEach((activity) {
+      activity.recurrenceDates = [];
+      activity.recurrenceDates.addAll(getActivityRecurrence(activity.recurrence,
+          activity.endDate, activity.startDate, activity.activityDates));
+    });
+    return activities;
+  }
+
   static Future<List<Activity>> getActivities() async {
     final response = await get(_activitiesURL);
 
@@ -261,7 +365,8 @@ class WebAPI {
     final List<dynamic> rawActivities = json.decode(response.body);
     final List<Activity> activities = [];
     for (final activityJson in rawActivities) {
-      activities.add(Activity.fromJson(activityJson));
+      if (Activity.fromJson(activityJson).endDate.isAfter(DateTime.now()))
+        activities.add(Activity.fromJson(activityJson));
     }
 
     return activities;
@@ -299,8 +404,10 @@ class WebAPI {
     final List<dynamic> rawWebinars = json.decode(response.body);
     final List<Webinar> webinars = [];
     for (final webinarJson in rawWebinars) {
+      //if (Webinar.fromJson(webinarJson).isRecorded == true)
       webinars.add(Webinar.fromJson(webinarJson));
     }
+    webinars.sort((b, a) => a.startDate.compareTo(b.startDate));
 
     return webinars;
   }
@@ -327,6 +434,8 @@ class WebAPI {
     for (final webinarJson in rawWebinars) {
       webinars.add(Webinar.fromJson(webinarJson));
     }
+    webinars.sort((b, a) => a.startDate.compareTo(b.startDate));
+
     return webinars;
   }
 
@@ -337,8 +446,10 @@ class WebAPI {
     final List<dynamic> rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
+      // if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
       events.add(Event.fromJson(eventJson));
     }
+    events.sort((b, a) => a.startDate.compareTo(b.startDate));
 
     return events;
   }
@@ -362,7 +473,8 @@ class WebAPI {
     final rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
-      events.add(Event.fromJson(eventJson));
+      if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
+        events.add(Event.fromJson(eventJson));
     }
     return events;
   }
@@ -375,8 +487,10 @@ class WebAPI {
     final List<dynamic> rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
+      //  if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
       events.add(Event.fromJson(eventJson));
     }
+    events.sort((b, a) => a.startDate.compareTo(b.startDate));
 
     return events;
   }
