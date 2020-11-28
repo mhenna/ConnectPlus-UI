@@ -1,3 +1,4 @@
+import 'package:carousel_pro/carousel_pro.dart';
 import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
@@ -52,14 +53,36 @@ class _OffersState extends State<Offers> {
     "Travel"
   ];
   List<dynamic> _filteredData;
+  List<dynamic> recentOffers;
+
   var randIndexCat;
   var randIndexOffer;
 
   void initState() {
     _filteredData = [];
+    recentOffers = [];
     selectedCountList = [];
     super.initState();
+    getRecentOffersPosters();
     getOffers();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> getRecentOffersPosters() async {
+    var recent = await WebAPI.getOfferHighlights();
+    if (this.mounted) {
+      setState(() {
+        recent.forEach((element) {
+          element.highlight.forEach((h) {
+            recentOffers.add(Image.network(WebAPI.baseURL + h.url));
+          });
+        });
+      });
+    }
   }
 
   Future getCategories() async {
@@ -80,7 +103,8 @@ class _OffersState extends State<Offers> {
       setState(() {
         this.offers = allOffers;
         allOffers.forEach((offer) {
-          if (categoriesAndOffers[offer.category.name] == null) {
+          if (offer.category !=
+              null) if (categoriesAndOffers[offer.category.name] == null) {
             categoriesAndOffers[offer.category.name] = [offer];
           } else
             categoriesAndOffers[offer.category.name].add(offer);
@@ -121,33 +145,11 @@ class _OffersState extends State<Offers> {
   void filterData() async {
     _filteredData = [];
     for (final data in offers) {
-      print(data.category);
       if (selectedCountList.indexOf(data.category.toString()) != -1) {
         _filteredData.add(data);
       }
     }
     setState(() {});
-  }
-
-  void _openFilterDialog() async {
-    await FilterListDialog.display(context,
-        allTextList: categoriesList,
-        height: 480,
-        borderRadius: 20,
-        headlineText: "Select Categories",
-        applyButonTextBackgroundColor: Utils.header,
-        allResetButonColor: Utils.header,
-        selectedTextBackgroundColor: Utils.header,
-        searchFieldHintText: "Search Here",
-        selectedTextList: selectedCountList, onApplyButtonClick: (list) {
-      if (list != null) {
-        setState(() {
-          selectedCountList = List.from(list);
-          filterData();
-        });
-      }
-      Navigator.pop(context);
-    });
   }
 
   @override
@@ -199,10 +201,6 @@ class _OffersState extends State<Offers> {
             ),
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: _openFilterDialog,
-          child: Icon(Icons.filter_list),
-        ),
         body: ListView.builder(
           shrinkWrap: true,
           padding: const EdgeInsets.all(10),
@@ -210,58 +208,74 @@ class _OffersState extends State<Offers> {
           itemBuilder: (BuildContext context, int elem) {
             if (elem == 0) {
               return Column(children: <Widget>[
-                TypeAheadField(
-                  textFieldConfiguration: TextFieldConfiguration(
-                      decoration: InputDecoration(
-                          border: OutlineInputBorder(), hintText: "Search")),
-                  suggestionsCallback: (pattern) async {
-                    return getSuggestions(pattern);
-                  },
-                  itemBuilder: (context, Offer suggestedOffer) {
-                    return ListTile(
-                      leading: Icon(Icons.shopping_cart),
-                      title: Text(suggestedOffer.name),
-                    );
-                  },
-                  onSuggestionSelected: (suggestion) {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => OfferWidget(
-                          offer: suggestion,
-                          category: suggestion.category,
-                        ),
-                      ),
-                    );
-                  },
-                ),
                 Container(
-                    height: MediaQuery.of(context).size.height * 0.35,
-                    width: MediaQuery.of(context).size.width,
-                    child: Padding(
-                      padding: EdgeInsets.fromLTRB(0, height * 0.01, 0, 0),
-                      child: base64ToImageFeatured(),
-                    ))
+                    decoration: BoxDecoration(
+                      boxShadow: <BoxShadow>[
+                        BoxShadow(
+                            color: Utils.header,
+                            blurRadius: 5.0,
+                            offset: Offset(0.30, 0.10))
+                      ],
+                    ),
+                    child: TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                          decoration: InputDecoration(
+                              fillColor: Colors.white,
+                              filled: true,
+                              suffixIcon: Icon(Icons.search),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Utils.header),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Utils.header),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              hintText: "Search for offers")),
+                      suggestionsCallback: (pattern) async {
+                        return getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, Offer suggestedOffer) {
+                        return ListTile(
+                          leading: Icon(Icons.shopping_cart),
+                          title: Text(suggestedOffer.name),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => OfferWidget(
+                              offer: suggestion,
+                              category: suggestion.category,
+                            ),
+                          ),
+                        );
+                      },
+                    )),
+                SizedBox(
+                  height: 10,
+                ),
+                SizedBox(
+                  height: height * 0.35,
+                  width: width,
+                  child: Carousel(
+                    images: recentOffers,
+                    boxFit: BoxFit.fitWidth,
+                    dotSize: 4.0,
+                    dotSpacing: 15.0,
+                    dotColor: Colors.grey,
+                    indicatorBgPadding: 5.0,
+                    dotBgColor: Colors.grey.withOpacity(0.2),
+                    overlayShadow: true,
+                    overlayShadowColors: Colors.white,
+                    overlayShadowSize: 0.7,
+                  ),
+                ),
               ]);
             } else if (elem == 1) {
               return Column(children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(0, height * 0.08, 0, 8.0),
-                  child: Text(
-                    "OFFERS",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontSize: size * 50,
-                        fontWeight: FontWeight.w600,
-                        color: Utils.header),
-                  ),
-                ),
-                Divider(
-                  color: Utils.header,
-                  thickness: 3,
-                  indent: width * 0.27,
-                  endIndent: width * 0.27,
-                )
+                Padding(padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0.0))
               ]);
             } else {
               return ListView(
@@ -274,12 +288,12 @@ class _OffersState extends State<Offers> {
                           if (index == 0)
                             Padding(
                                 padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.06),
+                                    height * 0.03, width * 0.03, height * 0.03),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     child: Text(
-                                      category.toString(),
+                                      category.toString().toUpperCase(),
                                       style: TextStyle(
                                           fontSize: size * 45,
                                           fontWeight: FontWeight.w600,
@@ -290,12 +304,12 @@ class _OffersState extends State<Offers> {
                           else
                             Padding(
                                 padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.06),
+                                    height * 0.03, width * 0.03, height * 0.03),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Container(
                                     child: Text(
-                                      category.toString(),
+                                      category.toString().toUpperCase(),
                                       style: TextStyle(
                                           fontSize: size * 45,
                                           fontWeight: FontWeight.w600,
@@ -326,8 +340,8 @@ class _OffersState extends State<Offers> {
                                             offer.name,
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
-                                                fontSize: size * 35,
-                                                color: Utils.header),
+                                                fontSize: size * 30,
+                                                color: Colors.black87),
                                           ),
                                           onPressed: () {
                                             Navigator.push(
@@ -349,7 +363,16 @@ class _OffersState extends State<Offers> {
                               ),
                             );
                           }).toList(),
-                        )
+                        ),
+                        SizedBox(
+                          height: 25,
+                        ),
+                        Divider(
+                          color: Utils.header,
+                          thickness: 2,
+                          indent: width * 0.27,
+                          endIndent: width * 0.27,
+                        ),
                       ],
                     );
                   },
