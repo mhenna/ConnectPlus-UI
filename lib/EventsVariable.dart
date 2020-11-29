@@ -166,10 +166,7 @@ class Single_Event extends StatelessWidget {
   });
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    print(event.name);
-    print(event.startDate);
     return SizedBox(
         height: height,
         child: Card(

@@ -212,7 +212,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                 _description(),
                 Padding(
                     padding:
-                        EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
+                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
                     child: Utils.titleText(
                         textString: "Webinars by ${webinar.erg.name}",
                         fontSize: size * 39,
@@ -247,21 +247,6 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                webinar.name,
-                style: TextStyle(
-                    fontSize: size * 50,
-                    color: Utils.headline,
-                    fontWeight: FontWeight.w600),
-              )
-            ],
-          ),
-        ),
         SizedBox(height: 15),
         Row(children: <Widget>[
           Text(
@@ -315,7 +300,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
             style: TextStyle(fontSize: size * 32),
           )
         ]),
-        SizedBox(height: 20),
+        SizedBox(height: 30),
         Center(
           child: RaisedButton(
             onPressed: _launchURL,
@@ -368,10 +353,13 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
       );
     } else {
       return Scaffold(
-        backgroundColor: Utils.background,
-        drawer: NavDrawer(),
-        body: SafeArea(
-          child: Container(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(webinar.name),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -382,20 +370,32 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    _appBar(),
-                    Container(
-                      height: height * 0.3,
-                      child: _webinarPoster(),
-                    )
-                  ],
-                ),
-                _detailWidget(),
+          ),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
               ],
+              begin: Alignment.topRight,
+              end: Alignment.topLeft,
             ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    padding: Utils.paddingPoster,
+                    height: height * 0.35,
+                    child: _webinarPoster(),
+                  )
+                ],
+              ),
+              _detailWidget(),
+            ],
           ),
         ),
       );

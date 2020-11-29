@@ -81,7 +81,6 @@ class WebAPI {
 
     // create default headers
     Map<String, String> headers = generateHeaders(token);
-    print(requestURL);
     final response = await http.get(
       requestURL,
       headers: headers,
@@ -343,7 +342,6 @@ class WebAPI {
     instances.forEach((element) {
       dateTimeInstances.add(element.toDateTimeLocal());
     });
-    print(dateTimeInstances);
     return dateTimeInstances;
   }
 
@@ -473,8 +471,8 @@ class WebAPI {
     final rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
-      if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
-        events.add(Event.fromJson(eventJson));
+      // if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
+      events.add(Event.fromJson(eventJson));
     }
     return events;
   }

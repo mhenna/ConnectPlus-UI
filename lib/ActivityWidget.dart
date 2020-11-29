@@ -112,58 +112,6 @@ class _ActivityState extends State<ActivityWidget>
     return list;
   }
 
-  Widget _appBar() {
-    var width = MediaQuery.of(context).size.width;
-    var size = MediaQuery.of(context).size.aspectRatio;
-    var height = MediaQuery.of(context).size.height;
-    return Container(
-      padding: Utils.padding,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          _icon(
-            Icons.arrow_back_ios,
-            color: Utils.header,
-            size: size * 30,
-            padding: size * 0.03,
-            isOutLine: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _icon(
-    IconData icon, {
-    Color color = Utils.iconColor,
-    double size = 20,
-    double padding = 10,
-    bool isOutLine = false,
-    Function onPressed,
-  }) {
-    return Container(
-      height: 40,
-      width: 40,
-      padding: EdgeInsets.all(padding),
-      // margin: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: Utils.iconColor,
-            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
-        color: isOutLine ? Colors.white : Theme.of(context).backgroundColor,
-      ),
-      child: Icon(icon, color: color, size: size),
-    ).ripple(() {
-      if (onPressed != null) {
-        onPressed();
-      }
-    }, borderRadius: BorderRadius.all(Radius.circular(13)));
-  }
-
   Widget _activityPoster() {
     return Stack(
       alignment: Alignment.bottomCenter,
@@ -214,7 +162,7 @@ class _ActivityState extends State<ActivityWidget>
                 ),
 //                  _dateWidget(eventDetails['event']['startDate'].toString().split("T")[0]),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 _description(),
                 SizedBox(
@@ -222,7 +170,7 @@ class _ActivityState extends State<ActivityWidget>
                 ),
                 Padding(
                     padding:
-                        EdgeInsets.fromLTRB(0, height * 0.08, 0, height * 0.02),
+                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
                     child: Utils.titleText(
                         textString: "Activities by ${activity.erg.name}",
                         fontSize: size * 39,
@@ -257,22 +205,7 @@ class _ActivityState extends State<ActivityWidget>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                activity.name,
-                style: TextStyle(
-                    fontSize: size * 50,
-                    color: Utils.headline,
-                    fontWeight: FontWeight.w600),
-              )
-            ],
-          ),
-        ),
-        SizedBox(height: 15),
+        SizedBox(height: 10),
         Row(children: <Widget>[
           Text(
             "Venue: ",
@@ -354,10 +287,13 @@ class _ActivityState extends State<ActivityWidget>
       );
     } else {
       return Scaffold(
-        backgroundColor: Utils.background,
-        drawer: NavDrawer(),
-        body: SafeArea(
-          child: Container(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(activity.name),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -368,20 +304,32 @@ class _ActivityState extends State<ActivityWidget>
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    _appBar(),
-                    Container(
-                      height: height * 0.3,
-                      child: _activityPoster(),
-                    )
-                  ],
-                ),
-                _detailWidget(),
+          ),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
               ],
+              begin: Alignment.topRight,
+              end: Alignment.topLeft,
             ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    padding: Utils.paddingPoster,
+                    height: height * 0.35,
+                    child: _activityPoster(),
+                  )
+                ],
+              ),
+              _detailWidget(),
+            ],
           ),
         ),
       );
