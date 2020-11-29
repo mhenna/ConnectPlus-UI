@@ -1,4 +1,5 @@
 import 'package:connect_plus/Activities.dart';
+import 'package:connect_plus/aboutus.dart';
 import 'package:connect_plus/events.dart';
 import 'package:connect_plus/included.dart';
 import 'package:flutter/material.dart';
@@ -124,6 +125,15 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => Included()),
+                  (Route<dynamic> route) => false)
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.info),
+            title: Text('About us'),
+            onTap: () => {
+              Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => AboutUs()),
                   (Route<dynamic> route) => false)
             },
           ),

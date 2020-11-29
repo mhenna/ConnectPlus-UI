@@ -55,6 +55,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       setState(() {
         ergEvents = events.where((ev) => ev.id != event.id).toList();
         loading = false;
+        print(ergEvents);
       });
   }
 
@@ -114,88 +115,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     return list;
   }
 
-  Widget _appBar() {
-    var width = MediaQuery.of(context).size.width;
-    var size = MediaQuery.of(context).size.aspectRatio;
-    var name = "";
-    name += "\n " + event.name.toString();
-    return Container(
-      padding: Utils.padding,
-      child: Row(
-        children: <Widget>[
-          _icon(
-            Icons.arrow_back_ios,
-            color: Utils.header,
-            size: size * 30,
-            padding: size * 0.03,
-            isOutLine: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _icon(
-    IconData icon, {
-    Color color = Utils.iconColor,
-    double size = 20,
-    double padding = 10,
-    bool isOutLine = false,
-    Function onPressed,
-  }) {
-    return Container(
-      height: 40,
-      width: 40,
-      padding: EdgeInsets.all(padding),
-      // margin: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: Utils.iconColor,
-            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
-        color: isOutLine ? Colors.white : Theme.of(context).backgroundColor,
-      ),
-      child: Icon(icon, color: color, size: size),
-    ).ripple(() {
-      if (onPressed != null) {
-        onPressed();
-      }
-    }, borderRadius: BorderRadius.all(Radius.circular(13)));
-  }
-
-  Widget _registerButton() {
-    return RaisedButton(
-      onPressed: () {},
-      color: Utils.iconColor,
-      textColor: Colors.white,
-      padding: const EdgeInsets.all(0.0),
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-          side: BorderSide(color: Utils.iconColor)),
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(30.0),
-          gradient: LinearGradient(
-            colors: [
-              Utils.secondaryColor,
-              Utils.primaryColor,
-            ],
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-          ),
-        ),
-        padding: const EdgeInsets.fromLTRB(30, 10, 30, 10),
-        child: Text(
-          'Register',
-          style: TextStyle(fontSize: 20),
-        ),
-      ),
-    );
-  }
-
   Widget _eventPoster() {
     return Stack(
       alignment: Alignment.bottomCenter,
@@ -244,12 +163,10 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                         borderRadius: BorderRadius.all(Radius.circular(10))),
                   ),
                 ),
-//                  _dateWidget(eventDetails['event']['startDate'].toString().split("T")[0]),
                 SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 _description(),
-                // Center(child: _registerButton()),
                 Padding(
                     padding:
                         EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
@@ -294,26 +211,12 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Container(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Text(
-                event.name,
-                style: TextStyle(
-                    fontSize: size * 50,
-                    color: Utils.headline,
-                    fontWeight: FontWeight.w600),
-              )
-            ],
-          ),
-        ),
         Text(
           text,
           style: TextStyle(
             color: Colors.black87,
-            fontSize: size * 30,
+            fontWeight: FontWeight.w500,
+            fontSize: size * 35,
           ),
         ),
       ],
@@ -330,10 +233,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       );
     } else
       return Scaffold(
-        backgroundColor: Utils.background,
-        drawer: NavDrawer(),
-        body: SafeArea(
-          child: Container(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(event.name),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -344,20 +250,32 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    _appBar(),
-                    Container(
-                      height: height * 0.3,
-                      child: _eventPoster(),
-                    )
-                  ],
-                ),
-                _detailWidget(),
+          ),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
               ],
+              begin: Alignment.topRight,
+              end: Alignment.topLeft,
             ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    padding: Utils.paddingPoster,
+                    height: height * 0.35,
+                    child: _eventPoster(),
+                  )
+                ],
+              ),
+              _detailWidget(),
+            ],
           ),
         ),
       );
