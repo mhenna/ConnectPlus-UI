@@ -1,3 +1,6 @@
+import 'package:connect_plus/models/profile.dart';
+import 'package:connect_plus/models/register_request_params.dart';
+import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,8 +10,6 @@ import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:connect_plus/services/web_api.dart';
-import 'package:connect_plus/models/user_profile.dart';
-import 'package:connect_plus/models/user_profile_request_params.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -22,12 +23,11 @@ class MapScreenState extends State<ProfilePage>
   final FocusNode myFocusNode = FocusNode();
 
   TextEditingController nameController = TextEditingController();
-  TextEditingController addressController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  UserProfile profile = new UserProfile();
+  User user = new User();
 
   @override
   void initState() {
@@ -39,36 +39,29 @@ class MapScreenState extends State<ProfilePage>
 
   void setProfile() async {
     setState(() {
-      profile = UserProfile.fromJson(localStorage.getItem('profile'));
+      user = User.fromJson(localStorage.getItem('profile'));
     });
   }
 
   void getProfile() async {
     setState(() {
-      nameController = TextEditingController(text: profile.name);
-      addressController = TextEditingController(text: profile.address);
-      carPlateController = TextEditingController(text: profile.carPlate);
-      phoneController = TextEditingController(text: profile.phoneNumber);
+      nameController = TextEditingController(text: user.username);
+      emailController = TextEditingController(text: user.email);
+      phoneController = TextEditingController(text: user.phoneNumber);
     });
   }
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     Map<String, dynamic> editedProfile = {
-      "name": nameController.text != "" ? nameController.text : profile.name,
-      "address": addressController.text != ""
-          ? addressController.text
-          : profile.address,
-      "phoneNumber": phoneController.text != ""
-          ? phoneController.text
-          : profile.phoneNumber,
-      "carPlate": carPlateController.text != ""
-          ? carPlateController.text
-          : profile.carPlate
+      "name": nameController.text != "" ? nameController.text : user.username,
+      "email": user.email,
+      "phoneNumber":
+          phoneController.text != "" ? phoneController.text : user.phoneNumber,
     };
 
-    final updatedProfile = await WebAPI.updateProfile(
-        UserProfileRequestParams.fromJson(editedProfile), profile.id);
+    final updatedProfile =
+        await WebAPI.updateProfile(Profile.fromJson(editedProfile), user.id);
 
     localStorage.setItem('profile', updatedProfile);
   }
@@ -96,7 +89,8 @@ class MapScreenState extends State<ProfilePage>
         ));
   }
 
-  Widget _getField(String value, TextEditingController controller) {
+  Widget _getField(
+      String value, TextEditingController controller, bool isEmail) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Padding(
@@ -111,7 +105,7 @@ class MapScreenState extends State<ProfilePage>
                 decoration: InputDecoration(
                   hintText: value,
                 ),
-                enabled: !_status,
+                enabled: isEmail ? false : !_status,
                 autofocus: !_status,
                 validator: (value) {
                   if (value.isEmpty) {
@@ -214,38 +208,15 @@ class MapScreenState extends State<ProfilePage>
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: <Widget>[
-                                _getLabel("Name"),
-                                _getField(
-                                    profile.name.toString(), nameController),
-                                _getLabel("Address"),
-                                _getField(profile.address.toString(),
-                                    addressController),
+                                _getLabel("Full Name"),
+                                _getField(user.username.toString(),
+                                    nameController, false),
+                                _getLabel("Email"),
+                                _getField(user.email.toString(),
+                                    emailController, true),
                                 _getLabel("Phone Number"),
-                                _getField(profile.phoneNumber.toString(),
-                                    phoneController),
-                                _getLabel(
-                                    "Car Plate # (Please write letters in Arabic)"),
-                                Padding(
-                                    padding: EdgeInsets.only(
-                                        left: width * 0.08,
-                                        right: width * 0.08,
-                                        top: height * 0.01),
-                                    child: new Row(
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: <Widget>[
-                                        new Flexible(
-                                          child: TextFormField(
-                                            controller: carPlateController,
-                                            decoration: InputDecoration(
-                                              hintText:
-                                                  profile.carPlate.toString(),
-                                            ),
-                                            enabled: !_status,
-                                            autofocus: !_status,
-                                          ),
-                                        ),
-                                      ],
-                                    )),
+                                _getField(user.phoneNumber.toString(),
+                                    phoneController, false),
                               ],
                             ),
                           ),

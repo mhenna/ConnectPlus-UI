@@ -58,7 +58,7 @@ class PushNotificationService {
       if (view == 'home') {
         Get.to(MyHomePage());
       } else if (view == 'emergency contacts') {
-        Get.to(emergencyContact());
+        Get.to(Emergency());
       } else if (view == 'events') {
         if (notificationData['event'] != null) {
           event = await WebAPI.getEventByName(notificationData['event']);

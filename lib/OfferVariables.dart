@@ -8,37 +8,32 @@ import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 
 class OfferVariables extends StatefulWidget {
+  OfferVariables({Key key, @required this.offers}) : super(key: key);
+
+  final List<Offer> offers;
+
   @override
-  _OfferVariables createState() => _OfferVariables();
+  State<StatefulWidget> createState() {
+    return new _OfferVariables(this.offers);
+  }
 }
 
-class _OfferVariables extends State<OfferVariables> {
+class _OfferVariables extends State<OfferVariables>
+    with TickerProviderStateMixin {
   List<Offer> offers = [];
   bool emptyList = false;
   String mostRecentOfferLogoURL;
   final LocalStorage localStorage = new LocalStorage("Connect+");
 
+  _OfferVariables(this.offers);
+
   @override
   void initState() {
     super.initState();
-    getOffers();
-  }
-
-  void getOffers() async {
-    try {
-      final recentOffers = await WebAPI.getRecentOffers();
-      recentOffers.sort((a, b) {
-        return a.createdAt.compareTo(b.createdAt);
-      });
-      setState(() {
-        this.offers = recentOffers;
-        if (offers.isEmpty)
-          emptyList = true;
-        else
-          this.mostRecentOfferLogoURL =
-              WebAPI.baseURL + recentOffers.first.logo.url;
-      });
-    } catch (e) {}
+    if (offers.isEmpty)
+      emptyList = true;
+    else
+      this.mostRecentOfferLogoURL = WebAPI.baseURL + offers.first.logo.url;
   }
 
   Widget _mostRecentOfferLogo() {
@@ -53,19 +48,19 @@ class _OfferVariables extends State<OfferVariables> {
   Widget build(BuildContext context) {
     final _scrollController = ScrollController();
     var height = MediaQuery.of(context).size.height;
-    if (emptyList) return Center(child: Text("No Offers"));
+    if (emptyList) return Center(child: Text("No Recent Offers, Coming Soon"));
     return Column(
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(left: 6, right: 6),
           child: Container(
-            height: height * 0.28,
+            height: height * 0.27,
             child: _mostRecentOfferLogo(),
           ),
         ),
         Expanded(
           child: Padding(
-            padding: EdgeInsets.only(left: 6, right: 6),
+            padding: EdgeInsets.only(left: 6, right: 7, top: 5),
             child: Scrollbar(
               controller: _scrollController,
               isAlwaysShown: true,
@@ -91,13 +86,14 @@ class _OfferVariables extends State<OfferVariables> {
 
     for (var offer in offers) {
       if (!first) {
-        list.add(
-          SizedBox(
+        list.add(Padding(
+          padding: EdgeInsets.only(right: 10),
+          child: SizedBox(
             height: height,
-            width: width * 0.70,
+            width: width * 0.52,
             child: Single_Offer(offer: offer),
           ),
-        );
+        ));
       }
       first = false;
     }

@@ -1,27 +1,12 @@
 import 'package:connect_plus/models/admin_user.dart';
 import 'package:connect_plus/models/attachment.dart';
+import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/image_file.dart';
-
-class OfferCategory {
-  final String _value;
-  const OfferCategory._internal(this._value);
-  const OfferCategory.fromString(this._value);
-  toString() => '$_value';
-
-  static const FOOD = const OfferCategory._internal('Food');
-  static const HEALTH = const OfferCategory._internal('Health');
-  static const CARS = const OfferCategory._internal('Cars');
-  static const SPORTS = const OfferCategory._internal('Sports');
-  static const FAMILY = const OfferCategory._internal('Family');
-  static const TRAVEL = const OfferCategory._internal('Travel');
-
-  static const asArray = const [FOOD, HEALTH, CARS, SPORTS, FAMILY, TRAVEL];
-}
 
 class Offer {
   String sId;
   String name;
-  OfferCategory category;
+  Category category;
   String details;
   String discount;
   DateTime expiration;
@@ -59,7 +44,7 @@ class Offer {
     sId = json['_id'];
     name = json['name'];
     category = json['category'] != null
-        ? OfferCategory.fromString(json['category'])
+        ? new Category.fromJson(json['category'])
         : null;
     details = json['details'];
     discount = json['discount'];
@@ -109,6 +94,9 @@ class Offer {
     data['location'] = this.location;
     if (this.attachment != null) {
       data['attachment'] = this.attachment.toJson();
+    }
+    if (this.category != null) {
+      data['category'] = this.category.toJson();
     }
     data['id'] = this.id;
     return data;

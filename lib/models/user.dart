@@ -1,5 +1,3 @@
-import 'package:connect_plus/models/user_profile.dart';
-
 class UserWithToken {
   String jwt;
   User user;
@@ -33,8 +31,7 @@ class User {
   int iV;
   Role role;
   String id;
-  String profileId;
-  UserProfile profile;
+  String phoneNumber;
 
   User({
     this.confirmed,
@@ -48,8 +45,7 @@ class User {
     this.iV,
     this.role,
     this.id,
-    this.profileId,
-    this.profile,
+    this.phoneNumber,
   });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -66,14 +62,7 @@ class User {
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
-    profileId = json['profile'].runtimeType == String
-        ? json['profile']
-        : json['profile'] != null
-            ? json['profile']['id']
-            : null;
-    profile = json['profile'] != null && json['profile'].runtimeType != String
-        ? UserProfile.fromJson(json['profile'])
-        : null;
+    phoneNumber = json['phoneNumber'];
   }
 
   Map<String, dynamic> toJson() {
@@ -91,8 +80,7 @@ class User {
       data['role'] = this.role.toJson();
     }
     data['id'] = this.id;
-    data['profileId'] = this.profileId;
-    data['profile'] = this.profile.toJson();
+    data['phoneNumber'] = this.phoneNumber;
     return data;
   }
 }

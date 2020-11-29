@@ -7,7 +7,7 @@ class Webinar {
   String name;
   String url;
   double duration;
-  DateTime date;
+  DateTime startDate;
   DateTime createdAt;
   DateTime updatedAt;
   int iV;
@@ -16,13 +16,14 @@ class Webinar {
   ImageFile poster;
   AdminUser updatedBy;
   String id;
+  bool isRecorded;
 
   Webinar(
       {this.sId,
       this.name,
       this.url,
       this.duration,
-      this.date,
+      this.startDate,
       this.createdAt,
       this.updatedAt,
       this.iV,
@@ -30,6 +31,7 @@ class Webinar {
       this.erg,
       this.poster,
       this.updatedBy,
+      this.isRecorded,
       this.id});
 
   Webinar.fromJson(Map<String, dynamic> json) {
@@ -37,7 +39,8 @@ class Webinar {
     name = json['name'];
     url = json['url'];
     duration = double.parse(json['Duration'].toString());
-    date = json['Date'] != null ? DateTime.parse((json['Date'])) : null;
+    startDate =
+        json['startDate'] != null ? DateTime.parse((json['startDate'])) : null;
     createdAt =
         json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
     updatedAt =
@@ -61,9 +64,11 @@ class Webinar {
     data['name'] = this.name;
     data['url'] = this.url;
     data['Duration'] = this.duration;
-    data['Date'] = this.date;
+    data['startDate'] = this.startDate;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
+    data['isRecorded'] = this.isRecorded;
+
     data['__v'] = this.iV;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();

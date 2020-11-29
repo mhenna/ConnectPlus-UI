@@ -4,6 +4,7 @@ import 'package:connect_plus/models/activity.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/webinar.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -35,50 +36,69 @@ class _CalendarState extends State<Calendar> {
     _controller = CalendarController();
     super.initState();
     getEvents();
-    getActivities();
-    getWebinars();
   }
 
   void getEvents() async {
     var events = await WebAPI.getEvents();
-    for (var event in events) {
-      var date = DateTime.parse(event.startDate.toString());
-      if (_events[date] != null)
-        _events[date].add(event);
-      else
-        _events[date] = [event];
+    if (this.mounted) {
+      for (var event in events) {
+        var date = DateTime.parse(event.startDate.toString());
+        if (_events[date] != null)
+          _events[date].add(event);
+        else
+          _events[date] = [event];
+      }
+      setState(() {
+        _all.addAll(_events);
+      });
+      getActivities();
     }
-    _all.addAll(_events);
   }
 
   void getActivities() async {
-    var activities = await WebAPI.getActivities();
-    for (var activity in activities) {
-      var date = DateTime.parse(activity.startDate.toString());
-      if (_activities[date] != null)
-        _activities[date].add(activity);
-      else
-        _activities[date] = [activity];
+    var activities = await WebAPI.getActivitiesDates();
+    if (this.mounted) {
+      for (var activity in activities) {
+        activity.recurrenceDates.forEach((element) {
+          var date = DateTime.parse(element.toString());
+          if (_activities[date] != null)
+            _activities[date].add(activity);
+          else
+            _activities[date] = [activity];
+        });
+      }
+      setState(() {
+        _all.addAll(_activities);
+      });
+      getWebinars();
     }
-    _all.addAll(_activities);
   }
 
   void getWebinars() async {
     var webinars = await WebAPI.getWebinars();
-    for (var webinar in webinars) {
-      var date = DateTime.parse(webinar.date.toString());
-      if (_webinars[date] != null)
-        _webinars[date].add(webinar);
-      else
-        _webinars[date] = [webinar];
+    if (this.mounted) {
+      for (var webinar in webinars) {
+        var date = DateTime.parse(webinar.startDate.toString());
+        if (_webinars[date] != null)
+          _webinars[date].add(webinar);
+        else
+          _webinars[date] = [webinar];
+      }
+      setState(() {
+        _all.addAll(_webinars);
+      });
     }
-    _all.addAll(_webinars);
   }
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    if (_events.isEmpty && _webinars.isEmpty && _activities.isEmpty) {
+      return Scaffold(
+        body: ImageRotate(),
+      );
+    }
     return Scaffold(
         appBar: AppBar(
           // Here we take the value from the MyHomePage object that was created by

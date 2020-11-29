@@ -1,5 +1,5 @@
 import 'package:connect_plus/models/login_request_params.dart';
-import 'package:connect_plus/models/user_profile.dart';
+import 'package:connect_plus/models/profile.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
@@ -8,8 +8,6 @@ import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:localstorage/localstorage.dart';
-import 'package:password/password.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'widgets/pushNotification.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,18 +39,22 @@ class _loginState extends State<login> {
     checkLoggedInStatus();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   void checkLoggedInStatus() async {
     try {
       prefs = await SharedPreferences.getInstance();
       final token = prefs.getString("token");
       if (token != null) {
         final user = await WebAPI.checkToken(token);
-        UserProfile profile;
-        if (user.profile == null) {
-          profile = await WebAPI.getProfile(user.profileId);
-        } else {
-          profile = user.profile;
-        }
+        final profile = Profile.fromJson({
+          'username': user.username,
+          'email': user.email,
+          'phoneNumber': user.phoneNumber,
+        });
         localStorage.setItem("profile", profile);
         pushNotification.initialize();
         Navigator.push(
@@ -80,14 +82,12 @@ class _loginState extends State<login> {
       });
 
       final userWithToken = await WebAPI.login(loginParams);
-      UserProfile profile;
-      if (userWithToken.user.profile == null) {
-        profile = await WebAPI.getProfile(userWithToken.user.profileId);
-      } else {
-        profile = userWithToken.user.profile;
-      }
-
       prefs.setString("token", userWithToken.jwt);
+      final profile = Profile.fromJson({
+        'username': userWithToken.user.username,
+        'email': userWithToken.user.email,
+        'phoneNumber': userWithToken.user.phoneNumber,
+      });
       localStorage.setItem("profile", profile);
 
       setState(() {
@@ -100,7 +100,7 @@ class _loginState extends State<login> {
       pushNotification.initialize();
     } catch (e) {
       prefs.setString("token", null);
-      localStorage.setItem("profile", null);
+      localStorage.setItem("user", null);
       setState(() {
         asyncCall = false;
       });
@@ -148,7 +148,7 @@ class _loginState extends State<login> {
                 fontWeight: FontWeight.bold,
                 color: Utils.header,
                 fontSize: size * 55,
-                fontFamily: "Arial",
+                fontFamily: "Roboto",
               ))
         ]),
       );
@@ -157,16 +157,18 @@ class _loginState extends State<login> {
           TextSpan(
               text: ' Not a user? ',
               style: TextStyle(
-                  color: Colors.black,
-                  fontSize: size * 30,
-                  fontFamily: "Arial")),
+                color: Colors.black,
+                fontSize: size * 30,
+                fontFamily: "Roboto",
+              )),
           TextSpan(
               text: ' Register now ',
               style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Utils.header,
-                  fontSize: size * 30,
-                  fontFamily: "Arial"),
+                fontWeight: FontWeight.bold,
+                color: Utils.header,
+                fontSize: size * 30,
+                fontFamily: "Roboto",
+              ),
               recognizer: TapGestureRecognizer()
                 ..onTap = () {
                   Navigator.push(

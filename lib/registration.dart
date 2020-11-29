@@ -9,8 +9,6 @@ import 'package:password/password.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:connect_plus/registrationProfile.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:localstorage/localstorage.dart';
 
 class registration extends StatefulWidget {
@@ -27,6 +25,8 @@ class _registrationState extends State<registration> {
   final fnController = TextEditingController();
   final emController = TextEditingController();
   final pwController = TextEditingController();
+  final phoneController = TextEditingController();
+
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -44,6 +44,8 @@ class _registrationState extends State<registration> {
     fnController.dispose();
     emController.dispose();
     pwController.dispose();
+    phoneController.dispose();
+
     super.dispose();
   }
 
@@ -109,6 +111,29 @@ class _registrationState extends State<registration> {
         return null;
       },
     );
+    final phoneField = TextFormField(
+      controller: phoneController,
+      obscureText: false,
+      maxLength: 11,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(
+              width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+          hintText: "01XXXXXXXXX",
+          border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+      validator: (value) {
+        if (value.isEmpty) {
+          return 'Please enter your phone number';
+        }
+        bool emailValid =
+            RegExp("^[0][1][0-9]{2,10}").hasMatch(value.toString());
+        if (!emailValid || value.length < 11) {
+          return "Please enter a valid phone number";
+        }
+        return null;
+      },
+    );
     final registerTitle = Text.rich(
       TextSpan(children: <TextSpan>[
         TextSpan(
@@ -117,7 +142,7 @@ class _registrationState extends State<registration> {
                 fontWeight: FontWeight.bold,
                 color: Utils.header,
                 fontSize: size * 55,
-                fontFamily: "Arial"))
+                fontFamily: "Roboto"))
       ]),
     );
     final loginPath = Text.rich(
@@ -125,14 +150,16 @@ class _registrationState extends State<registration> {
         TextSpan(
             text: ' Already a user? ',
             style: TextStyle(
-                color: Colors.black, fontSize: size * 30, fontFamily: "Arial")),
+                color: Colors.black,
+                fontSize: size * 30,
+                fontFamily: "Roboto")),
         TextSpan(
             text: ' Login',
             style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: Utils.header,
                 fontSize: size * 30,
-                fontFamily: "Arial"),
+                fontFamily: "Roboto"),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
                 Navigator.push(
@@ -229,6 +256,11 @@ class _registrationState extends State<registration> {
                                       width: width * 0.85,
                                       child: passwordField,
                                     ),
+                                    SizedBox(height: 20.0),
+                                    Container(
+                                      width: width * 0.85,
+                                      child: phoneField,
+                                    ),
                                     SizedBox(height: height * 0.027),
                                     Container(
                                       width: width * 0.85,
@@ -243,7 +275,10 @@ class _registrationState extends State<registration> {
                           ),
                         ),
                       ),
-                      loginPath
+                      loginPath,
+                      SizedBox(
+                        height: 20,
+                      )
                     ],
                   ),
                 ),
@@ -259,6 +294,7 @@ class _registrationState extends State<registration> {
         'username': fnController.text,
         'email': emController.text,
         'password': pwController.text,
+        'phoneNumber': phoneController.text,
       });
       final registeredUser = WebAPI.register(registerParams);
       localStorage.setItem("user", registeredUser);
@@ -267,7 +303,7 @@ class _registrationState extends State<registration> {
       });
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => RegistrationProfile()),
+        MaterialPageRoute(builder: (context) => login()),
       );
     } catch (e) {
       setState(() {
@@ -298,21 +334,5 @@ class _registrationState extends State<registration> {
         );
       },
     );
-  }
-
-  Widget LoadingText() {
-    return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              new Text(
-                "Loading...",
-                style: TextStyle(fontSize: 30, color: Colors.orangeAccent),
-              ),
-            ],
-          ),
-        ));
   }
 }

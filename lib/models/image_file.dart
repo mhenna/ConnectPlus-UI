@@ -51,7 +51,7 @@ class ImageFile {
     hash = json['hash'];
     ext = json['ext'];
     mime = json['mime'];
-    size = json['size'].toDouble();
+    size = json['size'];
     width = json['width'];
     height = json['height'];
     url = json['url'];
@@ -100,14 +100,20 @@ class ImageFile {
 
 class ImageFormats {
   Thumbnail thumbnail;
+  Thumbnail large;
+  Thumbnail medium;
   Thumbnail small;
 
-  ImageFormats({this.thumbnail, this.small});
+  ImageFormats({this.thumbnail, this.large, this.medium, this.small});
 
   ImageFormats.fromJson(Map<String, dynamic> json) {
     thumbnail = json['thumbnail'] != null
         ? new Thumbnail.fromJson(json['thumbnail'])
         : null;
+    large =
+        json['large'] != null ? new Thumbnail.fromJson(json['large']) : null;
+    medium =
+        json['medium'] != null ? new Thumbnail.fromJson(json['medium']) : null;
     small =
         json['small'] != null ? new Thumbnail.fromJson(json['small']) : null;
   }
@@ -116,6 +122,12 @@ class ImageFormats {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.thumbnail != null) {
       data['thumbnail'] = this.thumbnail.toJson();
+    }
+    if (this.large != null) {
+      data['large'] = this.large.toJson();
+    }
+    if (this.medium != null) {
+      data['medium'] = this.medium.toJson();
     }
     if (this.small != null) {
       data['small'] = this.small.toJson();
@@ -135,17 +147,16 @@ class Thumbnail {
   Null path;
   String url;
 
-  Thumbnail({
-    this.name,
-    this.hash,
-    this.ext,
-    this.mime,
-    this.width,
-    this.height,
-    this.size,
-    this.path,
-    this.url,
-  });
+  Thumbnail(
+      {this.name,
+      this.hash,
+      this.ext,
+      this.mime,
+      this.width,
+      this.height,
+      this.size,
+      this.path,
+      this.url});
 
   Thumbnail.fromJson(Map<String, dynamic> json) {
     name = json['name'];
