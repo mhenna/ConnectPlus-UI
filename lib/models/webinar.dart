@@ -38,6 +38,7 @@ class Webinar {
     sId = json['_id'];
     name = json['name'];
     url = json['url'];
+    isRecorded = json['isRecorded'];
     duration = double.parse(json['Duration'].toString());
     startDate =
         json['startDate'] != null ? DateTime.parse((json['startDate'])) : null;
