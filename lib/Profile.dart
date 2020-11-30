@@ -54,14 +54,13 @@ class MapScreenState extends State<ProfilePage>
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     Map<String, dynamic> editedProfile = {
-      "name": nameController.text != "" ? nameController.text : user.username,
-      "email": user.email,
+      "username":
+          nameController.text != "" ? nameController.text : user.username,
       "phoneNumber":
           phoneController.text != "" ? phoneController.text : user.phoneNumber,
     };
 
-    final updatedProfile =
-        await WebAPI.updateProfile(Profile.fromJson(editedProfile), user.id);
+    final updatedProfile = await WebAPI.updateProfile(editedProfile, user.id);
 
     localStorage.setItem('profile', updatedProfile);
   }

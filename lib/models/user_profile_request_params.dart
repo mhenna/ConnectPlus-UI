@@ -1,18 +1,18 @@
 class UserProfileRequestParams {
-  String name;
+  String username;
   String address;
   String carPlate;
   String phoneNumber;
 
   UserProfileRequestParams({
-    this.name,
+    this.username,
     this.address,
     this.carPlate,
     this.phoneNumber,
   });
 
   UserProfileRequestParams.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
+    username = json['username'];
     address = json['address'];
     carPlate = json['carPlate'];
     phoneNumber = json['phoneNumber'];
@@ -20,7 +20,7 @@ class UserProfileRequestParams {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['name'] = this.name;
+    data['username'] = this.username;
     data['address'] = this.address;
     data['carPlate'] = this.carPlate;
     data['phoneNumber'] = this.phoneNumber;
