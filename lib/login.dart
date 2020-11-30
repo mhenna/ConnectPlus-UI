@@ -1,5 +1,6 @@
 import 'package:connect_plus/models/login_request_params.dart';
 import 'package:connect_plus/models/profile.dart';
+import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
@@ -55,7 +56,8 @@ class _loginState extends State<login> {
           'email': user.email,
           'phoneNumber': user.phoneNumber,
         });
-        localStorage.setItem("profile", profile);
+        localStorage.setItem('user', user.toJson());
+        localStorage.setItem("profile", profile.toJson());
         pushNotification.initialize();
         Navigator.push(
           context,
@@ -88,8 +90,8 @@ class _loginState extends State<login> {
         'email': userWithToken.user.email,
         'phoneNumber': userWithToken.user.phoneNumber,
       });
-      localStorage.setItem("profile", profile);
-
+      localStorage.setItem("profile", profile.toJson());
+      localStorage.setItem('user', userWithToken.user.toJson());
       setState(() {
         asyncCall = false;
       });
@@ -100,6 +102,7 @@ class _loginState extends State<login> {
       pushNotification.initialize();
     } catch (e) {
       prefs.setString("token", null);
+      localStorage.setItem('profile', null);
       localStorage.setItem("user", null);
       setState(() {
         asyncCall = false;

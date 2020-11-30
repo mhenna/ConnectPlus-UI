@@ -55,7 +55,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       setState(() {
         ergEvents = events.where((ev) => ev.id != event.id).toList();
         loading = false;
-        print(ergEvents);
       });
   }
 
