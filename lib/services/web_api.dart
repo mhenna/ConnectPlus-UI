@@ -54,9 +54,9 @@ class WebAPI {
     );
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
-      throw response;
+      throw response.body;
     }
-    return response;
+    return response.body;
   }
 
   static put<T>(String url, String body) async {
@@ -115,7 +115,7 @@ class WebAPI {
   ) async {
     final requestBody = jsonEncode(params);
     final response = await post(_registerURL, requestBody);
-    final responseBody = json.decode(response.body);
+    final responseBody = json.decode(response);
 
     final registeredUser = UserWithToken.fromJson(responseBody);
 
@@ -130,7 +130,7 @@ class WebAPI {
     final requestBody = jsonEncode(params);
     try {
       final response = await post(_loginURL, requestBody);
-      final responseBody = json.decode(response.body);
+      final responseBody = json.decode(response);
 
       final loggedInUser = UserWithToken.fromJson(responseBody);
       // reset the current user on login
@@ -156,10 +156,11 @@ class WebAPI {
     return user;
   }
 
-  static Future<Profile> updateProfile(Profile params, String id) async {
+  static Future<Profile> updateProfile(
+      Map<String, dynamic> params, String id) async {
     final requestBody = jsonEncode(params);
-    final response = await put(_checkUserURL + "/$id", requestBody);
-    final responseBody = json.decode(response.body);
+    final response = await put("/users/$id", requestBody);
+    final responseBody = json.decode(response);
     final profile = Profile.fromJson(responseBody);
     return profile;
   }
@@ -402,8 +403,9 @@ class WebAPI {
     final List<dynamic> rawWebinars = json.decode(response.body);
     final List<Webinar> webinars = [];
     for (final webinarJson in rawWebinars) {
-      //if (Webinar.fromJson(webinarJson).isRecorded == true)
-      webinars.add(Webinar.fromJson(webinarJson));
+      if (Webinar.fromJson(webinarJson).isRecorded == true) {
+        webinars.add(Webinar.fromJson(webinarJson));
+      }
     }
     webinars.sort((b, a) => a.startDate.compareTo(b.startDate));
 
@@ -444,8 +446,8 @@ class WebAPI {
     final List<dynamic> rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
-      // if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
-      events.add(Event.fromJson(eventJson));
+      if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
+        events.add(Event.fromJson(eventJson));
     }
     events.sort((b, a) => a.startDate.compareTo(b.startDate));
 
@@ -471,8 +473,8 @@ class WebAPI {
     final rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
-      // if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
-      events.add(Event.fromJson(eventJson));
+      if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
+        events.add(Event.fromJson(eventJson));
     }
     return events;
   }
@@ -485,8 +487,8 @@ class WebAPI {
     final List<dynamic> rawEvents = json.decode(response.body);
     final List<Event> events = [];
     for (final eventJson in rawEvents) {
-      //  if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
-      events.add(Event.fromJson(eventJson));
+      if (Event.fromJson(eventJson).endDate.isAfter(DateTime.now()))
+        events.add(Event.fromJson(eventJson));
     }
     events.sort((b, a) => a.startDate.compareTo(b.startDate));
 

@@ -78,7 +78,7 @@ class _registrationState extends State<registration> {
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
               width * 0.05, height * 0.025, width * 0.02, height * 0.02),
-          hintText: "Email ( @dell.com)",
+          hintText: "Email ( @dell / @dellteams ).com",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       validator: (value) {
@@ -88,7 +88,10 @@ class _registrationState extends State<registration> {
         bool emailValid =
             RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dell.com")
                 .hasMatch(value.toString());
-        if (!emailValid) {
+        bool emailValid2 =
+            RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dellteams.com")
+                .hasMatch(value.toString());
+        if (!emailValid && !emailValid2) {
           return "Please enter a valid email";
         }
         return null;
@@ -291,10 +294,10 @@ class _registrationState extends State<registration> {
   void register() async {
     try {
       final registerParams = RegisterRequestParameters.fromJson({
-        'username': fnController.text,
-        'email': emController.text,
-        'password': pwController.text,
-        'phoneNumber': phoneController.text,
+        'username': fnController.text.toString(),
+        'email': emController.text.toString(),
+        'password': pwController.text.toString(),
+        'phoneNumber': phoneController.text.toString(),
       });
       final registeredUser = WebAPI.register(registerParams);
       localStorage.setItem("user", registeredUser);

@@ -125,7 +125,7 @@ class _loginState extends State<login> {
         decoration: InputDecoration(
             contentPadding: EdgeInsets.fromLTRB(
                 width * 0.05, height * 0.025, width * 0.02, height * 0.02),
-            hintText: "Email (@dell.com)",
+            hintText: "Email ( @dell / @dellteams )",
             border:
                 OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       );
