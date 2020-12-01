@@ -55,7 +55,6 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       setState(() {
         ergEvents = events.where((ev) => ev.id != event.id).toList();
         loading = false;
-        print(ergEvents);
       });
   }
 
@@ -205,9 +204,13 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     if (event.venue != null) {
       text += "\n\nVenue: " + event.venue.toString();
     }
+
     text += "\n\nDate: " + date;
 
-    text += "\n\nTime: " + time + "\n";
+    text += "\n\nTime: " + time;
+    if (event.onBehalfOf != null) {
+      text += "\n\nOn behalf of: " + event.onBehalfOf.toString();
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[

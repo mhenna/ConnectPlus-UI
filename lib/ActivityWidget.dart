@@ -202,21 +202,34 @@ class _ActivityState extends State<ActivityWidget>
     var size = MediaQuery.of(context).size.aspectRatio;
     String time = DateFormat.Hm('en_US').format(activity.startDate);
     String date = DateFormat.yMMMMd('en_US').format(activity.startDate);
+    var textV = "";
+    var text = "";
+    if (activity.venue != null) {
+      textV += "\n\nVenue:" + activity.venue.toString() + '\n';
+    }
+    text += "\n\nStart Date: " + date;
+    text += "\n\nTime: " + date;
+    text += "\n\nDate: " + date;
+    text += "\n\nTime: " + time;
+    text += "\n\nRecurrence: " + activity.recurrence;
+    text += "\n\nDay(s): " + activity.days;
+
+    if (activity.onBehalfOf != null) {
+      text += "\n\nOn behalf of: " + activity.onBehalfOf;
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 10),
-        Row(children: <Widget>[
-          Text(
-            "Venue: ",
-            style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
+        Text(
+          textV,
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+            fontSize: size * 35,
           ),
-          Text(
-            activity.venue,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
-        SizedBox(height: 5),
+        ),
         Row(children: <Widget>[
           Text(
             "Zoom ID: ",
@@ -230,50 +243,14 @@ class _ActivityState extends State<ActivityWidget>
             onTap: _launchURL,
           )
         ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Start Date: ",
-            style: TextStyle(
-              fontSize: size * 32,
-              fontWeight: FontWeight.bold,
-            ),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+            fontSize: size * 35,
           ),
-          Text(
-            date,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Time: ",
-            style: TextStyle(
-              fontSize: size * 32,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            time,
-            style: TextStyle(fontSize: size * 30),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Reccurence: ",
-            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
-          ),
-          Text(activity.recurrence, style: TextStyle(fontSize: size * 28))
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Day(s): ",
-            style: TextStyle(fontSize: size * 30, fontWeight: FontWeight.bold),
-          ),
-          Text(activity.days, style: TextStyle(fontSize: size * 28))
-        ]),
+        ),
       ],
     );
   }

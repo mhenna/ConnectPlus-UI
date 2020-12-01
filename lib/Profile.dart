@@ -39,7 +39,7 @@ class MapScreenState extends State<ProfilePage>
 
   void setProfile() async {
     setState(() {
-      user = User.fromJson(localStorage.getItem('profile'));
+      user = User.fromJson(localStorage.getItem('user'));
     });
   }
 
@@ -59,10 +59,12 @@ class MapScreenState extends State<ProfilePage>
       "phoneNumber":
           phoneController.text != "" ? phoneController.text : user.phoneNumber,
     };
-
     final updatedProfile = await WebAPI.updateProfile(editedProfile, user.id);
-
     localStorage.setItem('profile', updatedProfile);
+    final updatedUser = user;
+    updatedUser.username = updatedProfile.username;
+    updatedUser.phoneNumber = updatedProfile.phoneNumber;
+    localStorage.setItem('user', updatedUser);
   }
 
   Widget _getLabel(String value) {

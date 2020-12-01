@@ -61,7 +61,6 @@ class WebAPI {
 
   static put<T>(String url, String body) async {
     final requestURL = constructURL(url);
-
     Map<String, String> headers = generateHeaders();
 
     final response = await http.put(
@@ -71,7 +70,7 @@ class WebAPI {
     );
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
-      throw response.body;
+      throw response;
     }
     return response;
   }
@@ -88,7 +87,7 @@ class WebAPI {
 
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
-      throw response.body;
+      throw response;
     }
     return response;
   }
@@ -160,7 +159,7 @@ class WebAPI {
       Map<String, dynamic> params, String id) async {
     final requestBody = jsonEncode(params);
     final response = await put("/users/$id", requestBody);
-    final responseBody = json.decode(response);
+    final responseBody = json.decode(response.body);
     final profile = Profile.fromJson(responseBody);
     return profile;
   }

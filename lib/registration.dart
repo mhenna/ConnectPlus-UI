@@ -299,8 +299,8 @@ class _registrationState extends State<registration> {
         'password': pwController.text.toString(),
         'phoneNumber': phoneController.text.toString(),
       });
-      final registeredUser = WebAPI.register(registerParams);
-      localStorage.setItem("user", registeredUser);
+      final registeredUser = await WebAPI.register(registerParams);
+      localStorage.setItem("user", registeredUser.user.toJson());
       setState(() {
         asyncCall = false;
       });
@@ -312,7 +312,7 @@ class _registrationState extends State<registration> {
       setState(() {
         asyncCall = false;
       });
-      _showDialog(e.toString);
+      _showDialog(e.toString());
     }
   }
 
