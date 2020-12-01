@@ -10,6 +10,7 @@ class Activity {
   String name;
   DateTime startDate;
   DateTime endDate;
+  String onBehalfOf;
   String venue;
   String zoomID;
   String days;
@@ -28,6 +29,7 @@ class Activity {
     this.poster,
     this.sId,
     this.name,
+    this.onBehalfOf,
     this.startDate,
     this.endDate,
     this.zoomID,
@@ -51,8 +53,11 @@ class Activity {
     }
     sId = json['_id'];
     name = json['name'];
+    onBehalfOf = json['onBehalfOf'];
+
     zoomID = json['zoomID'];
     days = json['days'];
+
     recurrenceDates = json['recurrenceDates'] != null
         ? json['recurrenceDates'].cast<DateTime>()
         : null;
@@ -89,6 +94,7 @@ class Activity {
     if (this.poster != null) {
       data['poster'] = this.poster.toJson();
     }
+    data['onBehalfOf'] = this.onBehalfOf;
     data['_id'] = this.sId;
     data['name'] = this.name;
     data['startDate'] = this.startDate;

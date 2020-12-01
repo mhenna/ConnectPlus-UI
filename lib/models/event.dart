@@ -13,6 +13,7 @@ class Event {
   DateTime createdAt;
   DateTime updatedAt;
   int iV;
+  String onBehalfOf;
   AdminUser createdBy;
   ImageFile poster;
   AdminUser updatedBy;
@@ -32,6 +33,7 @@ class Event {
     this.createdBy,
     this.poster,
     this.updatedBy,
+    this.onBehalfOf,
     this.erg,
     this.id,
   });
@@ -41,6 +43,7 @@ class Event {
     sId = json['_id'];
     name = json['name'];
     venue = json['venue'];
+    onBehalfOf = json['onBehalfOf'];
     endDate =
         json['endDate'] != null ? DateTime.parse((json['endDate'])) : null;
     startDate =
@@ -68,6 +71,7 @@ class Event {
     data['_id'] = this.sId;
     data['name'] = this.name;
     data['venue'] = this.venue;
+    data['onBehalfOf'] = this.onBehalfOf;
     data['startDate'] = this.startDate;
     data['endDate'] = this.endDate;
     data['createdAt'] = this.createdAt;

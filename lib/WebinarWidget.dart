@@ -244,62 +244,28 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     var size = MediaQuery.of(context).size.aspectRatio;
     String time = DateFormat.Hm('en_US').format(webinar.startDate);
     String date = DateFormat.yMMMMd('en_US').format(webinar.startDate);
+    var text = "";
+    text += "\n\nCommittee: " + webinar.erg.name;
+    text += "\n\nDate: " + date;
+
+    text += "\n\nTime: " + time;
+    text += "\n\nDuration: " + webinar.duration.toString() + 'Hour(s)';
+
+    if (webinar.onBehalfOf != null) {
+      text += "\n\nOn behalf of: " + webinar.onBehalfOf;
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        SizedBox(height: 15),
-        Row(children: <Widget>[
-          Text(
-            "Committee: ",
-            style: TextStyle(fontSize: size * 35, fontWeight: FontWeight.bold),
+        SizedBox(height: 10),
+        Text(
+          text,
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+            fontSize: size * 35,
           ),
-          Text(
-            webinar.erg.name,
-            style: TextStyle(fontSize: size * 32),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Date: ",
-            style: TextStyle(
-              fontSize: size * 35,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            date,
-            style: TextStyle(fontSize: size * 32),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Time: ",
-            style: TextStyle(
-              fontSize: size * 35,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            time,
-            style: TextStyle(fontSize: size * 32),
-          )
-        ]),
-        SizedBox(height: 5),
-        Row(children: <Widget>[
-          Text(
-            "Duration: ",
-            style: TextStyle(
-              fontSize: size * 35,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Text(
-            webinar.duration.toString() + " Hour(s)",
-            style: TextStyle(fontSize: size * 32),
-          )
-        ]),
+        ),
         SizedBox(height: 30),
         Center(
           child: RaisedButton(

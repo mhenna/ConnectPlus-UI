@@ -10,6 +10,7 @@ class Webinar {
   DateTime startDate;
   DateTime createdAt;
   DateTime updatedAt;
+  String onBehalfOf;
   int iV;
   AdminUser createdBy;
   ERG erg;
@@ -25,6 +26,7 @@ class Webinar {
       this.duration,
       this.startDate,
       this.createdAt,
+      this.onBehalfOf,
       this.updatedAt,
       this.iV,
       this.createdBy,
@@ -38,6 +40,7 @@ class Webinar {
     sId = json['_id'];
     name = json['name'];
     url = json['url'];
+    onBehalfOf = json['onBehalfOf'];
     isRecorded = json['isRecorded'];
     duration = double.parse(json['Duration'].toString());
     startDate =
@@ -63,6 +66,7 @@ class Webinar {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['_id'] = this.sId;
     data['name'] = this.name;
+    data['onBehalfOf'] = this.onBehalfOf;
     data['url'] = this.url;
     data['Duration'] = this.duration;
     data['startDate'] = this.startDate;
