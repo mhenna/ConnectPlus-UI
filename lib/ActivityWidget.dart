@@ -60,11 +60,7 @@ class _ActivityState extends State<ActivityWidget>
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-      child: SizedBox(
-        width: 250, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
-      ),
-    );
+        child: FittedBox(fit: BoxFit.contain, child: Image.network(imageURL)));
   }
 
   List<Widget> activitiesByERG() {
@@ -207,9 +203,7 @@ class _ActivityState extends State<ActivityWidget>
     if (activity.venue != null) {
       textV += "\n\nVenue:" + activity.venue.toString() + '\n';
     }
-    text += "\n\nStart Date: " + date;
-    text += "\n\nTime: " + date;
-    text += "\n\nDate: " + date;
+    text += "\nStart Date: " + date;
     text += "\n\nTime: " + time;
     text += "\n\nRecurrence: " + activity.recurrence;
     text += "\n\nDay(s): " + activity.days;

@@ -124,7 +124,7 @@ class _OffersState extends State<Offers> {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
+        child: FittedBox(fit: BoxFit.cover, child: Image.network(imageURL)),
       ),
     );
   }
@@ -261,7 +261,7 @@ class _OffersState extends State<Offers> {
                   width: width,
                   child: Carousel(
                     images: recentOffers,
-                    boxFit: BoxFit.fitWidth,
+                    boxFit: BoxFit.fill,
                     dotSize: 4.0,
                     dotSpacing: 15.0,
                     dotColor: Colors.grey,

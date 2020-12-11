@@ -60,13 +60,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-      child: SizedBox(
-        width: MediaQuery.of(context)
-            .size
-            .width, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
-      ),
-    );
+        child: FittedBox(fit: BoxFit.contain, child: Image.network(imageURL)));
   }
 
   List<Widget> eventsByERG() {

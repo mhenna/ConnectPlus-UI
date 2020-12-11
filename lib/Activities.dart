@@ -121,7 +121,7 @@ class MyActivitiesPageState extends State<Activities>
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width *
           0.5, // otherwise the logo will be tiny
-      child: Image.network(imageUrl),
+      child: FittedBox(fit: BoxFit.contain, child: Image.network(imageUrl)),
     );
   }
 
