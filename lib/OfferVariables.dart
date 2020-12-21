@@ -61,16 +61,12 @@ class _OfferVariables extends State<OfferVariables>
         Expanded(
           child: Padding(
             padding: EdgeInsets.only(left: 6, right: 7, top: 5),
-            child: Scrollbar(
+            child: ListView(
               controller: _scrollController,
-              isAlwaysShown: true,
-              child: ListView(
-                controller: _scrollController,
-                physics: ClampingScrollPhysics(),
-                shrinkWrap: true,
-                scrollDirection: Axis.horizontal,
-                children: constructOffers(),
-              ),
+              physics: ClampingScrollPhysics(),
+              shrinkWrap: true,
+              scrollDirection: Axis.horizontal,
+              children: constructOffers(),
             ),
           ),
         ),
@@ -90,7 +86,7 @@ class _OfferVariables extends State<OfferVariables>
           padding: EdgeInsets.only(right: 10),
           child: SizedBox(
             height: height,
-            width: width * 0.52,
+            width: width * 0.60,
             child: Single_Offer(offer: offer),
           ),
         ));
@@ -157,7 +153,7 @@ class Single_Offer extends StatelessWidget {
                   ),
                   child: Image.network(
                     WebAPI.baseURL + offer.logo.url,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.fill,
                   )),
             ),
           ),

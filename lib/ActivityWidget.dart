@@ -172,20 +172,17 @@ class _ActivityState extends State<ActivityWidget>
                         fontSize: size * 39,
                         textcolor: Utils.header)),
                 Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width * 0.02, 0, width * 0.02, height * 0.02),
+                    padding:
+                        EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
                     child: SizedBox(
                         height: height * 0.28,
-                        child: Scrollbar(
-                            controller: _scrollController,
-                            isAlwaysShown: true,
-                            child: ListView(
-                              controller: _scrollController,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: activitiesByERG(),
-                            )))),
+                        child: ListView(
+                          controller: _scrollController,
+                          physics: ClampingScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          children: activitiesByERG(),
+                        ))),
               ],
             ),
           ),
@@ -216,7 +213,7 @@ class _ActivityState extends State<ActivityWidget>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 10),
-        Text(
+        SelectableText(
           textV,
           style: TextStyle(
             color: Colors.black87,
@@ -230,14 +227,14 @@ class _ActivityState extends State<ActivityWidget>
             style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
           ),
           InkWell(
-            child: Text(
+            child: SelectableText(
               activity.zoomID,
               style: TextStyle(fontSize: size * 30, color: Colors.blue),
             ),
             onTap: _launchURL,
           )
         ]),
-        Text(
+        SelectableText(
           text,
           style: TextStyle(
             color: Colors.black87,

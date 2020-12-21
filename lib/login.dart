@@ -267,7 +267,22 @@ class _loginState extends State<login> {
                             ),
                           ),
                         ),
-                        register
+                        register,
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Divider(
+                          height: 10,
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Center(
+                          child: Text(
+                            'Forgot Password? \n Please Contact ayman.hassib@dell.com',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -284,19 +299,54 @@ class _loginState extends State<login> {
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        return AlertDialog(
-          title: new Text("Oops!"),
-          content: new Text(err),
-          actions: <Widget>[
-            // usually buttons at the bottom of the dialog
-            new FlatButton(
-              child: new Text("Close"),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
+        if (err == '400') {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text("Oops!"),
+            content: new Text('Invalid Credentials!'),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text(
+                  "Close",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        } else {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text("Oops!"),
+            content: new Text(
+                'Connection timed out! Please check your internet connection and try again.'),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text(
+                  "Close",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
       },
     );
   }

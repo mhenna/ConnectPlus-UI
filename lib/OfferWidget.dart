@@ -72,7 +72,9 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
   Widget urlToImage(String imageURL) {
     return Expanded(
       child: SizedBox(
-        width: 220, // otherwise the logo will be tiny
+        width: MediaQuery.of(context)
+            .size
+            .width, // otherwise the logo will be tiny
         child: Image.network(imageURL),
       ),
     );
@@ -128,80 +130,6 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     return list;
   }
 
-  Widget _appBar() {
-    var width = MediaQuery.of(context).size.width;
-    var size = MediaQuery.of(context).size.aspectRatio;
-    var height = MediaQuery.of(context).size.height;
-    return Container(
-      padding: Utils.padding,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          _icon(
-            Icons.arrow_back_ios,
-            color: Utils.header,
-            size: size * 30,
-            padding: size * 0.03,
-            isOutLine: true,
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          Container(
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Padding(
-                  padding:
-                      EdgeInsets.fromLTRB(0, height * 0.03, 0, height * 0.02),
-                  child: Text(
-                    widget.offer.name,
-                    style: TextStyle(
-                      fontSize: size * 55,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-          SizedBox(
-            width: width * 0.12,
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _icon(
-    IconData icon, {
-    Color color = Utils.iconColor,
-    double size = 20,
-    double padding = 10,
-    bool isOutLine = false,
-    Function onPressed,
-  }) {
-    return Container(
-      height: 40,
-      width: 40,
-      padding: EdgeInsets.all(padding),
-      decoration: BoxDecoration(
-        border: Border.all(
-            color: Utils.iconColor,
-            style: isOutLine ? BorderStyle.solid : BorderStyle.none),
-        borderRadius: BorderRadius.all(Radius.circular(13)),
-        color: isOutLine ? Colors.white : Theme.of(context).backgroundColor,
-      ),
-      child: Icon(icon, color: color, size: size),
-    ).ripple(() {
-      if (onPressed != null) {
-        onPressed();
-      }
-    }, borderRadius: BorderRadius.all(Radius.circular(13)));
-  }
-
   Widget _offerPoster() {
     return Stack(
       alignment: Alignment.bottomCenter,
@@ -212,6 +140,42 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         )
       ],
     );
+  }
+
+  Widget moreDetails() {
+    if (widget.offer.attachment != null) {
+      return Column(
+        children: <Widget>[
+          SizedBox(
+            height: 20,
+          ),
+          InkWell(
+            child: Text(
+              "More Details",
+              style: TextStyle(
+                color: Colors.blue,
+                fontSize: 16.0,
+              ),
+            ),
+            onTap: () async {
+              String pathPDF = WebAPI.baseURL + widget.offer.attachment.url;
+              if (widget.offer.attachment.url != null)
+                Navigator.push(
+                  context,
+                  MaterialPageRoute<dynamic>(
+                    builder: (_) => PDFViewerCachedFromUrl(
+                      url: pathPDF,
+                      title: widget.offer.name,
+                    ),
+                  ),
+                );
+            },
+          )
+        ],
+      );
+    } else {
+      return SizedBox(height: 1);
+    }
   }
 
   Widget _detailWidget() {
@@ -270,32 +234,8 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                   height: 15,
                 ),
                 _description(),
-                SizedBox(
-                  height: 20,
-                ),
-                InkWell(
-                  child: Text(
-                    "More Details",
-                    style: TextStyle(
-                      color: Colors.blue,
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  onTap: () async {
-                    String pathPDF =
-                        WebAPI.baseURL + widget.offer.attachment.url;
-                    if (widget.offer.attachment.url != null)
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute<dynamic>(
-                          builder: (_) => PDFViewerCachedFromUrl(
-                            url: pathPDF,
-                            title: widget.offer.name,
-                          ),
-                        ),
-                      );
-                  },
-                ),
+
+                moreDetails(),
                 // TODO: Hide this section when we don't have related offers.
                 Padding(
                   padding: EdgeInsets.fromLTRB(
@@ -311,13 +251,12 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                   ),
                 ),
                 Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width * 0.02, 0, width * 0.02, height * 0.02),
+                    padding:
+                        EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
                     child: SizedBox(
                         height: height * 0.28,
-                        child: Scrollbar(
-                            controller: _scrollController,
-                            isAlwaysShown: true,
+                        child: Container(
+                            margin: EdgeInsets.only(bottom: 10),
                             child: ListView(
                               controller: _scrollController,
                               physics: ClampingScrollPhysics(),
@@ -350,14 +289,14 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text(
+        SelectableText(
           widget.offer.details,
           style: TextStyle(
             color: Utils.header,
             fontSize: size * 31,
           ),
         ),
-        Text(
+        SelectableText(
           text,
           style: TextStyle(
             color: Colors.black87,
@@ -375,12 +314,15 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
       return Scaffold(
         body: ImageRotate(),
       );
-    } else {
+    } else
       return Scaffold(
-        backgroundColor: Utils.background,
-        drawer: NavDrawer(),
-        body: SafeArea(
-          child: Container(
+        appBar: AppBar(
+          // Here we take the value from the MyHomePage object that was created by
+          // the App.build method, and use it to set our appbar title.
+          title: Text(widget.offer.name),
+          centerTitle: true,
+          backgroundColor: Utils.header,
+          flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
@@ -391,23 +333,34 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                 end: Alignment.bottomLeft,
               ),
             ),
-            child: Stack(
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    _appBar(),
-                    Container(
-                      height: height * 0.3,
-                      child: _offerPoster(),
-                    )
-                  ],
-                ),
-                _detailWidget(),
+          ),
+        ),
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
               ],
+              begin: Alignment.topRight,
+              end: Alignment.topLeft,
             ),
+          ),
+          child: Stack(
+            children: <Widget>[
+              Column(
+                children: <Widget>[
+                  Container(
+                    padding: Utils.paddingPoster,
+                    height: height * 0.30,
+                    child: _offerPoster(),
+                  )
+                ],
+              ),
+              _detailWidget(),
+            ],
           ),
         ),
       );
-    }
   }
 }

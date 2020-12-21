@@ -53,21 +53,23 @@ class MyEventsPageState extends State<Events>
     ergsList = [];
     super.initState();
     getEvents();
-    getWebinars();
     getERGS();
   }
 
   void getEvents() async {
     final allEvents = await WebAPI.getEvents();
-    if (this.mounted)
+    if (this.mounted) {
+      eventsLoaded = true;
+
       setState(() {
         events = allEvents;
         if (events.length != 0) {
           emptyEvents = false;
-          eventsLoaded = true;
           randIndex = Events._random.nextInt(events.length);
         }
       });
+      getWebinars();
+    }
     if (!emptyEvents) {
       _all.addAll(events);
       _filteredData.addAll(events);
@@ -79,7 +81,6 @@ class MyEventsPageState extends State<Events>
     if (this.mounted)
       setState(() {
         webinars = allWebinars;
-        webinarsLoaded = true;
         if (webinars.length != 0) {
           emptyWebinars = false;
         }
@@ -88,8 +89,16 @@ class MyEventsPageState extends State<Events>
     if (!emptyWebinars) {
       _all.addAll(webinars);
       _filteredData.addAll(webinars);
+      sortData();
+    } else {
+      webinarsLoaded = true;
     }
     getSearchData();
+  }
+
+  sortData() {
+    _all.sort((b, a) => a.startDate.compareTo(b.startDate));
+    webinarsLoaded = true;
   }
 
   getSearchData() {
@@ -122,7 +131,7 @@ class MyEventsPageState extends State<Events>
       final featuredEvent = events[randIndex];
       final imageURL = WebAPI.baseURL + featuredEvent.poster.url;
       return FittedBox(
-        fit: BoxFit.contain,
+        fit: BoxFit.fill,
         child: Image.network(imageURL),
       );
     } catch (Exception) {
@@ -137,18 +146,13 @@ class MyEventsPageState extends State<Events>
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width *
           0.50, // otherwise the logo will be tiny
-      child: FittedBox(fit: BoxFit.cover, child: Image.network(imageUrl)),
+      child: FittedBox(fit: BoxFit.fill, child: Image.network(imageUrl)),
     );
   }
 
   Widget search() {
     return Container(
-      decoration: BoxDecoration(
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-              color: Utils.header, blurRadius: 3.0, offset: Offset(0.30, 0.10))
-        ],
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
       child: TypeAheadField(
         textFieldConfiguration: TextFieldConfiguration(
             decoration: InputDecoration(
@@ -157,13 +161,13 @@ class MyEventsPageState extends State<Events>
                 suffixIcon: Icon(Icons.search),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Utils.header),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Utils.header),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                hintText: "Search ")),
+                hintText: " Search ")),
         suggestionsCallback: (pattern) async {
           return getEventsSuggestions(pattern);
         },
@@ -225,7 +229,7 @@ class MyEventsPageState extends State<Events>
     var width = MediaQuery.of(context).size.width;
 
     try {
-      if (!webinarsLoaded && !eventsLoaded)
+      if (!webinarsLoaded || !eventsLoaded)
         return Scaffold(
           body: ImageRotate(),
         );
@@ -262,6 +266,10 @@ class MyEventsPageState extends State<Events>
               title: Text("Events & Webinars"),
               centerTitle: true,
               backgroundColor: Utils.header,
+              bottom: PreferredSize(
+                child: search(),
+                preferredSize: Size.fromHeight(kToolbarHeight + 10),
+              ),
               flexibleSpace: Container(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -288,9 +296,8 @@ class MyEventsPageState extends State<Events>
                 child: Container(
                     child: SingleChildScrollView(
                         child: Column(children: <Widget>[
-                  search(),
                   SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
                   ListView(
                     shrinkWrap: true,

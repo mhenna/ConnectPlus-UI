@@ -124,7 +124,7 @@ class _OffersState extends State<Offers> {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: FittedBox(fit: BoxFit.cover, child: Image.network(imageURL)),
+        child: FittedBox(fit: BoxFit.contain, child: Image.network(imageURL)),
       ),
     );
   }
@@ -150,6 +150,47 @@ class _OffersState extends State<Offers> {
       }
     }
     setState(() {});
+  }
+
+  Widget search() {
+    return Container(
+        margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
+        child: TypeAheadField(
+          textFieldConfiguration: TextFieldConfiguration(
+              decoration: InputDecoration(
+                  fillColor: Colors.white,
+                  filled: true,
+                  suffixIcon: Icon(Icons.search),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.header),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Utils.header),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  hintText: " Search for offers")),
+          suggestionsCallback: (pattern) async {
+            return getSuggestions(pattern);
+          },
+          itemBuilder: (context, Offer suggestedOffer) {
+            return ListTile(
+              leading: Icon(Icons.shopping_cart),
+              title: Text(suggestedOffer.name),
+            );
+          },
+          onSuggestionSelected: (suggestion) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OfferWidget(
+                  offer: suggestion,
+                  category: suggestion.category,
+                ),
+              ),
+            );
+          },
+        ));
   }
 
   @override
@@ -188,6 +229,10 @@ class _OffersState extends State<Offers> {
           title: Text("Offers"),
           centerTitle: true,
           backgroundColor: Utils.header,
+          bottom: PreferredSize(
+            child: search(),
+            preferredSize: Size.fromHeight(kToolbarHeight + 10),
+          ),
           flexibleSpace: Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -203,65 +248,16 @@ class _OffersState extends State<Offers> {
         ),
         body: ListView.builder(
           shrinkWrap: true,
-          padding: const EdgeInsets.all(10),
           itemCount: 3,
           itemBuilder: (BuildContext context, int elem) {
             if (elem == 0) {
               return Column(children: <Widget>[
-                Container(
-                    decoration: BoxDecoration(
-                      boxShadow: <BoxShadow>[
-                        BoxShadow(
-                            color: Utils.header,
-                            blurRadius: 5.0,
-                            offset: Offset(0.30, 0.10))
-                      ],
-                    ),
-                    child: TypeAheadField(
-                      textFieldConfiguration: TextFieldConfiguration(
-                          decoration: InputDecoration(
-                              fillColor: Colors.white,
-                              filled: true,
-                              suffixIcon: Icon(Icons.search),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Utils.header),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Utils.header),
-                                borderRadius: BorderRadius.circular(5),
-                              ),
-                              hintText: "Search for offers")),
-                      suggestionsCallback: (pattern) async {
-                        return getSuggestions(pattern);
-                      },
-                      itemBuilder: (context, Offer suggestedOffer) {
-                        return ListTile(
-                          leading: Icon(Icons.shopping_cart),
-                          title: Text(suggestedOffer.name),
-                        );
-                      },
-                      onSuggestionSelected: (suggestion) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => OfferWidget(
-                              offer: suggestion,
-                              category: suggestion.category,
-                            ),
-                          ),
-                        );
-                      },
-                    )),
                 SizedBox(
-                  height: 10,
-                ),
-                SizedBox(
-                  height: height * 0.35,
+                  height: height * 0.308,
                   width: width,
                   child: Carousel(
                     images: recentOffers,
-                    boxFit: BoxFit.fill,
+                    boxFit: BoxFit.cover,
                     dotSize: 4.0,
                     dotSpacing: 15.0,
                     dotColor: Colors.grey,
@@ -279,6 +275,7 @@ class _OffersState extends State<Offers> {
               ]);
             } else {
               return ListView(
+                padding: const EdgeInsets.all(10),
                 children: mapIndexed<Widget, String>(
                   categoriesAndOffers.keys,
                   (index, category) {
@@ -326,41 +323,55 @@ class _OffersState extends State<Offers> {
                           addAutomaticKeepAlives: true,
                           children: categoriesAndOffers[category].map((offer) {
                             return Center(
-                              child: Card(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    urlToImage(WebAPI.baseURL + offer.logo.url),
-                                    ButtonBar(
-                                      alignment: MainAxisAlignment.center,
+                              child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OfferWidget(
+                                          category: offer.category,
+                                          offer: offer,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
-                                        FlatButton(
-                                          child: Text(
-                                            offer.name,
-                                            textAlign: TextAlign.center,
-                                            style: TextStyle(
-                                                fontSize: size * 30,
-                                                color: Colors.black87),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    OfferWidget(
-                                                  category: offer.category,
-                                                  offer: offer,
-                                                ),
+                                        urlToImage(
+                                            WebAPI.baseURL + offer.logo.url),
+                                        ButtonBar(
+                                          alignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            FlatButton(
+                                              child: Text(
+                                                offer.name,
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: size * 30,
+                                                    color: Colors.black87),
                                               ),
-                                            );
-                                          },
-                                        )
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        OfferWidget(
+                                                      category: offer.category,
+                                                      offer: offer,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                            )
+                                          ],
+                                        ),
                                       ],
                                     ),
-                                  ],
-                                ),
-                              ),
+                                  )),
                             );
                           }).toList(),
                         ),

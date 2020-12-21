@@ -46,15 +46,16 @@ class MyActivitiesPageState extends State<Activities>
 
   void getActivities() async {
     final allActivities = await WebAPI.getActivities();
-    if (this.mounted)
+    if (this.mounted) {
       setState(() {
         activities = allActivities;
         if (activities.length != 0) {
           emptyActivities = false;
-          activitiesLoaded = true;
         }
         randIndex = Activities._rand.nextInt(activities.length);
       });
+      activitiesLoaded = true;
+    }
     if (!emptyActivities) _filteredData.addAll(activities);
     getSearchData();
   }
@@ -108,7 +109,7 @@ class MyActivitiesPageState extends State<Activities>
       final featuruedActivity = activities[randIndex];
       final imageURL = WebAPI.baseURL + featuruedActivity.poster.url;
       return FittedBox(
-        fit: BoxFit.contain,
+        fit: BoxFit.fill,
         child: Image.network(imageURL),
       );
     } catch (Exception) {
@@ -121,18 +122,13 @@ class MyActivitiesPageState extends State<Activities>
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width *
           0.5, // otherwise the logo will be tiny
-      child: FittedBox(fit: BoxFit.contain, child: Image.network(imageUrl)),
+      child: FittedBox(fit: BoxFit.fill, child: Image.network(imageUrl)),
     );
   }
 
   Widget search() {
     return Container(
-      decoration: BoxDecoration(
-        boxShadow: <BoxShadow>[
-          BoxShadow(
-              color: Utils.header, blurRadius: 5.0, offset: Offset(0.30, 0.10))
-        ],
-      ),
+      margin: const EdgeInsets.fromLTRB(20, 5, 20, 10),
       child: TypeAheadField(
         textFieldConfiguration: TextFieldConfiguration(
             decoration: InputDecoration(
@@ -141,13 +137,13 @@ class MyActivitiesPageState extends State<Activities>
                 suffixIcon: Icon(Icons.search),
                 focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Utils.header),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: Utils.header),
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                hintText: "Search for Activities")),
+                hintText: " Search for Activities")),
         suggestionsCallback: (pattern) async {
           return getActivitySuggestions(pattern);
         },
@@ -189,6 +185,10 @@ class MyActivitiesPageState extends State<Activities>
               // the App.build method, and use it to set our appbar title.
               title: Text("Events & Webinars"),
               centerTitle: true,
+              bottom: PreferredSize(
+                child: search(),
+                preferredSize: Size.fromHeight(kToolbarHeight + 10),
+              ),
               backgroundColor: Utils.header,
               flexibleSpace: Container(
                 decoration: BoxDecoration(
@@ -211,6 +211,10 @@ class MyActivitiesPageState extends State<Activities>
               // the App.build method, and use it to set our appbar title.
               title: Text("Activities"),
               centerTitle: true,
+              bottom: PreferredSize(
+                child: search(),
+                preferredSize: Size.fromHeight(kToolbarHeight + 10),
+              ),
               backgroundColor: Utils.header,
               flexibleSpace: Container(
                 decoration: BoxDecoration(
@@ -238,9 +242,8 @@ class MyActivitiesPageState extends State<Activities>
                 child: Container(
                     child: SingleChildScrollView(
                   child: Column(children: <Widget>[
-                    search(),
                     SizedBox(
-                      height: 30,
+                      height: 10,
                     ),
                     ListView(
                       shrinkWrap: true,

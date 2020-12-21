@@ -3,7 +3,7 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher.dart' as urlLauncher;
 import 'package:connect_plus/Navbar.dart';
 
 class Emergency extends StatefulWidget {
@@ -49,21 +49,21 @@ class MyEmergencyPageState extends State<Emergency>
         bupa.add(
           ListTile(
             title: Text(contact.name, style: TextStyle(color: Utils.header)),
-            onTap: () => launch(contact.number),
+            onTap: () => urlLauncher.launch(contact.number),
           ),
         );
       } else if (contact.type == 'DELL') {
         dell.add(
           ListTile(
             title: Text(contact.name, style: TextStyle(color: Utils.header)),
-            onTap: () => launch(contact.number),
+            onTap: () => urlLauncher.launch(contact.number),
           ),
         );
       } else {
         local.add(
           ListTile(
             title: Text(contact.name, style: TextStyle(color: Utils.header)),
-            onTap: () => launch(contact.number),
+            onTap: () => urlLauncher.launch(contact.number),
           ),
         );
       }

@@ -54,7 +54,7 @@ class WebAPI {
     );
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
-      throw response.body;
+      throw response.statusCode;
     }
     return response.body;
   }
@@ -230,6 +230,7 @@ class WebAPI {
       if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
         offers.add(Offer.fromJson(offerJson));
     }
+    offers.sort((b, a) => a.createdAt.compareTo(b.createdAt));
 
     return offers;
   }
@@ -246,6 +247,8 @@ class WebAPI {
       if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
         offers.add(Offer.fromJson(offerJson));
     }
+    offers.sort((b, a) => a.createdAt.compareTo(b.createdAt));
+
     return offers;
   }
 
@@ -261,8 +264,7 @@ class WebAPI {
   }
 
   static Future<List<Offer>> getRecentOffers() async {
-    final recentURL = "$_offersURL?_limit=5";
-    final response = await get(recentURL);
+    final response = await get(_offersURL);
 
     // TODO: Add this logic to a seperate transformer service
     final List<dynamic> rawOffers = json.decode(response.body);
@@ -271,7 +273,9 @@ class WebAPI {
       if (Offer.fromJson(offerJson).expiration.isAfter(DateTime.now()))
         offers.add(Offer.fromJson(offerJson));
     }
+    offers.sort((b, a) => a.createdAt.compareTo(b.createdAt));
 
+    offers.sublist(0, 6);
     return offers;
   }
 

@@ -6,17 +6,11 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
-import 'package:connect_plus/Carousel.dart';
-import 'package:carousel_slider/carousel_options.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/Events.dart';
 import 'package:connect_plus/OfferVariables.dart';
 import 'package:connect_plus/Offers.dart';
-
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 import 'EventsVariable.dart';
 
@@ -81,9 +75,6 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final recentOffers = await WebAPI.getRecentOffers();
       if (this.mounted) {
-        recentOffers.sort((a, b) {
-          return a.createdAt.compareTo(b.createdAt);
-        });
         setState(() {
           this.offers = recentOffers;
           offersLoaded = true;
@@ -161,36 +152,20 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget title(String title) {
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
-    return new Padding(
-      padding: EdgeInsets.fromLTRB(0, height * 0.07, 0, height * 0.07),
-      child: Row(children: <Widget>[
-        Expanded(
-          child: new Container(
-              margin: const EdgeInsets.only(left: 45.0, right: 10.0),
-              child: Divider(
-                color: Colors.black87,
-                thickness: 2,
-                height: 30,
-              )),
-        ),
-        Text(
-          title.toUpperCase(),
-          style: TextStyle(
-            fontSize: size * 37,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+    return Row(
+      children: <Widget>[
+        Padding(
+          padding: EdgeInsets.fromLTRB(15, height * 0.07, 0, 10),
+          child: Text(
+            title,
+            style: TextStyle(
+              fontSize: size * 48,
+              fontWeight: FontWeight.w700,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        Expanded(
-          child: new Container(
-              margin: const EdgeInsets.only(left: 10.0, right: 45.0),
-              child: Divider(
-                color: Colors.black87,
-                thickness: 2,
-                height: 30,
-              )),
-        ),
-      ]),
+        )
+      ],
     );
   }
 
@@ -202,19 +177,22 @@ class _MyHomePageState extends State<MyHomePage> {
       if (recentEvents.isNotEmpty) {
         list.add(
           SizedBox(
-            height: height * 0.35,
-            width: width * 1,
-            child: Carousel(
-              images: recentEvents,
-              boxFit: BoxFit.fill,
-              dotSize: 4.0,
-              dotSpacing: 15.0,
-              dotColor: Colors.grey,
-              indicatorBgPadding: 5.0,
-              dotBgColor: Colors.grey.withOpacity(0.2),
-              overlayShadow: true,
-              overlayShadowColors: Colors.white,
-              overlayShadowSize: 0.7,
+            height: height * 0.308,
+            child: DecoratedBox(
+              decoration: BoxDecoration(color: Utils.background),
+              child: Carousel(
+                images: recentEvents,
+                autoplayDuration: const Duration(seconds: 20),
+                boxFit: BoxFit.fill,
+                dotSize: 4.0,
+                dotSpacing: 15.0,
+                dotColor: Colors.grey,
+                indicatorBgPadding: 5.0,
+                dotBgColor: Colors.grey.withOpacity(0.2),
+                overlayShadow: true,
+                overlayShadowColors: Colors.white,
+                overlayShadowSize: 0.7,
+              ),
             ),
           ),
         );
@@ -251,7 +229,18 @@ class _MyHomePageState extends State<MyHomePage> {
         list.add(Text('No Recent Data, Coming Soon!'));
       }
       list.add(SizedBox(
-        height: 15,
+        height: 35,
+      ));
+      list.add(Divider(
+        height: 20,
+      ));
+      list.add(Center(
+          child: Text(
+        "Copyright © 2020. Cairo Automation Team - The Co-partner \n project . All rights reserved.",
+        textAlign: TextAlign.center,
+      )));
+      list.add(SizedBox(
+        height: 40,
       ));
       return list;
     } else {
@@ -294,8 +283,8 @@ class _MyHomePageState extends State<MyHomePage> {
           drawer: NavDrawer(),
           backgroundColor: Utils.background,
           body: Stack(children: <Widget>[
-            SingleChildScrollView(
-              child: Container(
+            Container(
+              child: SingleChildScrollView(
                 child: Column(
                   children: getContent(),
                 ),
