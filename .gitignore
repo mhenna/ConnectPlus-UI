@@ -47,3 +47,5 @@ ios/Runner.xcworkspace/contents.xcworkspacedata
 google-services.json
 launch.json
 android/key.properties
+node_modules
+node_modules

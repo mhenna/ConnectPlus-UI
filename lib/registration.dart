@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class registration extends StatefulWidget {
   registration({Key key, this.title}) : super(key: key);
@@ -26,14 +27,16 @@ class _registrationState extends State<registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-
+  bool _success = false;
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
   var port;
+  bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
+  UserCredential userCredentials;
   void initState() {
     super.initState();
   }
@@ -195,7 +198,7 @@ class _registrationState extends State<registration> {
               asyncCall = true;
             });
             Future.delayed(Duration(seconds: 1), () {
-              register();
+              registerOnFirebase();
             });
           }
         },
@@ -229,7 +232,7 @@ class _registrationState extends State<registration> {
                     children: [
                       Padding(
                         padding: EdgeInsets.fromLTRB(width * 0.05,
-                            height * 0.32, width * 0.05, height * 0.03),
+                            height * 0.25, width * 0.05, height * 0.03),
                         child: Card(
                           child: Column(
                             children: <Widget>[
@@ -291,6 +294,67 @@ class _registrationState extends State<registration> {
     );
   }
 
+  void registerOnFirebase() async {
+    try {
+      userCredentials = await _firebaseAuth.createUserWithEmailAndPassword(
+          email: emController.text, password: pwController.text);
+
+      userCredentials.user.sendEmailVerification();
+      _showVerifyEmailSentDialog();
+    } catch (e) {
+      _showDialog('400');
+      throw e;
+    }
+  }
+
+  void confirmEmailVerified() async {
+    await _firebaseAuth.currentUser.reload();
+    var isEmailVerified = _firebaseAuth.currentUser.emailVerified;
+    if (isEmailVerified) {
+      print("Email verified");
+      register();
+    } else {
+      _firebaseAuth.currentUser.delete();
+      notVerifiedDialog();
+    }
+  }
+
+  void _showVerifyEmailSentDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text(
+              "Verify your account",
+              textAlign: TextAlign.center,
+            ),
+            content: Text(
+              "Verification Link has been sent to your email, Please verify then click Yes.",
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(
+                  "Yes",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  confirmEmailVerified();
+                },
+              ),
+            ]);
+      },
+    );
+  }
+
   void register() async {
     try {
       final registerParams = RegisterRequestParameters.fromJson({
@@ -301,13 +365,11 @@ class _registrationState extends State<registration> {
       });
       final registeredUser = await WebAPI.register(registerParams);
       localStorage.setItem("user", registeredUser.user.toJson());
+      successDialog();
+
       setState(() {
         asyncCall = false;
       });
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => login()),
-      );
     } catch (e) {
       setState(() {
         asyncCall = false;
@@ -316,25 +378,140 @@ class _registrationState extends State<registration> {
     }
   }
 
-  void _showDialog(err) {
+  void notVerifiedDialog() {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text(
+              "Oops!",
+              textAlign: TextAlign.center,
+            ),
+            content: new Text(
+              "Your Account is not verified, Please try again!",
+              textAlign: TextAlign.center,
+            ),
+            actions: <Widget>[
+              new FlatButton(
+                child: new Text(
+                  "Dismiss",
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                  textAlign: TextAlign.center,
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        });
+  }
+
+  void successDialog() {
     // flutter defined function
     showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
         return AlertDialog(
-          title: new Text("Oops!"),
-          content: new Text(err),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          title: new Text(
+            "Welcome!",
+            textAlign: TextAlign.center,
+          ),
+          content: new Text('Account created successfully!'),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close"),
+              child: new Text("Close",
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                  textAlign: TextAlign.center),
               onPressed: () {
                 Navigator.of(context).pop();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => login()),
+                );
               },
             ),
           ],
         );
+      },
+    );
+  }
+
+  void _showDialog(err) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        if (err == '400') {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text(
+              "Oops!",
+              textAlign: TextAlign.center,
+            ),
+            content: new Text('Full Name/Email Address is Already Taken!'),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text(
+                  "Close",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        } else {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+            title: new Text(
+              "Oops!",
+              textAlign: TextAlign.center,
+            ),
+            content: new Text(
+                'Connection timed out! Please check your internet connection and try again.'),
+            actions: <Widget>[
+              // usually buttons at the bottom of the dialog
+              new FlatButton(
+                child: new Text(
+                  "Close",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Utils.header,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 17),
+                ),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        }
       },
     );
   }
