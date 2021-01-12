@@ -1,4 +1,5 @@
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/widgets/version_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
         // Initialize FlutterFire:
         future: _initialization,
         builder: (context, snapshot) {
+          versionCheck(context);
           if (snapshot.hasError) {
             return Splash();
           }
