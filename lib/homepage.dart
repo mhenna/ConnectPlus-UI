@@ -84,6 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getRecentEventsPosters() async {
+    this.recentEvents.clear();
     var recent = await WebAPI.getEventHighlights();
     if (this.mounted) {
       setState(() {
@@ -95,6 +96,19 @@ class _MyHomePageState extends State<MyHomePage> {
         highlightsLoaded = true;
       });
     }
+  }
+
+  Future<void> _refreshData() async {
+    setState(() {
+      // eventsLoaded = false;
+      // webinarsLoaded = false;
+      // offersLoaded = false;
+      // highlightsLoaded = false;
+      getEvents();
+      getWebinars();
+      getOffers();
+      getRecentEventsPosters();
+    });
   }
 
   Widget seeMore(String view) {
@@ -200,7 +214,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if (events.isNotEmpty || webinars.isNotEmpty) {
         list.add(
-          title('Recent Events \n   & Webinars'),
+          title('Recent Events & Webinars'),
           //gridview
         );
         list.add(Container(
@@ -258,41 +272,43 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     if (highlightsLoaded && webinarsLoaded && eventsLoaded && offersLoaded)
-      return new WillPopScope(
-        onWillPop: () async => false,
-        child: Scaffold(
-          appBar: AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            title: Text("Home"),
-            centerTitle: true,
-            backgroundColor: Utils.header,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Utils.secondaryColor,
-                    Utils.primaryColor,
-                  ],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
+      return RefreshIndicator(
+          onRefresh: _refreshData,
+          child: WillPopScope(
+            onWillPop: () async => false,
+            child: Scaffold(
+              appBar: AppBar(
+                // Here we take the value from the MyHomePage object that was created by
+                // the App.build method, and use it to set our appbar title.
+                title: Text("Home"),
+                centerTitle: true,
+                backgroundColor: Utils.header,
+                flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Utils.secondaryColor,
+                        Utils.primaryColor,
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          drawer: NavDrawer(),
-          backgroundColor: Utils.background,
-          body: Stack(children: <Widget>[
-            Container(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: getContent(),
+              drawer: NavDrawer(),
+              backgroundColor: Utils.background,
+              body: Stack(children: <Widget>[
+                Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: getContent(),
+                    ),
+                  ),
                 ),
-              ),
+              ]),
             ),
-          ]),
-        ),
-      );
+          ));
     else {
       return Scaffold(body: ImageRotate());
     }

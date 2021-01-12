@@ -1,12 +1,9 @@
 import 'package:carousel_pro/carousel_pro.dart';
-import 'package:connect_plus/models/category.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
-import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
-import 'package:connect_plus/widgets/app_scaffold.dart';
 import 'dart:math';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/OfferWidget.dart';
@@ -33,7 +30,6 @@ class Offers extends StatefulWidget {
 
 class _OffersState extends State<Offers> {
   List<Offer> offers = [];
-  List<Category> categories = [];
   bool emptyCategories = true;
   Map<String, List<Offer>> categoriesAndOffers = new Map<String, List<Offer>>();
   List<Offer> searchData = [];
@@ -55,6 +51,9 @@ class _OffersState extends State<Offers> {
   List<dynamic> _filteredData;
   List<dynamic> recentOffers;
 
+  bool loadedOffers = false;
+  bool loadedHighlights = false;
+
   var randIndexCat;
   var randIndexOffer;
 
@@ -72,6 +71,17 @@ class _OffersState extends State<Offers> {
     super.dispose();
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      _filteredData.clear();
+      recentOffers.clear();
+      categoriesAndOffers.clear();
+      selectedCountList.clear();
+      getRecentOffersPosters();
+      getOffers();
+    });
+  }
+
   Future<void> getRecentOffersPosters() async {
     var recent = await WebAPI.getOfferHighlights();
     if (this.mounted) {
@@ -81,18 +91,7 @@ class _OffersState extends State<Offers> {
             recentOffers.add(Image.network(WebAPI.baseURL + h.url));
           });
         });
-      });
-    }
-  }
-
-  Future getCategories() async {
-    final allCat = await WebAPI.getCategories();
-    if (this.mounted) {
-      setState(() {
-        this.categories = allCat;
-        if (categories.length != 0) {
-          emptyCategories = false;
-        }
+        loadedHighlights = true;
       });
     }
   }
@@ -111,6 +110,7 @@ class _OffersState extends State<Offers> {
         });
         randIndexCat = Offers._random.nextInt(categoriesAndOffers.length);
         randIndexOffer = Offers._random.nextInt(allOffers.length);
+        loadedOffers = true;
       });
     _filteredData.addAll(offers);
     getSearchData();
@@ -198,209 +198,230 @@ class _OffersState extends State<Offers> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
-    if (this.offers.isEmpty) {
-      return Scaffold(
-          appBar: AppBar(
-            // Here we take the value from the MyHomePage object that was created by
-            // the App.build method, and use it to set our appbar title.
-            title: Text("Offers"),
-            centerTitle: true,
-            backgroundColor: Utils.header,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Utils.secondaryColor,
-                    Utils.primaryColor,
-                  ],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                ),
-              ),
-            ),
-          ),
-          body: Container(child: ImageRotate()));
-    }
-    try {
-      return Scaffold(
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("Offers"),
-          centerTitle: true,
-          backgroundColor: Utils.header,
-          bottom: PreferredSize(
-            child: search(),
-            preferredSize: Size.fromHeight(kToolbarHeight + 10),
-          ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Utils.secondaryColor,
-                  Utils.primaryColor,
-                ],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
-            ),
-          ),
-        ),
-        body: ListView.builder(
-          shrinkWrap: true,
-          itemCount: 3,
-          itemBuilder: (BuildContext context, int elem) {
-            if (elem == 0) {
-              return Column(children: <Widget>[
-                SizedBox(
-                  height: height * 0.308,
-                  width: width,
-                  child: Carousel(
-                    images: recentOffers,
-                    boxFit: BoxFit.cover,
-                    dotSize: 4.0,
-                    dotSpacing: 15.0,
-                    dotColor: Colors.grey,
-                    indicatorBgPadding: 5.0,
-                    dotBgColor: Colors.grey.withOpacity(0.2),
-                    overlayShadow: true,
-                    overlayShadowColors: Colors.white,
-                    overlayShadowSize: 0.7,
-                  ),
-                ),
-              ]);
-            } else if (elem == 1) {
-              return Column(children: [
-                Padding(padding: EdgeInsets.fromLTRB(0, height * 0.03, 0, 0.0))
-              ]);
-            } else {
-              return ListView(
-                padding: const EdgeInsets.all(10),
-                children: mapIndexed<Widget, String>(
-                  categoriesAndOffers.keys,
-                  (index, category) {
-                    return Column(
-                      children: <Widget>[
-                        if (categoriesAndOffers[category].isNotEmpty)
-                          if (index == 0)
-                            Padding(
-                                padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.03),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: Text(
-                                      category.toString().toUpperCase(),
-                                      style: TextStyle(
-                                          fontSize: size * 45,
-                                          fontWeight: FontWeight.w600,
-                                          color: Utils.header),
-                                    ),
-                                  ),
-                                ))
-                          else
-                            Padding(
-                                padding: EdgeInsets.fromLTRB(width * 0.03,
-                                    height * 0.03, width * 0.03, height * 0.03),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Container(
-                                    child: Text(
-                                      category.toString().toUpperCase(),
-                                      style: TextStyle(
-                                          fontSize: size * 45,
-                                          fontWeight: FontWeight.w600,
-                                          color: Utils.header),
-                                    ),
-                                  ),
-                                )),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: ScrollPhysics(),
-                          // Create a grid with 2 columns. If you change the scrollDirection to
-                          // horizontal, this produces 2 rows.
-                          crossAxisCount: 2,
-                          addAutomaticKeepAlives: true,
-                          children: categoriesAndOffers[category].map((offer) {
-                            return Center(
-                              child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => OfferWidget(
-                                          category: offer.category,
-                                          offer: offer,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: Card(
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: <Widget>[
-                                        urlToImage(
-                                            WebAPI.baseURL + offer.logo.url),
-                                        ButtonBar(
-                                          alignment: MainAxisAlignment.center,
-                                          children: <Widget>[
-                                            FlatButton(
-                                              child: Text(
-                                                offer.name,
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: size * 30,
-                                                    color: Colors.black87),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        OfferWidget(
-                                                      category: offer.category,
-                                                      offer: offer,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )),
-                            );
-                          }).toList(),
-                        ),
-                        SizedBox(
-                          height: 25,
-                        ),
-                        Divider(
-                          color: Utils.header,
-                          thickness: 2,
-                          indent: width * 0.27,
-                          endIndent: width * 0.27,
-                        ),
-                      ],
-                    );
-                  },
-                ).toList(),
-                shrinkWrap: true,
-                physics: ScrollPhysics(),
-              );
-            }
-          },
-        ),
-      );
-    } catch (Exception) {
-      print(Exception);
+    if (!loadedHighlights || !loadedOffers)
       return Scaffold(
         body: ImageRotate(),
       );
-    }
+    else if (this.offers.isEmpty && loadedOffers) {
+      return RefreshIndicator(
+          onRefresh: _refreshData,
+          child: Scaffold(
+              appBar: AppBar(
+                // Here we take the value from the MyHomePage object that was created by
+                // the App.build method, and use it to set our appbar title.
+                title: Text("Offers"),
+                centerTitle: true,
+                backgroundColor: Utils.header,
+                flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Utils.secondaryColor,
+                        Utils.primaryColor,
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                    ),
+                  ),
+                ),
+              ),
+              body: Center(child: Text("No Recent Offers."))));
+    } else
+      try {
+        return RefreshIndicator(
+            onRefresh: _refreshData,
+            child: Scaffold(
+              appBar: AppBar(
+                // Here we take the value from the MyHomePage object that was created by
+                // the App.build method, and use it to set our appbar title.
+                title: Text("Offers"),
+                centerTitle: true,
+                backgroundColor: Utils.header,
+                bottom: PreferredSize(
+                  child: search(),
+                  preferredSize: Size.fromHeight(kToolbarHeight + 10),
+                ),
+                flexibleSpace: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Utils.secondaryColor,
+                        Utils.primaryColor,
+                      ],
+                      begin: Alignment.topRight,
+                      end: Alignment.bottomLeft,
+                    ),
+                  ),
+                ),
+              ),
+              body: ListView.builder(
+                shrinkWrap: true,
+                itemCount: 3,
+                itemBuilder: (BuildContext context, int elem) {
+                  if (elem == 0) {
+                    return Column(children: <Widget>[
+                      SizedBox(
+                        height: height * 0.308,
+                        width: width,
+                        child: Carousel(
+                          images: recentOffers,
+                          boxFit: BoxFit.cover,
+                          dotSize: 4.0,
+                          dotSpacing: 15.0,
+                          dotColor: Colors.grey,
+                          indicatorBgPadding: 5.0,
+                          dotBgColor: Colors.grey.withOpacity(0.2),
+                          overlayShadow: true,
+                          overlayShadowColors: Colors.white,
+                          overlayShadowSize: 0.7,
+                        ),
+                      ),
+                    ]);
+                  } else if (elem == 1) {
+                    return Column(children: [
+                      Padding(
+                          padding:
+                              EdgeInsets.fromLTRB(0, height * 0.03, 0, 0.0))
+                    ]);
+                  } else {
+                    return ListView(
+                      padding: const EdgeInsets.all(10),
+                      children: mapIndexed<Widget, String>(
+                        categoriesAndOffers.keys,
+                        (index, category) {
+                          return Column(
+                            children: <Widget>[
+                              if (categoriesAndOffers[category].isNotEmpty)
+                                if (index == 0)
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          width * 0.03,
+                                          height * 0.03,
+                                          width * 0.03,
+                                          height * 0.03),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child: Text(
+                                            category.toString().toUpperCase(),
+                                            style: TextStyle(
+                                                fontSize: size * 45,
+                                                fontWeight: FontWeight.w600,
+                                                color: Utils.header),
+                                          ),
+                                        ),
+                                      ))
+                                else
+                                  Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          width * 0.03,
+                                          height * 0.03,
+                                          width * 0.03,
+                                          height * 0.03),
+                                      child: Align(
+                                        alignment: Alignment.centerLeft,
+                                        child: Container(
+                                          child: Text(
+                                            category.toString().toUpperCase(),
+                                            style: TextStyle(
+                                                fontSize: size * 45,
+                                                fontWeight: FontWeight.w600,
+                                                color: Utils.header),
+                                          ),
+                                        ),
+                                      )),
+                              GridView.count(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                // Create a grid with 2 columns. If you change the scrollDirection to
+                                // horizontal, this produces 2 rows.
+                                crossAxisCount: 2,
+                                addAutomaticKeepAlives: true,
+                                children:
+                                    categoriesAndOffers[category].map((offer) {
+                                  return Center(
+                                    child: InkWell(
+                                        onTap: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => OfferWidget(
+                                                category: offer.category,
+                                                offer: offer,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        child: Card(
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              urlToImage(WebAPI.baseURL +
+                                                  offer.logo.url),
+                                              ButtonBar(
+                                                alignment:
+                                                    MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                  FlatButton(
+                                                    child: Text(
+                                                      offer.name,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          fontSize: size * 30,
+                                                          color:
+                                                              Colors.black87),
+                                                    ),
+                                                    onPressed: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              OfferWidget(
+                                                            category:
+                                                                offer.category,
+                                                            offer: offer,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  )
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        )),
+                                  );
+                                }).toList(),
+                              ),
+                              SizedBox(
+                                height: 25,
+                              ),
+                              Divider(
+                                color: Utils.header,
+                                thickness: 2,
+                                indent: width * 0.27,
+                                endIndent: width * 0.27,
+                              ),
+                            ],
+                          );
+                        },
+                      ).toList(),
+                      shrinkWrap: true,
+                      physics: ScrollPhysics(),
+                    );
+                  }
+                },
+              ),
+            ));
+      } catch (Exception) {
+        print(Exception);
+        return Scaffold(
+          body: ImageRotate(),
+        );
+      }
   }
 
   List<Offer> getSuggestions(String pattern) {

@@ -56,6 +56,16 @@ class MyEventsPageState extends State<Events>
     getERGS();
   }
 
+  Future<void> _refreshData() async {
+    setState(() {
+      _filteredData.clear();
+      ergsList.clear();
+      _all.clear();
+      getEvents();
+      getERGS();
+    });
+  }
+
   void getEvents() async {
     final allEvents = await WebAPI.getEvents();
     if (this.mounted) {
@@ -237,129 +247,133 @@ class MyEventsPageState extends State<Events>
           eventsLoaded &&
           webinarsLoaded &&
           webinars.isEmpty)
-        return Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Events & Webinars"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
+        return RefreshIndicator(
+            onRefresh: _refreshData,
+            child: Scaffold(
+                appBar: AppBar(
+                  // Here we take the value from the MyHomePage object that was created by
+                  // the App.build method, and use it to set our appbar title.
+                  title: Text("Events & Webinars"),
+                  centerTitle: true,
+                  backgroundColor: Utils.header,
+                  flexibleSpace: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Utils.secondaryColor,
+                          Utils.primaryColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            body: Center(child: Text("No Recent Events or Webinars.")));
+                body: Center(child: Text("No Recent Events or Webinars."))));
       else
-        return Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text("Events & Webinars"),
-              centerTitle: true,
-              backgroundColor: Utils.header,
-              bottom: PreferredSize(
-                child: search(),
-                preferredSize: Size.fromHeight(kToolbarHeight + 10),
-              ),
-              flexibleSpace: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Utils.secondaryColor,
-                      Utils.primaryColor,
-                    ],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
+        return RefreshIndicator(
+            onRefresh: _refreshData,
+            child: Scaffold(
+                appBar: AppBar(
+                  // Here we take the value from the MyHomePage object that was created by
+                  // the App.build method, and use it to set our appbar title.
+                  title: Text("Events & Webinars"),
+                  centerTitle: true,
+                  backgroundColor: Utils.header,
+                  bottom: PreferredSize(
+                    child: search(),
+                    preferredSize: Size.fromHeight(kToolbarHeight + 10),
+                  ),
+                  flexibleSpace: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Utils.secondaryColor,
+                          Utils.primaryColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
-            floatingActionButton: FloatingActionButton(
-              onPressed: _openFilterDialog,
-              child: Icon(Icons.filter_list),
-            ),
-            body: Padding(
-                padding: EdgeInsets.only(
-                    top: height * 0.02,
-                    bottom: height * 0.02,
-                    left: width * 0.02,
-                    right: width * 0.02),
-                child: Container(
-                    child: SingleChildScrollView(
-                        child: Column(children: <Widget>[
-                  SizedBox(
-                    height: 10,
-                  ),
-                  ListView(
-                    shrinkWrap: true,
-                    physics: ScrollPhysics(),
-                    children: mapIndexed(_filteredData, (index, event) {
-                      return Center(
-                          child: SizedBox(
-                        width: width * 0.8,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            Text(
-                              event.name.toString(),
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 23,
-                                  color: Colors.black87,
-                                  fontWeight: FontWeight.w500),
+                floatingActionButton: FloatingActionButton(
+                  onPressed: _openFilterDialog,
+                  child: Icon(Icons.filter_list),
+                ),
+                body: Padding(
+                    padding: EdgeInsets.only(
+                        top: height * 0.02,
+                        bottom: height * 0.02,
+                        left: width * 0.02,
+                        right: width * 0.02),
+                    child: Container(
+                        child: SingleChildScrollView(
+                            child: Column(children: <Widget>[
+                      SizedBox(
+                        height: 10,
+                      ),
+                      ListView(
+                        shrinkWrap: true,
+                        physics: ScrollPhysics(),
+                        children: mapIndexed(_filteredData, (index, event) {
+                          return Center(
+                              child: SizedBox(
+                            width: width * 0.8,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Text(
+                                  event.name.toString(),
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                      fontSize: 23,
+                                      color: Colors.black87,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(
+                                  height: 5,
+                                ),
+                                Card(
+                                    elevation: 7.0,
+                                    clipBehavior: Clip.antiAlias,
+                                    margin: EdgeInsets.all(12.0),
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10.0))),
+                                    child: InkWell(
+                                      child: urlToImage(
+                                          WebAPI.baseURL + event.poster.url),
+                                      onTap: () {
+                                        if (event.runtimeType == Event) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  EventWidget(event: event),
+                                            ),
+                                          );
+                                        } else {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  WebinarWidget(webinar: event),
+                                            ),
+                                          );
+                                        }
+                                      },
+                                    )),
+                                SizedBox(
+                                  height: 30,
+                                )
+                              ],
                             ),
-                            SizedBox(
-                              height: 5,
-                            ),
-                            Card(
-                                elevation: 7.0,
-                                clipBehavior: Clip.antiAlias,
-                                margin: EdgeInsets.all(12.0),
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(10.0))),
-                                child: InkWell(
-                                  child: urlToImage(
-                                      WebAPI.baseURL + event.poster.url),
-                                  onTap: () {
-                                    if (event.runtimeType == Event) {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              EventWidget(event: event),
-                                        ),
-                                      );
-                                    } else {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              WebinarWidget(webinar: event),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                )),
-                            SizedBox(
-                              height: 30,
-                            )
-                          ],
-                        ),
-                      ));
-                    }).toList(),
-                  ),
-                ])))));
+                          ));
+                        }).toList(),
+                      ),
+                    ]))))));
     } catch (err) {
       return Scaffold(
         body: ImageRotate(),
