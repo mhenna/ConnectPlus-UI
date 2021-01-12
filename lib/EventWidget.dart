@@ -120,11 +120,43 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
     );
   }
 
-  Widget _detailWidget() {
+  Widget _relatedEvents() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     var size = MediaQuery.of(context).size.aspectRatio;
     final _scrollController = ScrollController();
+
+    if (ergEvents.isNotEmpty) {
+      return Column(
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
+              child: Utils.titleText(
+                  textString: "Events by ${event.erg.name}",
+                  fontSize: size * 39,
+                  textcolor: Utils.header)),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
+              child: SizedBox(
+                  height: height * 0.25,
+                  child: ListView(
+                    controller: _scrollController,
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: eventsByERG(),
+                  ))),
+        ],
+      );
+    } else {
+      return SizedBox(
+        height: 1,
+      );
+    }
+  }
+
+  Widget _detailWidget() {
+    var width = MediaQuery.of(context).size.width;
 
     return DraggableScrollableSheet(
       maxChildSize: .6,
@@ -160,25 +192,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                   height: 10,
                 ),
                 _description(),
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
-                    child: Utils.titleText(
-                        textString: "Events by ${event.erg.name}",
-                        fontSize: size * 39,
-                        textcolor: Utils.header)),
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
-                    child: SizedBox(
-                        height: height * 0.25,
-                        child: ListView(
-                          controller: _scrollController,
-                          physics: ClampingScrollPhysics(),
-                          shrinkWrap: true,
-                          scrollDirection: Axis.horizontal,
-                          children: eventsByERG(),
-                        ))),
+                _relatedEvents(),
               ],
             ),
           ),

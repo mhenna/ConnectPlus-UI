@@ -3,6 +3,7 @@ import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
@@ -324,9 +325,7 @@ class _registrationState extends State<registration> {
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        return CupertinoAlertDialog(
             title: new Text(
               "Verify your account",
               textAlign: TextAlign.center,
@@ -382,9 +381,7 @@ class _registrationState extends State<registration> {
     showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          return CupertinoAlertDialog(
             title: new Text(
               "Oops!",
               textAlign: TextAlign.center,
@@ -419,9 +416,7 @@ class _registrationState extends State<registration> {
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        return CupertinoAlertDialog(
           title: new Text(
             "Welcome!",
             textAlign: TextAlign.center,
@@ -457,9 +452,7 @@ class _registrationState extends State<registration> {
       builder: (BuildContext context) {
         // return object of type Dialog
         if (err == '400') {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          return CupertinoAlertDialog(
             title: new Text(
               "Oops!",
               textAlign: TextAlign.center,
@@ -484,9 +477,7 @@ class _registrationState extends State<registration> {
             ],
           );
         } else {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          return CupertinoAlertDialog(
             title: new Text(
               "Oops!",
               textAlign: TextAlign.center,

@@ -90,41 +90,55 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     for (var offer in relatedOffers) {
       if (offer.id != widget.offer.id) {
         list.add(Container(
-          padding: EdgeInsets.fromLTRB(width * 0.01, 0.0, width * 0.01, 0.0),
-          width: width * 0.48,
-          child: Card(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                urlToImage(WebAPI.baseURL + offer.logo.url),
-                ButtonBar(
-                  alignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    FlatButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OfferWidget(
-                                category: widget.category,
-                                offer: offer,
-                              ),
-                            ));
-                      },
-                      child: Text(
-                        offer.name,
-                        textAlign: TextAlign.center,
-                        style:
-                            TextStyle(fontSize: size * 30, color: Utils.header),
+            padding: EdgeInsets.fromLTRB(width * 0.01, 0.0, width * 0.01, 0.0),
+            width: width * 0.48,
+            child: Center(
+              child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => OfferWidget(
+                          category: offer.category,
+                          offer: offer,
+                        ),
                       ),
-                    )
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ));
+                    );
+                  },
+                  child: Card(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: <Widget>[
+                        urlToImage(WebAPI.baseURL + offer.logo.url),
+                        ButtonBar(
+                          alignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            FlatButton(
+                              child: Text(
+                                offer.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: size * 30, color: Colors.black87),
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => OfferWidget(
+                                      category: offer.category,
+                                      offer: offer,
+                                    ),
+                                  ),
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  )),
+            )));
       }
     }
     return list;
@@ -178,6 +192,46 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     }
   }
 
+  Widget _relatedOffers() {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    final _scrollController = ScrollController();
+    if (relatedOffers.isNotEmpty) {
+      return Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.fromLTRB(
+              0,
+              height * 0.08,
+              0,
+              height * 0.02,
+            ),
+            child: Text(
+              " Related Offers",
+              style: TextStyle(fontSize: size * 45, color: Utils.header),
+            ),
+          ),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
+              child: SizedBox(
+                  height: height * 0.28,
+                  child: Container(
+                      margin: EdgeInsets.only(bottom: 10),
+                      child: ListView(
+                        controller: _scrollController,
+                        physics: ClampingScrollPhysics(),
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        children: constructRelatedOffers(),
+                      )))),
+        ],
+      );
+    } else {
+      return SizedBox(height: 1);
+    }
+  }
+
   Widget _detailWidget() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -221,7 +275,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Text(
-                        "${widget.offer.discount.toString()} OFF",
+                        "${widget.offer.discount.toString()}",
                         style: TextStyle(
                             fontSize: size * 50,
                             color: Utils.headline,
@@ -237,33 +291,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
 
                 moreDetails(),
                 // TODO: Hide this section when we don't have related offers.
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    0,
-                    height * 0.08,
-                    0,
-                    height * 0.02,
-                  ),
-                  child: Utils.titleText(
-                    textString: " Related Offers",
-                    fontSize: size * 45,
-                    textcolor: Utils.header,
-                  ),
-                ),
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
-                    child: SizedBox(
-                        height: height * 0.28,
-                        child: Container(
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: ListView(
-                              controller: _scrollController,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: constructRelatedOffers(),
-                            )))),
+                _relatedOffers(),
               ],
             ),
           ),

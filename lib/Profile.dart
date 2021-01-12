@@ -69,9 +69,7 @@ class MapScreenState extends State<ProfilePage>
       localStorage.setItem('user', updatedUser);
       _showDialog();
     } catch (e) {
-      AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(15.0))),
+      CupertinoAlertDialog(
         content: new Text("An Error Occured, Please try again!"),
         actions: <Widget>[
           // usually buttons at the bottom of the dialog
@@ -99,9 +97,7 @@ class MapScreenState extends State<ProfilePage>
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(15.0))),
+        return CupertinoAlertDialog(
           content: new Text("Profile Edited Successfully!"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog

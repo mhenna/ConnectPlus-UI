@@ -4,6 +4,7 @@ import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
@@ -300,9 +301,7 @@ class _loginState extends State<login> {
       builder: (BuildContext context) {
         // return object of type Dialog
         if (err == '400') {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          return CupertinoAlertDialog(
             title: new Text("Oops!"),
             content: new Text('Invalid Credentials!'),
             actions: <Widget>[
@@ -323,9 +322,7 @@ class _loginState extends State<login> {
             ],
           );
         } else {
-          return AlertDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(15.0))),
+          return CupertinoAlertDialog(
             title: new Text("Oops!"),
             content: new Text(
                 'Connection timed out! Please check your internet connection and try again.'),
