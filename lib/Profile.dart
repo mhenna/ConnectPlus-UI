@@ -59,12 +59,65 @@ class MapScreenState extends State<ProfilePage>
       "phoneNumber":
           phoneController.text != "" ? phoneController.text : user.phoneNumber,
     };
-    final updatedProfile = await WebAPI.updateProfile(editedProfile, user.id);
-    localStorage.setItem('profile', updatedProfile);
-    final updatedUser = user;
-    updatedUser.username = updatedProfile.username;
-    updatedUser.phoneNumber = updatedProfile.phoneNumber;
-    localStorage.setItem('user', updatedUser);
+    try {
+      final updatedProfile = await WebAPI.updateProfile(editedProfile, user.id);
+
+      localStorage.setItem('profile', updatedProfile);
+      final updatedUser = user;
+      updatedUser.username = updatedProfile.username;
+      updatedUser.phoneNumber = updatedProfile.phoneNumber;
+      localStorage.setItem('user', updatedUser);
+      _showDialog();
+    } catch (e) {
+      CupertinoAlertDialog(
+        content: new Text("An Error Occured, Please try again!"),
+        actions: <Widget>[
+          // usually buttons at the bottom of the dialog
+          new FlatButton(
+            child: new Text(
+              "Close",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  color: Utils.header,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 17),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
+  }
+
+  void _showDialog() {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return CupertinoAlertDialog(
+          content: new Text("Profile Edited Successfully!"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text(
+                "Close",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Utils.header,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _getLabel(String value) {

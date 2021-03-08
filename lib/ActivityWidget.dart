@@ -60,11 +60,7 @@ class _ActivityState extends State<ActivityWidget>
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-      child: SizedBox(
-        width: 250, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
-      ),
-    );
+        child: FittedBox(fit: BoxFit.contain, child: Image.network(imageURL)));
   }
 
   List<Widget> activitiesByERG() {
@@ -124,6 +120,41 @@ class _ActivityState extends State<ActivityWidget>
     );
   }
 
+  Widget _relatedActivities() {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    final _scrollController = ScrollController();
+
+    if (ergActivities.isNotEmpty) {
+      return Column(
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
+              child: Utils.titleText(
+                  textString: "Activities by ${activity.erg.name}",
+                  fontSize: size * 39,
+                  textcolor: Utils.header)),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
+              child: SizedBox(
+                  height: height * 0.28,
+                  child: ListView(
+                    controller: _scrollController,
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: activitiesByERG(),
+                  ))),
+        ],
+      );
+    } else {
+      return SizedBox(
+        height: 1,
+      );
+    }
+  }
+
   Widget _detailWidget() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -165,31 +196,7 @@ class _ActivityState extends State<ActivityWidget>
                   height: 10,
                 ),
                 _description(),
-                SizedBox(
-                  height: 10,
-                ),
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
-                    child: Utils.titleText(
-                        textString: "Activities by ${activity.erg.name}",
-                        fontSize: size * 39,
-                        textcolor: Utils.header)),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width * 0.02, 0, width * 0.02, height * 0.02),
-                    child: SizedBox(
-                        height: height * 0.28,
-                        child: Scrollbar(
-                            controller: _scrollController,
-                            isAlwaysShown: true,
-                            child: ListView(
-                              controller: _scrollController,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: activitiesByERG(),
-                            )))),
+                _relatedActivities(),
               ],
             ),
           ),
@@ -207,9 +214,7 @@ class _ActivityState extends State<ActivityWidget>
     if (activity.venue != null) {
       textV += "\n\nVenue:" + activity.venue.toString() + '\n';
     }
-    text += "\n\nStart Date: " + date;
-    text += "\n\nTime: " + date;
-    text += "\n\nDate: " + date;
+    text += "\nStart Date: " + date;
     text += "\n\nTime: " + time;
     text += "\n\nRecurrence: " + activity.recurrence;
     text += "\n\nDay(s): " + activity.days;
@@ -222,7 +227,7 @@ class _ActivityState extends State<ActivityWidget>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 10),
-        Text(
+        SelectableText(
           textV,
           style: TextStyle(
             color: Colors.black87,
@@ -236,14 +241,14 @@ class _ActivityState extends State<ActivityWidget>
             style: TextStyle(fontSize: size * 32, fontWeight: FontWeight.bold),
           ),
           InkWell(
-            child: Text(
+            child: SelectableText(
               activity.zoomID,
               style: TextStyle(fontSize: size * 30, color: Colors.blue),
             ),
             onTap: _launchURL,
           )
         ]),
-        Text(
+        SelectableText(
           text,
           style: TextStyle(
             color: Colors.black87,

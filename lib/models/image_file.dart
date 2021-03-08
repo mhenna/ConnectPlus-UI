@@ -165,7 +165,7 @@ class Thumbnail {
     mime = json['mime'];
     width = json['width'];
     height = json['height'];
-    size = json['size'];
+    size = json['size'].toDouble();
     path = json['path'];
     url = json['url'];
   }

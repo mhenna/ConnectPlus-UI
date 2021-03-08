@@ -169,6 +169,41 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     );
   }
 
+  Widget _relatedWebinars() {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    final _scrollController = ScrollController();
+
+    if (ergWebinars.isNotEmpty) {
+      return Column(
+        children: <Widget>[
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
+              child: Utils.titleText(
+                  textString: "Webinars by ${webinar.erg.name}",
+                  fontSize: size * 39,
+                  textcolor: Utils.header)),
+          Padding(
+              padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
+              child: SizedBox(
+                  height: height * 0.25,
+                  child: ListView(
+                    controller: _scrollController,
+                    physics: ClampingScrollPhysics(),
+                    shrinkWrap: true,
+                    scrollDirection: Axis.horizontal,
+                    children: webinarsByERG(),
+                  ))),
+        ],
+      );
+    } else {
+      return SizedBox(
+        height: 1,
+      );
+    }
+  }
+
   Widget _detailWidget() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -210,28 +245,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                   height: 20,
                 ),
                 _description(),
-                Padding(
-                    padding:
-                        EdgeInsets.fromLTRB(0, height * 0.05, 0, height * 0.02),
-                    child: Utils.titleText(
-                        textString: "Webinars by ${webinar.erg.name}",
-                        fontSize: size * 39,
-                        textcolor: Utils.header)),
-                Padding(
-                    padding: EdgeInsets.fromLTRB(
-                        width * 0.02, 0, width * 0.02, height * 0.02),
-                    child: SizedBox(
-                        height: height * 0.25,
-                        child: Scrollbar(
-                            controller: _scrollController,
-                            isAlwaysShown: true,
-                            child: ListView(
-                              controller: _scrollController,
-                              physics: ClampingScrollPhysics(),
-                              shrinkWrap: true,
-                              scrollDirection: Axis.horizontal,
-                              children: webinarsByERG(),
-                            )))),
+                _relatedWebinars(),
               ],
             ),
           ),
@@ -258,7 +272,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         SizedBox(height: 10),
-        Text(
+        SelectableText(
           text,
           style: TextStyle(
             color: Colors.black87,

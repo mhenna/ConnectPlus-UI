@@ -111,16 +111,13 @@ class _EventsVariablesState extends State<EventsVariables>
         Expanded(
             child: Padding(
                 padding: EdgeInsets.only(left: 6, right: 7, top: 5),
-                child: Scrollbar(
-                    controller: _scrollController,
-                    isAlwaysShown: true,
-                    child: ListView(
-                      controller: _scrollController,
-                      physics: ClampingScrollPhysics(),
-                      shrinkWrap: true,
-                      scrollDirection: Axis.horizontal,
-                      children: constructEvents(),
-                    )))),
+                child: ListView(
+                  controller: _scrollController,
+                  physics: ClampingScrollPhysics(),
+                  shrinkWrap: true,
+                  scrollDirection: Axis.horizontal,
+                  children: constructEvents(),
+                ))),
       ],
     );
   }
@@ -217,7 +214,7 @@ class Single_Event extends StatelessWidget {
                     ),
                     child: Image.network(
                       WebAPI.baseURL + event.poster.url,
-                      fit: BoxFit.contain,
+                      fit: BoxFit.fill,
                     )),
               ),
             ),
