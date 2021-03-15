@@ -45,9 +45,9 @@ class Event {
     venue = json['venue'];
     onBehalfOf = json['onBehalfOf'];
     endDate =
-        json['endDate'] != null ? DateTime.parse((json['endDate'])) : null;
+        json['endDate'] != null ? DateTime.parse((json['endDate'])).toLocal() : null;
     startDate =
-        json['startDate'] != null ? DateTime.parse((json['startDate'])) : null;
+        json['startDate'] != null ? DateTime.parse((json['startDate'])).toLocal() : null;
     createdAt =
         json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
     updatedAt =

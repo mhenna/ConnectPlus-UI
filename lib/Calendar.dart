@@ -11,7 +11,7 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/EventWidget.dart';
-
+import 'package:intl/intl.dart';
 class Calendar extends StatefulWidget {
   @override
   _CalendarState createState() => _CalendarState();
@@ -39,19 +39,19 @@ class _CalendarState extends State<Calendar> {
   }
 
   void getEvents() async {
+    getActivities();
     var events = await WebAPI.getEvents();
     if (this.mounted) {
       for (var event in events) {
-        var date = DateTime.parse(event.startDate.toString());
-        if (_events[date] != null)
-          _events[date].add(event);
+        var date = DateTime.parse(DateFormat('yyyy-MM-dd').format(event.startDate));
+        if (_all[date] != null)
+          _all[date].add(event);
         else
-          _events[date] = [event];
+          _all[date] = [event];
       }
       setState(() {
-        _all.addAll(_events);
       });
-      getActivities();
+      
     }
   }
 
@@ -60,7 +60,7 @@ class _CalendarState extends State<Calendar> {
     if (this.mounted) {
       for (var activity in activities) {
         activity.recurrenceDates.forEach((element) {
-          var date = DateTime.parse(element.toString());
+          var date = DateTime.parse(DateFormat('yyyy-MM-dd').format(element));
           if (_activities[date] != null)
             _activities[date].add(activity);
           else
@@ -78,17 +78,19 @@ class _CalendarState extends State<Calendar> {
     var webinars = await WebAPI.getWebinars();
     if (this.mounted) {
       for (var webinar in webinars) {
-        var date = DateTime.parse(webinar.startDate.toString());
-        if (_webinars[date] != null)
-          _webinars[date].add(webinar);
+        var date = DateTime.parse(DateFormat('yyyy-MM-dd').format(webinar.startDate));
+        if (_all[date] != null)
+          _all[date].add(webinar);
         else
-          _webinars[date] = [webinar];
+          _all[date] = [webinar];
       }
       setState(() {
-        _all.addAll(_webinars);
       });
     }
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
