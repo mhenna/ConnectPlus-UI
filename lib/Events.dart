@@ -12,6 +12,7 @@ import 'package:connect_plus/EventWidget.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:localstorage/localstorage.dart';
 import 'dart:math';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Events extends StatefulWidget {
   Events({
@@ -142,7 +143,11 @@ class MyEventsPageState extends State<Events>
       final imageURL = WebAPI.baseURL + featuredEvent.poster.url;
       return FittedBox(
         fit: BoxFit.fill,
-        child: Image.network(imageURL),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => CircularProgressIndicator(),
+          imageUrl:
+          imageURL,
+        ),
       );
     } catch (Exception) {
       return Scaffold(
@@ -153,10 +158,16 @@ class MyEventsPageState extends State<Events>
 
   Widget urlToImage(String imageUrl) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.width *
-          0.50, // otherwise the logo will be tiny
-      child: FittedBox(fit: BoxFit.fill, child: Image.network(imageUrl)),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width *
+            0.50, // otherwise the logo will be tiny
+        child: FittedBox(fit: BoxFit.fill,
+          child: CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl:
+            imageUrl,
+          ),
+        )
     );
   }
 
@@ -223,14 +234,14 @@ class MyEventsPageState extends State<Events>
         selectedTextBackgroundColor: Utils.header,
         searchFieldHintText: "Search Here",
         selectedTextList: selectedCountList, onApplyButtonClick: (list) {
-      if (list != null) {
-        setState(() {
-          selectedCountList = List.from(list);
-          filterData();
+          if (list != null) {
+            setState(() {
+              selectedCountList = List.from(list);
+              filterData();
+            });
+          }
+          Navigator.pop(context);
         });
-      }
-      Navigator.pop(context);
-    });
   }
 
   @override
@@ -310,70 +321,70 @@ class MyEventsPageState extends State<Events>
                     child: Container(
                         child: SingleChildScrollView(
                             child: Column(children: <Widget>[
-                      SizedBox(
-                        height: 10,
-                      ),
-                      ListView(
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        children: mapIndexed(_filteredData, (index, event) {
-                          return Center(
-                              child: SizedBox(
-                            width: width * 0.8,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  event.name.toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 23,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Card(
-                                    elevation: 7.0,
-                                    clipBehavior: Clip.antiAlias,
-                                    margin: EdgeInsets.all(12.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0))),
-                                    child: InkWell(
-                                      child: urlToImage(
-                                          WebAPI.baseURL + event.poster.url),
-                                      onTap: () {
-                                        if (event.runtimeType == Event) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EventWidget(event: event),
+                              SizedBox(
+                                height: 10,
+                              ),
+                              ListView(
+                                shrinkWrap: true,
+                                physics: ScrollPhysics(),
+                                children: mapIndexed(_filteredData, (index, event) {
+                                  return Center(
+                                      child: SizedBox(
+                                        width: width * 0.8,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: <Widget>[
+                                            Text(
+                                              event.name.toString(),
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(
+                                                  fontSize: 23,
+                                                  color: Colors.black87,
+                                                  fontWeight: FontWeight.w500),
                                             ),
-                                          );
-                                        } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WebinarWidget(webinar: event),
+                                            SizedBox(
+                                              height: 5,
                                             ),
-                                          );
-                                        }
-                                      },
-                                    )),
-                                SizedBox(
-                                  height: 30,
-                                )
-                              ],
-                            ),
-                          ));
-                        }).toList(),
-                      ),
-                    ]))))));
+                                            Card(
+                                                elevation: 7.0,
+                                                clipBehavior: Clip.antiAlias,
+                                                margin: EdgeInsets.all(12.0),
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius: BorderRadius.all(
+                                                        Radius.circular(10.0))),
+                                                child: InkWell(
+                                                  child: urlToImage(
+                                                      WebAPI.baseURL + event.poster.url),
+                                                  onTap: () {
+                                                    if (event.runtimeType == Event) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              EventWidget(event: event),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              WebinarWidget(webinar: event),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                )),
+                                            SizedBox(
+                                              height: 30,
+                                            )
+                                          ],
+                                        ),
+                                      ));
+                                }).toList(),
+                              ),
+                            ]))))));
     } catch (err) {
       return Scaffold(
         body: ImageRotate(),
@@ -386,7 +397,7 @@ class MyEventsPageState extends State<Events>
     final filter = searchAll
         .where(
           (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
-        )
+    )
         .toList();
     return filter;
   }

@@ -11,7 +11,7 @@ import 'widgets/Utils.dart';
 import 'dart:convert';
 import 'widgets/Indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class WebinarWidget extends StatefulWidget {
   WebinarWidget({Key key, @required this.webinar}) : super(key: key);
 
@@ -55,7 +55,11 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => CircularProgressIndicator(),
+          imageUrl:
+          imageURL,
+        ),
       ),
     );
   }
@@ -92,7 +96,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                       ergwebinar.name,
                       textAlign: TextAlign.center,
                       style:
-                          TextStyle(fontSize: size * 35, color: Utils.header),
+                      TextStyle(fontSize: size * 35, color: Utils.header),
                     ),
                   )
                 ],
@@ -130,13 +134,13 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
   }
 
   Widget _icon(
-    IconData icon, {
-    Color color = Utils.iconColor,
-    double size = 20,
-    double padding = 10,
-    bool isOutLine = false,
-    Function onPressed,
-  }) {
+      IconData icon, {
+        Color color = Utils.iconColor,
+        double size = 20,
+        double padding = 10,
+        bool isOutLine = false,
+        Function onPressed,
+      }) {
     return Container(
       height: 40,
       width: 40,
@@ -163,7 +167,11 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Image.network(WebAPI.baseURL + webinar.poster.url),
+          child: CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl:
+            WebAPI.baseURL + webinar.poster.url,
+          ),
         )
       ],
     );
