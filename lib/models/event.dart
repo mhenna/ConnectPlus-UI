@@ -93,9 +93,8 @@ class Event {
     if (this.erg != null) {
       data['erg'] = this.erg.toJson();
     }
-    if (this.trivia != null) {
-      data['trivia'] = this.trivia;
-    }
+
+    data['trivia'] = this.trivia;
     data['id'] = this.id;
     return data;
   }
