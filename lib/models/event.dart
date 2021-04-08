@@ -19,6 +19,7 @@ class Event {
   AdminUser updatedBy;
   ERG erg;
   String id;
+  bool slider;
 
   Event({
     this.status,
@@ -36,6 +37,7 @@ class Event {
     this.onBehalfOf,
     this.erg,
     this.id,
+    this.slider,
   });
 
   Event.fromJson(Map<String, dynamic> json) {
@@ -44,10 +46,12 @@ class Event {
     name = json['name'];
     venue = json['venue'];
     onBehalfOf = json['onBehalfOf'];
-    endDate =
-        json['endDate'] != null ? DateTime.parse((json['endDate'])).toLocal() : null;
-    startDate =
-        json['startDate'] != null ? DateTime.parse((json['startDate'])).toLocal() : null;
+    endDate = json['endDate'] != null
+        ? DateTime.parse((json['endDate'])).toLocal()
+        : null;
+    startDate = json['startDate'] != null
+        ? DateTime.parse((json['startDate'])).toLocal()
+        : null;
     createdAt =
         json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
     updatedAt =
@@ -63,6 +67,7 @@ class Event {
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
+    slider = json['slider'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -77,6 +82,7 @@ class Event {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
+    data['slider'] = this.slider;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();
     }

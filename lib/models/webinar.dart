@@ -18,23 +18,26 @@ class Webinar {
   AdminUser updatedBy;
   String id;
   bool isRecorded;
+  bool slider;
 
-  Webinar(
-      {this.sId,
-      this.name,
-      this.url,
-      this.duration,
-      this.startDate,
-      this.createdAt,
-      this.onBehalfOf,
-      this.updatedAt,
-      this.iV,
-      this.createdBy,
-      this.erg,
-      this.poster,
-      this.updatedBy,
-      this.isRecorded,
-      this.id});
+  Webinar({
+    this.sId,
+    this.name,
+    this.url,
+    this.duration,
+    this.startDate,
+    this.createdAt,
+    this.onBehalfOf,
+    this.updatedAt,
+    this.iV,
+    this.createdBy,
+    this.erg,
+    this.poster,
+    this.updatedBy,
+    this.isRecorded,
+    this.id,
+    this.slider,
+  });
 
   Webinar.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -43,8 +46,9 @@ class Webinar {
     onBehalfOf = json['onBehalfOf'];
     isRecorded = json['isRecorded'];
     duration = double.parse(json['Duration'].toString());
-    startDate =
-        json['startDate'] != null ? DateTime.parse((json['startDate'])).toLocal() : null;
+    startDate = json['startDate'] != null
+        ? DateTime.parse((json['startDate'])).toLocal()
+        : null;
     createdAt =
         json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
     updatedAt =
@@ -60,6 +64,7 @@ class Webinar {
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
+    slider = json['slider'] ?? false;
   }
 
   Map<String, dynamic> toJson() {
@@ -73,7 +78,7 @@ class Webinar {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['isRecorded'] = this.isRecorded;
-
+    data['slider'] = this.slider;
     data['__v'] = this.iV;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();
