@@ -103,9 +103,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Image> posters = [];
     final int ergPosterLimit = 1;
 
-    // TODO: create queries to get events and webinars with slider set to true
-    List<Event> events = await WebAPI.getEvents();
-    List<Webinar> webinars = await WebAPI.getWebinars();
+    List<Event> events = await WebAPI.getSliderEvents();
+    List<Webinar> webinars = await WebAPI.getSliderWebinars();
 
     // TODO: create a superclass for webinars and events
     Map<ERG, List<dynamic>> ergItems = {};
@@ -147,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ergItems.forEach((erg, items) {
       for (int i = 0; i < ergPosterLimit; i++) {
         // will break when poster field changes
-        posters.add(Image.network(items[i].poster.url));
+        posters.add(Image.network(WebAPI.baseURL + items[i].poster.url));
       }
     });
     setState(() {

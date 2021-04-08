@@ -497,4 +497,34 @@ class WebAPI {
 
     return events;
   }
+
+  static Future<List<Webinar>> getSliderWebinars() async {
+    final webinarsUrl = "$_webinarsURL?slider_eq=true";
+    final response = await get(webinarsUrl);
+
+    // TODO: Add this logic to a seperate transformer service
+    final rawWebinars = json.decode(response.body);
+    final List<Webinar> webinars = [];
+    for (final webinarJson in rawWebinars) {
+      webinars.add(Webinar.fromJson(webinarJson));
+    }
+    webinars.sort((b, a) => a.startDate.compareTo(b.startDate));
+
+    return webinars;
+  }
+
+  static Future<List<Event>> getSliderEvents() async {
+    final eventsURL = "$_eventsURL?slider_eq=true";
+    final response = await get(eventsURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final rawEvents = json.decode(response.body);
+    final List<Event> events = [];
+    for (final eventJson in rawEvents) {
+      events.add(Event.fromJson(eventJson));
+    }
+    events.sort((b, a) => a.startDate.compareTo(b.startDate));
+
+    return events;
+  }
 }
