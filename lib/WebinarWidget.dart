@@ -283,7 +283,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
         SizedBox(height: 30),
         Center(
           child: RaisedButton(
-            onPressed: _launchURL,
+            onPressed: () => _launchURL(webinar.url ?? ''),
             color: Utils.iconColor,
             textColor: Colors.white,
             padding: const EdgeInsets.all(0.0),
@@ -319,7 +319,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
             ? Container()
             : Center(
                 child: RaisedButton(
-                  onPressed: _launchURL,
+                  onPressed: () => _launchURL(webinar.trivia ?? ''),
                   color: Utils.iconColor,
                   textColor: Colors.white,
                   padding: const EdgeInsets.all(0.0),
@@ -350,8 +350,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     );
   }
 
-  _launchURL() async {
-    var url = webinar.url;
+  _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {
