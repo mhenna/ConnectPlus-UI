@@ -9,6 +9,7 @@ import 'Navbar.dart';
 import 'widgets/Utils.dart';
 import 'dart:convert';
 import 'widgets/Indicator.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class EventWidget extends StatefulWidget {
   EventWidget({Key key, @required this.event}) : super(key: key);
@@ -227,8 +228,52 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
             fontSize: size * 35,
           ),
         ),
+        Divider(
+          color: Colors.transparent,
+          height: 10,
+        ),
+        // trivia button
+        event.trivia == null
+            ? Container()
+            : Center(
+                child: RaisedButton(
+                  onPressed: () => _launchURL(event.trivia ?? ''),
+                  color: Utils.iconColor,
+                  textColor: Colors.white,
+                  padding: const EdgeInsets.all(0.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      side: BorderSide(color: Utils.iconColor)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                      gradient: LinearGradient(
+                        colors: [
+                          Utils.secondaryColor,
+                          Utils.primaryColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                    child: Text(
+                      'Trivia Link',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
+  }
+
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
