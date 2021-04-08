@@ -309,7 +309,43 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
               ),
             ),
           ),
-        )
+        ),
+        Divider(
+          color: Colors.transparent,
+          height: 10,
+        ),
+        // trivia button
+        webinar.trivia == null
+            ? Container()
+            : Center(
+                child: RaisedButton(
+                  onPressed: _launchURL,
+                  color: Utils.iconColor,
+                  textColor: Colors.white,
+                  padding: const EdgeInsets.all(0.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      side: BorderSide(color: Utils.iconColor)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                      gradient: LinearGradient(
+                        colors: [
+                          Utils.secondaryColor,
+                          Utils.primaryColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                    child: Text(
+                      'Trivia Link',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
   }
