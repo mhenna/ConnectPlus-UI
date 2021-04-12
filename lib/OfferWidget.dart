@@ -11,7 +11,7 @@ import 'package:localstorage/localstorage.dart';
 import 'Navbar.dart';
 import 'widgets/Utils.dart';
 import 'widgets/Indicator.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class OfferWidget extends StatefulWidget {
   OfferWidget({
     Key key,
@@ -75,7 +75,11 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         width: MediaQuery.of(context)
             .size
             .width, // otherwise the logo will be tiny
-        child: Image.network(imageURL),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => CircularProgressIndicator(),
+          imageUrl:
+            imageURL,
+        ),
       ),
     );
   }
@@ -150,7 +154,11 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Image.network(WebAPI.baseURL + widget.offer.logo.url),
+          child: CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl:
+            WebAPI.baseURL + widget.offer.logo.url,
+          ),
         )
       ],
     );

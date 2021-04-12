@@ -10,6 +10,7 @@ import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class Activities extends StatefulWidget {
   Activities({
@@ -110,7 +111,11 @@ class MyActivitiesPageState extends State<Activities>
       final imageURL = WebAPI.baseURL + featuruedActivity.poster.url;
       return FittedBox(
         fit: BoxFit.fill,
-        child: Image.network(imageURL),
+        child: CachedNetworkImage(
+          placeholder: (context, url) => CircularProgressIndicator(),
+          imageUrl:
+            imageURL,
+        ),
       );
     } catch (Exception) {
       return Scaffold(body: ImageRotate());
@@ -122,7 +127,13 @@ class MyActivitiesPageState extends State<Activities>
       width: MediaQuery.of(context).size.width,
       height: MediaQuery.of(context).size.width *
           0.5, // otherwise the logo will be tiny
-      child: FittedBox(fit: BoxFit.fill, child: Image.network(imageUrl)),
+      child: FittedBox(fit: BoxFit.fill,
+        child: CachedNetworkImage(
+          placeholder: (context, url) => CircularProgressIndicator(),
+          imageUrl:
+            imageUrl,
+        ),
+      ),
     );
   }
 

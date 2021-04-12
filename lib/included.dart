@@ -6,7 +6,7 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Navbar.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class Included extends StatefulWidget {
   Included({Key key, this.title}) : super(key: key);
   final String title;
@@ -112,9 +112,13 @@ class _IncludedState extends State<Included> {
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.3,
                         width: MediaQuery.of(context).size.width * 0.65,
-                        child: Image.network(
-                            WebAPI.baseURL + ergsList[index].poster.url),
-                      )),
+                        child: CachedNetworkImage(
+                          placeholder: (context, url) => CircularProgressIndicator(),
+                          imageUrl:
+                            WebAPI.baseURL + ergsList[index].poster.url,
+                        ),
+                      ),
+                  ),
                   SizedBox(
                     height: 20,
                   ),
