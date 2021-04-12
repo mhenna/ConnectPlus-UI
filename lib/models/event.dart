@@ -19,6 +19,7 @@ class Event {
   AdminUser updatedBy;
   ERG erg;
   String id;
+  String trivia;
   bool slider;
 
   Event({
@@ -38,6 +39,7 @@ class Event {
     this.erg,
     this.id,
     this.slider,
+    this.trivia,
   });
 
   Event.fromJson(Map<String, dynamic> json) {
@@ -68,6 +70,7 @@ class Event {
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
     slider = json['slider'] ?? false;
+    trivia = json['trivia'];
   }
 
   Map<String, dynamic> toJson() {
@@ -95,7 +98,10 @@ class Event {
     if (this.erg != null) {
       data['erg'] = this.erg.toJson();
     }
+
+    data['trivia'] = this.trivia;
     data['id'] = this.id;
+    data['slider'] = this.slider;
     return data;
   }
 }

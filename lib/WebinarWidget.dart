@@ -291,7 +291,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
         SizedBox(height: 30),
         Center(
           child: RaisedButton(
-            onPressed: _launchURL,
+            onPressed: () => _launchURL(webinar.url ?? ''),
             color: Utils.iconColor,
             textColor: Colors.white,
             padding: const EdgeInsets.all(0.0),
@@ -317,13 +317,48 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
               ),
             ),
           ),
-        )
+        ),
+        Divider(
+          color: Colors.transparent,
+          height: 10,
+        ),
+        // trivia button
+        webinar.trivia == null
+            ? Container()
+            : Center(
+                child: RaisedButton(
+                  onPressed: () => _launchURL(webinar.trivia ?? ''),
+                  color: Utils.iconColor,
+                  textColor: Colors.white,
+                  padding: const EdgeInsets.all(0.0),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                      side: BorderSide(color: Utils.iconColor)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30.0),
+                      gradient: LinearGradient(
+                        colors: [
+                          Utils.secondaryColor,
+                          Utils.primaryColor,
+                        ],
+                        begin: Alignment.topRight,
+                        end: Alignment.bottomLeft,
+                      ),
+                    ),
+                    padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                    child: Text(
+                      'Trivia Link',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ),
+                ),
+              ),
       ],
     );
   }
 
-  _launchURL() async {
-    var url = webinar.url;
+  _launchURL(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     } else {

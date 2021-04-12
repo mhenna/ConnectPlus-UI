@@ -18,6 +18,7 @@ class Webinar {
   AdminUser updatedBy;
   String id;
   bool isRecorded;
+  String trivia;
   bool slider;
 
   Webinar({
@@ -37,6 +38,7 @@ class Webinar {
     this.isRecorded,
     this.id,
     this.slider,
+    this.trivia,
   });
 
   Webinar.fromJson(Map<String, dynamic> json) {
@@ -65,6 +67,7 @@ class Webinar {
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
     slider = json['slider'] ?? false;
+    trivia = json['trivia']; // will auto set to null
   }
 
   Map<String, dynamic> toJson() {
@@ -92,7 +95,10 @@ class Webinar {
     if (this.updatedBy != null) {
       data['updated_by'] = this.updatedBy.toJson();
     }
+
+    data['trivia'] = this.trivia;
     data['id'] = this.id;
+    data['slider'] = this.slider;
     return data;
   }
 }
