@@ -11,6 +11,7 @@ import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/Events.dart';
 import 'package:connect_plus/OfferVariables.dart';
 import 'package:connect_plus/Offers.dart';
+import 'package:connect_plus/models/erg.dart';
 import 'EventsVariable.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -25,7 +26,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextStyle style = TextStyle(fontFamily: 'Roboto', fontSize: 16.0);
 
-  List<dynamic> recentEvents;
+  List<CachedNetworkImage> sliderPosters = [];
   List<Event> events = [];
   List<Offer> offers = [];
   List<Webinar> webinars = [];
@@ -33,9 +34,9 @@ class _MyHomePageState extends State<MyHomePage> {
   bool eventsLoaded = false;
   bool offersLoaded = false;
   bool highlightsLoaded = false;
+  bool sliderPostersLoaded = false;
 
   void initState() {
-    recentEvents = [];
     events = [];
     offers = [];
     webinars = [];
@@ -84,23 +85,92 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getRecentEventsPosters() async {
-    this.recentEvents.clear();
+    this.sliderPosters.clear();
     var recent = await WebAPI.getEventHighlights();
     if (this.mounted) {
       setState(() {
         recent.forEach((element) {
           element.highlight.forEach((h) {
-
-            recentEvents.add(CachedNetworkImage(
-              placeholder: (context, url) => CircularProgressIndicator(),
-              imageUrl:
-                WebAPI.baseURL + h.url,
+            sliderPosters.add(CachedNetworkImage(
+              placeholder: (context, url) => SizedBox(
+                height: 40,
+                child: CircularProgressIndicator(),
+              ),
+              imageUrl: WebAPI.baseURL + h.url,
             ));
           });
         });
         highlightsLoaded = true;
       });
     }
+  }
+
+  // TODO: Move business logic outside of UI
+  Future<void> getErgSliderPosters() async {
+    List<CachedNetworkImage> posters = [];
+    final int ergPosterLimit = 1;
+
+    List<Event> events = await WebAPI.getSliderEvents();
+    List<Webinar> webinars = await WebAPI.getSliderWebinars();
+
+    // TODO: create a superclass for webinars and events
+    Map<ERG, List<dynamic>> ergItems = {};
+
+    // add events to erg owner
+    events.forEach((event) {
+      if (event.slider) {
+        ERG erg = event.erg;
+        if (ergItems.containsKey(erg)) {
+          ergItems[erg].add(event);
+        } else {
+          ergItems[erg] = [event];
+        }
+      }
+    });
+
+    // add webinars to erg owner
+    webinars.forEach((webinar) {
+      if (webinar.slider) {
+        ERG erg = webinar.erg;
+        if (ergItems.containsKey(erg)) {
+          ergItems[erg].add(webinar);
+        } else {
+          ergItems[erg] = [webinar];
+        }
+      }
+    });
+
+    // Sorts items for each erg
+    // superclass for webinar and events will make for much safer and cleaner code
+    // The following will break if webinar/event class changes createdAt field name
+    ergItems.forEach((erg, items) {
+      items.sort(
+        (item1, item2) => item2.createdAt.compareTo(item1.createdAt),
+      );
+      ergItems[erg] = items;
+    });
+
+    ergItems.forEach((erg, items) {
+      for (int i = 0; i < ergPosterLimit; i++) {
+        // will break when poster field changes
+        posters.add(
+          CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl: WebAPI.baseURL + items[i].poster.ur,
+          ),
+        );
+      }
+    });
+    setState(() {
+      sliderPosters.addAll(posters);
+    });
+  }
+
+  Future<void> getSliderPosters() async {
+    sliderPosters.clear();
+    await getRecentEventsPosters();
+    await getErgSliderPosters();
+    sliderPostersLoaded = true;
   }
 
   Future<void> _refreshData() async {
@@ -112,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
       getEvents();
       getWebinars();
       getOffers();
-      getRecentEventsPosters();
+      getSliderPosters();
     });
   }
 
@@ -193,14 +263,14 @@ class _MyHomePageState extends State<MyHomePage> {
     var height = MediaQuery.of(context).size.height;
     List<Widget> list = [];
     if (webinarsLoaded && eventsLoaded && offersLoaded) {
-      if (recentEvents.isNotEmpty) {
+      if (sliderPosters.isNotEmpty) {
         list.add(
           SizedBox(
             height: height * 0.308,
             child: DecoratedBox(
               decoration: BoxDecoration(color: Utils.background),
               child: Carousel(
-                images: recentEvents,
+                images: sliderPosters,
                 autoplayDuration: const Duration(seconds: 20),
                 boxFit: BoxFit.fill,
                 dotSize: 4.0,

@@ -20,24 +20,27 @@ class Event {
   ERG erg;
   String id;
   String trivia;
+  bool slider;
 
-  Event(
-      {this.status,
-      this.sId,
-      this.name,
-      this.venue,
-      this.startDate,
-      this.endDate,
-      this.createdAt,
-      this.updatedAt,
-      this.iV,
-      this.createdBy,
-      this.poster,
-      this.updatedBy,
-      this.onBehalfOf,
-      this.erg,
-      this.id,
-      this.trivia});
+  Event({
+    this.status,
+    this.sId,
+    this.name,
+    this.venue,
+    this.startDate,
+    this.endDate,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+    this.createdBy,
+    this.poster,
+    this.updatedBy,
+    this.onBehalfOf,
+    this.erg,
+    this.id,
+    this.slider,
+    this.trivia,
+  });
 
   Event.fromJson(Map<String, dynamic> json) {
     status = json['status'];
@@ -66,6 +69,7 @@ class Event {
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
+    slider = json['slider'] ?? false;
     trivia = json['trivia'];
   }
 
@@ -81,6 +85,7 @@ class Event {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
+    data['slider'] = this.slider;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();
     }
@@ -96,6 +101,7 @@ class Event {
 
     data['trivia'] = this.trivia;
     data['id'] = this.id;
+    data['slider'] = this.slider;
     return data;
   }
 }

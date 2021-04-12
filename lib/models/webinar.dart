@@ -19,24 +19,27 @@ class Webinar {
   String id;
   bool isRecorded;
   String trivia;
+  bool slider;
 
-  Webinar(
-      {this.sId,
-      this.name,
-      this.url,
-      this.duration,
-      this.startDate,
-      this.createdAt,
-      this.onBehalfOf,
-      this.updatedAt,
-      this.iV,
-      this.createdBy,
-      this.erg,
-      this.poster,
-      this.updatedBy,
-      this.isRecorded,
-      this.id,
-      this.trivia});
+  Webinar({
+    this.sId,
+    this.name,
+    this.url,
+    this.duration,
+    this.startDate,
+    this.createdAt,
+    this.onBehalfOf,
+    this.updatedAt,
+    this.iV,
+    this.createdBy,
+    this.erg,
+    this.poster,
+    this.updatedBy,
+    this.isRecorded,
+    this.id,
+    this.slider,
+    this.trivia,
+  });
 
   Webinar.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -63,6 +66,7 @@ class Webinar {
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
+    slider = json['slider'] ?? false;
     trivia = json['trivia']; // will auto set to null
   }
 
@@ -77,7 +81,7 @@ class Webinar {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['isRecorded'] = this.isRecorded;
-
+    data['slider'] = this.slider;
     data['__v'] = this.iV;
     if (this.createdBy != null) {
       data['created_by'] = this.createdBy.toJson();
@@ -94,6 +98,7 @@ class Webinar {
 
     data['trivia'] = this.trivia;
     data['id'] = this.id;
+    data['slider'] = this.slider;
     return data;
   }
 }
