@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connect_plus/EventWidget.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class EventsVariables extends StatefulWidget {
   EventsVariables({Key key, @required this.events, @required this.webinars})
       : super(key: key);
@@ -212,10 +212,12 @@ class Single_Event extends StatelessWidget {
                         ]),
                       ),
                     ),
-                    child: Image.network(
-                      WebAPI.baseURL + event.poster.url,
-                      fit: BoxFit.fill,
-                    )),
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) => CircularProgressIndicator(),
+                      imageUrl:
+                        WebAPI.baseURL + event.poster.url,
+                    ),
+                ),
               ),
             ),
           ),

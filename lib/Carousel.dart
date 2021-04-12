@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_options.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 final List<String> imgList = [
   'https://mainvibes.com/wp-content/uploads/2020/05/Party.jpeg',
   'https://identity-mag.com/wp-content/uploads/2020/01/My-Post-19.jpg',
@@ -19,7 +19,14 @@ final List<Widget> imageSliders = imgList
                 borderRadius: BorderRadius.all(Radius.circular(5.0)),
                 child: Stack(
                   children: <Widget>[
-                    Image.network(item, fit: BoxFit.cover, width: 1000.0),
+                    CachedNetworkImage(
+                      placeholder: (context, url) => CircularProgressIndicator(),
+                      imageUrl:
+                        item,
+                      fit: BoxFit.cover,
+                      width: 1000.0
+                    ),
+                    //Image.network(item, fit: BoxFit.cover, width: 1000.0),
                     Positioned(
                       bottom: 0.0,
                       left: 0.0,
