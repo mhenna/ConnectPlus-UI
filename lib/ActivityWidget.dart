@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:typed_data';
 import 'widgets/Indicator.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class ActivityWidget extends StatefulWidget {
   ActivityWidget({Key key, @required this.activity}) : super(key: key);
 
@@ -60,7 +60,14 @@ class _ActivityState extends State<ActivityWidget>
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-        child: FittedBox(fit: BoxFit.contain, child: Image.network(imageURL)));
+        child: FittedBox(fit: BoxFit.contain,
+          child: CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl:
+              imageURL,
+          ),
+        )
+    );
   }
 
   List<Widget> activitiesByERG() {
@@ -114,7 +121,11 @@ class _ActivityState extends State<ActivityWidget>
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: Image.network(WebAPI.baseURL + activity.poster.url),
+          child: CachedNetworkImage(
+            placeholder: (context, url) => CircularProgressIndicator(),
+            imageUrl:
+              WebAPI.baseURL + activity.poster.url,
+          ),
         )
       ],
     );

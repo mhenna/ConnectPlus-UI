@@ -11,8 +11,8 @@ import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/Events.dart';
 import 'package:connect_plus/OfferVariables.dart';
 import 'package:connect_plus/Offers.dart';
-
 import 'EventsVariable.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -90,7 +90,12 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         recent.forEach((element) {
           element.highlight.forEach((h) {
-            recentEvents.add(Image.network(WebAPI.baseURL + h.url));
+
+            recentEvents.add(CachedNetworkImage(
+              placeholder: (context, url) => CircularProgressIndicator(),
+              imageUrl:
+                WebAPI.baseURL + h.url,
+            ));
           });
         });
         highlightsLoaded = true;

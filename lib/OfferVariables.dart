@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
-
+import 'package:cached_network_image/cached_network_image.dart';
 class OfferVariables extends StatefulWidget {
   OfferVariables({Key key, @required this.offers}) : super(key: key);
 
@@ -151,10 +151,12 @@ class Single_Offer extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: Image.network(
-                    WebAPI.baseURL + offer.logo.url,
-                    fit: BoxFit.fill,
-                  )),
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => CircularProgressIndicator(),
+                    imageUrl:
+                      WebAPI.baseURL + offer.logo.url,
+                  ),
+              ),
             ),
           ),
         ),
