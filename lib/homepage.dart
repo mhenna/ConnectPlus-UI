@@ -156,7 +156,7 @@ class _MyHomePageState extends State<MyHomePage> {
         posters.add(
           CachedNetworkImage(
             placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl: WebAPI.baseURL + items[i].poster.url,
+            imageUrl: WebAPI.baseURL + items[i].poster.ur,
           ),
         );
       }
