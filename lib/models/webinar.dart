@@ -18,6 +18,7 @@ class Webinar {
   AdminUser updatedBy;
   String id;
   bool isRecorded;
+  String trivia;
 
   Webinar(
       {this.sId,
@@ -34,7 +35,8 @@ class Webinar {
       this.poster,
       this.updatedBy,
       this.isRecorded,
-      this.id});
+      this.id,
+      this.trivia});
 
   Webinar.fromJson(Map<String, dynamic> json) {
     sId = json['_id'];
@@ -43,8 +45,9 @@ class Webinar {
     onBehalfOf = json['onBehalfOf'];
     isRecorded = json['isRecorded'];
     duration = double.parse(json['Duration'].toString());
-    startDate =
-        json['startDate'] != null ? DateTime.parse((json['startDate'])).toLocal() : null;
+    startDate = json['startDate'] != null
+        ? DateTime.parse((json['startDate'])).toLocal()
+        : null;
     createdAt =
         json['createdAt'] != null ? DateTime.parse((json['createdAt'])) : null;
     updatedAt =
@@ -60,6 +63,7 @@ class Webinar {
         : null;
     erg = json['erg'] != null ? new ERG.fromJson(json['erg']) : null;
     id = json['id'];
+    trivia = json['trivia']; // will auto set to null
   }
 
   Map<String, dynamic> toJson() {
@@ -87,6 +91,8 @@ class Webinar {
     if (this.updatedBy != null) {
       data['updated_by'] = this.updatedBy.toJson();
     }
+
+    data['trivia'] = this.trivia;
     data['id'] = this.id;
     return data;
   }
