@@ -39,6 +39,10 @@ class AuthService {
           'email': email,
           'phoneNumber': phoneNumber,
           'carPlate': carPlate,
+          'createdAt': DateTime.now().toString(),
+          'updatedAt': DateTime.now().toString(),
+          'blocked': false,
+          'id': cred.user.uid,
         });
         return true;
       }
