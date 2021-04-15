@@ -1,4 +1,3 @@
-import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/version_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +14,6 @@ import 'package:connect_plus/models/user.dart';
 
 Future main() async {
   await DotEnv().load('.env');
-  // di.init();
   runApp(MyApp());
 }
 
