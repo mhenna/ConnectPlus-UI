@@ -80,6 +80,36 @@ class User {
     data['id'] = this.id;
     return data;
   }
+
+  User copyWith({
+    bool confirmed,
+    bool blocked,
+    String sId,
+    String username,
+    String email,
+    String phoneNumber,
+    String provider,
+    String createdAt,
+    String updatedAt,
+    int iV,
+    Role role,
+    String id,
+  }) {
+    return User(
+      confirmed: confirmed ?? this.confirmed,
+      blocked: blocked ?? this.blocked,
+      sId: sId ?? this.sId,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      provider: provider ?? this.provider,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      iV: iV ?? this.iV,
+      role: role ?? this.role,
+      id: id ?? this.id,
+    );
+  }
 }
 
 class Role {

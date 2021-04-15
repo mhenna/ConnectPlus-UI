@@ -65,6 +65,7 @@ class AuthService {
       } else if (e.code == 'wrong-password') {
         return AuthState.WrongPassword;
       }
+      return AuthState.Unregistered;
     } catch (e) {
       return AuthState.Unregistered;
     }
@@ -81,9 +82,7 @@ class AuthService {
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
       'carPlate': carPlate,
     });
-    // TODO: Repalce with copyWith method
-    _user.username = username ?? _user.username;
-    _user.phoneNumber = phoneNumber ?? _user.phoneNumber;
+    _user = _user.copyWith(username: username, phoneNumber: phoneNumber);
   }
 
   Future<user_model.User> get user async {
