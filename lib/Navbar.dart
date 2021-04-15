@@ -143,7 +143,7 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               prefs.remove("token"),
               Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => login()),
+                  MaterialPageRoute(builder: (context) => Login()),
                   (Route<dynamic> route) => false)
             },
           ),

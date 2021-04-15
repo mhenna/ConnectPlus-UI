@@ -12,17 +12,20 @@ import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/injection_container.dart';
 
-class registration extends StatefulWidget {
-  registration({Key key, this.title}) : super(key: key);
+class Registration extends StatefulWidget {
+  Registration({Key key, this.title}) : super(key: key);
   final String title;
 
   // This widget is the root of your application.
   @override
-  _registrationState createState() => _registrationState();
+  _RegistrationState createState() => _RegistrationState();
 }
 
-class _registrationState extends State<registration> {
+class _RegistrationState extends State<Registration> {
+  AuthService authService = sl<AuthService>();
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final fnController = TextEditingController();
   final emController = TextEditingController();
@@ -171,7 +174,7 @@ class _registrationState extends State<registration> {
               ..onTap = () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => login()),
+                  MaterialPageRoute(builder: (context) => Login()),
                 );
               })
       ]),
@@ -192,14 +195,30 @@ class _registrationState extends State<registration> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(
             width * 0.02, height * 0.023, width * 0.02, height * 0.023),
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState.validate()) {
             FocusScope.of(context).unfocus();
             setState(() {
               asyncCall = true;
             });
-            Future.delayed(Duration(seconds: 1), () {
-              registerOnFirebase();
+            bool loggedIn = await authService.register(
+              email: emController.text,
+              password: pwController.text,
+              username: fnController.text,
+              phoneNumber: phoneController.text,
+            );
+            if (loggedIn) {
+              await successDialog();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            } else {
+              //TODO: change dialog logic
+              _showDialog('Could not register');
+            }
+            setState(() {
+              asyncCall = false;
             });
           }
         },
@@ -295,124 +314,9 @@ class _registrationState extends State<registration> {
     );
   }
 
-  void registerOnFirebase() async {
-    try {
-      userCredentials = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: emController.text, password: pwController.text);
-
-      userCredentials.user.sendEmailVerification();
-      _showVerifyEmailSentDialog();
-    } catch (e) {
-      _showDialog('400');
-      throw e;
-    }
-  }
-
-  void confirmEmailVerified() async {
-    await _firebaseAuth.currentUser.reload();
-    var isEmailVerified = _firebaseAuth.currentUser.emailVerified;
-    if (isEmailVerified) {
-      print("Email verified");
-      register();
-    } else {
-      _firebaseAuth.currentUser.delete();
-      notVerifiedDialog();
-    }
-  }
-
-  void _showVerifyEmailSentDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return CupertinoAlertDialog(
-            title: new Text(
-              "Verify your account",
-              textAlign: TextAlign.center,
-            ),
-            content: Text(
-              "Verification Link has been sent to your email, Please verify then click Yes.",
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text(
-                  "Yes",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  confirmEmailVerified();
-                },
-              ),
-            ]);
-      },
-    );
-  }
-
-  void register() async {
-    try {
-      final registerParams = RegisterRequestParameters.fromJson({
-        'username': fnController.text.toString(),
-        'email': emController.text.toString(),
-        'password': pwController.text.toString(),
-        'phoneNumber': phoneController.text.toString(),
-      });
-      final registeredUser = await WebAPI.register(registerParams);
-      localStorage.setItem("user", registeredUser.user.toJson());
-      successDialog();
-
-      setState(() {
-        asyncCall = false;
-      });
-    } catch (e) {
-      setState(() {
-        asyncCall = false;
-      });
-      _showDialog(e.toString());
-    }
-  }
-
-  void notVerifiedDialog() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: new Text(
-              "Oops!",
-              textAlign: TextAlign.center,
-            ),
-            content: new Text(
-              "Your Account is not verified, Please try again!",
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text(
-                  "Dismiss",
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                  textAlign: TextAlign.center,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-  }
-
-  void successDialog() {
+  Future<void> successDialog() {
     // flutter defined function
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
@@ -421,21 +325,25 @@ class _registrationState extends State<registration> {
             "Welcome!",
             textAlign: TextAlign.center,
           ),
-          content: new Text('Account created successfully!'),
+          content: new Text(
+            'Account created successfully, verification Link has been sent to your email',
+          ),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close",
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                  textAlign: TextAlign.center),
+              child: new Text(
+                "Close",
+                style: TextStyle(
+                    color: Utils.header,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17),
+                textAlign: TextAlign.center,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => login()),
+                  MaterialPageRoute(builder: (context) => Login()),
                 );
               },
             ),
