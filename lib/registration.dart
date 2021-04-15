@@ -1,14 +1,10 @@
 import 'package:connect_plus/login.dart';
-import 'package:connect_plus/models/register_request_params.dart';
-import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,7 +27,6 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-  bool _success = false;
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -39,7 +34,6 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   UserCredential userCredentials;
   void initState() {
     super.initState();
