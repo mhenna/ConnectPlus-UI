@@ -10,6 +10,8 @@ import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/injection_container.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -22,52 +24,19 @@ class MapScreenState extends State<ProfilePage>
   bool _status = true;
   final FocusNode myFocusNode = FocusNode();
 
+  final AuthService authService = sl<AuthService>();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  User user = new User();
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    setProfile();
-    getProfile();
-  }
-
-  void setProfile() async {
-    setState(() {
-      user = User.fromJson(localStorage.getItem('user'));
-    });
-  }
-
-  void getProfile() async {
-    setState(() {
-      nameController = TextEditingController(text: user.username);
-      emailController = TextEditingController(text: user.email);
-      phoneController = TextEditingController(text: user.phoneNumber);
-    });
-  }
-
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
-    Map<String, dynamic> editedProfile = {
-      "username":
-          nameController.text != "" ? nameController.text : user.username,
-      "phoneNumber":
-          phoneController.text != "" ? phoneController.text : user.phoneNumber,
-    };
     try {
-      final updatedProfile = await WebAPI.updateProfile(editedProfile, user.id);
-
-      localStorage.setItem('profile', updatedProfile);
-      final updatedUser = user;
-      updatedUser.username = updatedProfile.username;
-      updatedUser.phoneNumber = updatedProfile.phoneNumber;
-      localStorage.setItem('user', updatedUser);
-      _showDialog();
+      await authService.updateProfile(
+        username: nameController.text,
+        phoneNumber: phoneController.text,
+      );
     } catch (e) {
       CupertinoAlertDialog(
         content: new Text("An Error Occured, Please try again!"),
@@ -259,19 +228,34 @@ class MapScreenState extends State<ProfilePage>
                               )),
                           Form(
                             key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                _getLabel("Full Name"),
-                                _getField(user.username.toString(),
-                                    nameController, false),
-                                _getLabel("Email"),
-                                _getField(user.email.toString(),
-                                    emailController, true),
-                                _getLabel("Phone Number"),
-                                _getField(user.phoneNumber.toString(),
-                                    phoneController, false),
-                              ],
+                            child: FutureBuilder<User>(
+                              future: authService.user,
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: SizedBox(
+                                      height: 60,
+                                      width: 60,
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                                final user = snapshot.data;
+                                return Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    _getLabel("Full Name"),
+                                    _getField(user.username.toString(),
+                                        nameController, false),
+                                    _getLabel("Email"),
+                                    _getField(user.email.toString(),
+                                        emailController, true),
+                                    _getLabel("Phone Number"),
+                                    _getField(user.phoneNumber.toString(),
+                                        phoneController, false),
+                                  ],
+                                );
+                              },
                             ),
                           ),
                           !_status ? _getActionButtons() : new Container(),
@@ -309,13 +293,11 @@ class MapScreenState extends State<ProfilePage>
                 textColor: Colors.white,
                 color: Colors.green,
                 onPressed: () {
-                  if (_formKey.currentState.validate()) {
-                    editProfile();
-                    setState(() {
-                      _status = true;
-                      FocusScope.of(context).requestFocus(new FocusNode());
-                    });
-                  }
+                  editProfile();
+                  setState(() {
+                    _status = true;
+                    FocusScope.of(context).requestFocus(new FocusNode());
+                  });
                 },
                 shape: new RoundedRectangleBorder(
                     borderRadius: new BorderRadius.circular(20.0)),
