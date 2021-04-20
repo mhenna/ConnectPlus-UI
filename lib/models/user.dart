@@ -32,20 +32,23 @@ class User {
   int iV;
   Role role;
   String id;
+  String carPlate;
 
-  User(
-      {this.confirmed,
-      this.blocked,
-      this.sId,
-      this.username,
-      this.email,
-      this.phoneNumber,
-      this.provider,
-      this.createdAt,
-      this.updatedAt,
-      this.iV,
-      this.role,
-      this.id});
+  User({
+    this.confirmed,
+    this.blocked,
+    this.sId,
+    this.username,
+    this.email,
+    this.phoneNumber,
+    this.provider,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+    this.role,
+    this.id,
+    this.carPlate,
+  });
 
   User.fromJson(Map<String, dynamic> json) {
     confirmed = json['confirmed'];
@@ -60,6 +63,7 @@ class User {
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
+    carPlate = json['carPlate'];
   }
 
   Map<String, dynamic> toJson() {
@@ -74,6 +78,7 @@ class User {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
+    data['carPlate'] = this.carPlate;
     if (this.role != null) {
       data['role'] = this.role.toJson();
     }
@@ -94,6 +99,7 @@ class User {
     int iV,
     Role role,
     String id,
+    String carPlate,
   }) {
     return User(
       confirmed: confirmed ?? this.confirmed,
@@ -108,6 +114,7 @@ class User {
       iV: iV ?? this.iV,
       role: role ?? this.role,
       id: id ?? this.id,
+      carPlate: carPlate ?? this.carPlate,
     );
   }
 }
