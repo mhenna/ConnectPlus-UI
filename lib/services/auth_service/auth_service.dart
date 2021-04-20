@@ -86,7 +86,11 @@ class AuthService {
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
       'carPlate': carPlate ?? _user.carPlate,
     });
-    _user = _user.copyWith(username: username, phoneNumber: phoneNumber);
+    _user = _user.copyWith(
+      username: username,
+      phoneNumber: phoneNumber,
+      carPlate: carPlate,
+    );
   }
 
   Future<user_model.User> get user async {
