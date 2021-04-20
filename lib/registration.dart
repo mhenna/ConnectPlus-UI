@@ -21,7 +21,6 @@ class Registration extends StatefulWidget {
 }
 
 class _RegistrationState extends State<Registration> {
-  AuthService authService = sl<AuthService>();
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final fnController = TextEditingController();
   final emController = TextEditingController();
@@ -196,7 +195,7 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
-            bool registered = await authService.register(
+            bool registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,

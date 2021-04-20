@@ -23,7 +23,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final AuthService authService = sl<AuthService>();
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final PushNotificationService pushNotification = PushNotificationService();
 
@@ -134,7 +133,7 @@ class _LoginState extends State<Login> {
             setState(() {
               asyncCall = true;
             });
-            final AuthState state = await authService.login(
+            final AuthState state = await sl<AuthService>().login(
               email: emController.text,
               password: pwController.text,
             );
