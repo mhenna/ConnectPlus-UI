@@ -33,11 +33,17 @@ class MapScreenState extends State<ProfilePage>
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     try {
-      await sl<AuthService>().updateProfile(
-        username: nameController.text == "" ? null : nameController.text,
-        phoneNumber: phoneController.text == "" ? null : phoneController.text,
-        carPlate: carPlateController.text == "" ? null : phoneController.text,
-      );
+      if (_formKey.currentState.validate()) {
+        await sl<AuthService>().updateProfile(
+          username: nameController.text == "" ? null : nameController.text,
+          phoneNumber: phoneController.text == "" ? null : phoneController.text,
+          carPlate:
+              carPlateController.text == "" ? null : carPlateController.text,
+        );
+        setState(() {
+          _notEditing = true;
+        });
+      }
     } catch (e) {
       CupertinoAlertDialog(
         content: new Text("An Error Occured, Please try again!"),
@@ -131,12 +137,6 @@ class MapScreenState extends State<ProfilePage>
                 ),
                 enabled: isEmail ? false : !_notEditing,
                 autofocus: !_notEditing,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
               ),
             ),
           ],
@@ -314,7 +314,6 @@ class MapScreenState extends State<ProfilePage>
                 onPressed: () {
                   editProfile();
                   setState(() {
-                    _notEditing = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
@@ -412,6 +411,7 @@ class _CarPlateFormState extends State<CarPlateForm> {
     if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
       return null;
     }
+    if (letters.isEmpty) return null;
     if (_plateLetters.isEmpty) {
       return "Empty field";
     }
@@ -429,6 +429,7 @@ class _CarPlateFormState extends State<CarPlateForm> {
     if (_plateNumbers.isEmpty) {
       return "Invalid Input";
     }
+    if (numbers.isEmpty) return null;
     if (!isArabicNumeral(numbers)) {
       return "Arabic numerals only";
     }
