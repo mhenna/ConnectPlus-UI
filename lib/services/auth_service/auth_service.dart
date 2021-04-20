@@ -84,7 +84,7 @@ class AuthService {
     await _fs.collection('users').doc(userUid).update({
       'username': username ?? _user.username,
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
-      'carPlate': carPlate,
+      'carPlate': carPlate ?? _user.carPlate,
     });
     _user = _user.copyWith(username: username, phoneNumber: phoneNumber);
   }
