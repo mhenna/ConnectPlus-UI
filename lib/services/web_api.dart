@@ -20,6 +20,7 @@ import 'package:connect_plus/models/webinar.dart';
 import 'package:http/http.dart' as http;
 import 'package:rrule/rrule.dart';
 import 'package:time_machine/time_machine.dart';
+import 'package:connect_plus/models/announcement.dart';
 
 class WebAPI {
   static final String baseURL = "http://18.221.173.220:1337";
@@ -33,6 +34,7 @@ class WebAPI {
   static final String _ergsURL = '/ergs';
   static final String _categoriesURL = '/categories';
   static final String _eventHighlightsURL = "/event-highlights";
+  static final String _announcementURL = "/announcements";
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -471,5 +473,19 @@ class WebAPI {
     events.sort((b, a) => a.startDate.compareTo(b.startDate));
 
     return events;
+  }
+
+  static Future<List<Announcement>> getAnnouncements() async {
+    final response = await get(_announcementURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawAnnouncements = json.decode(response.body);
+    final List<Announcement> announcements = [];
+    for (final announcementJson in rawAnnouncements) {
+      //if (announcement.fromJson(announcementJson).endDate.isAfter(DateTime.now()))
+      announcements.add(Announcement.fromJson(announcementJson));
+    }
+
+    return announcements;
   }
 }
