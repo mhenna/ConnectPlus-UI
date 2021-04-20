@@ -433,134 +433,153 @@ class CarPlateForm extends StatefulWidget {
 }
 
 class _CarPlateFormState extends State<CarPlateForm> {
-  final _toolTipKey = GlobalKey<State<Tooltip>>();
-
   String _plateLetters = "";
   String _plateNumbers = "";
 
+  String _validateLetters(String letters) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (_plateLetters.isEmpty) {
+      return "Empty field";
+    }
+    bool lettersValid = RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
+        .hasMatch(letters.toString());
+    if (!lettersValid) {
+      return "Arabic letters only";
+    }
+    return null;
+  }
+
+  String _validateNumbers(String numbers) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (_plateNumbers.isEmpty) {
+      return "Invalid Input";
+    }
+    bool numbersAreValid =
+        RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(numbers.toString());
+    if (!numbersAreValid) {
+      return "Arabic numerals only";
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text(
-              "Car Plate",
-              style: TextStyle(fontSize: 20.0),
-            ),
-            SizedBox(width: 8),
-            GestureDetector(
-              onTap: () async {
-                final dynamic tooltip = _toolTipKey.currentState;
-                tooltip?.ensureTooltipVisible();
-              },
-              child: Tooltip(
-                key: _toolTipKey,
-                message: "Write your car plate in arabic letters and numerals",
-                preferBelow: false,
-                child: Icon(
-                  Icons.info_outline,
-                  size: 20,
-                  color: Colors.grey,
-                ),
-              ),
-            )
-          ],
-        ),
+        CarPlateInputTitle(),
         SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              width: width * 0.4,
-              child: TextFormField(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: CarPlateTextField(
+                validator: _validateNumbers,
+                hintText: "١٢٣",
                 onChanged: (numbers) {
                   _plateNumbers = numbers;
                   widget.carPlateController.text =
                       _plateLetters + _plateNumbers;
                 },
-                validator: (value) {
-                  if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-                    return null;
-                  }
-                  if (_plateNumbers.isEmpty) {
-                    return "Invalid Input";
-                  }
-                  bool numbersAreValid =
-                      RegExp("^[\u0621-\u064A\u0660-\u0669]+\$")
-                          .hasMatch(value.toString());
-                  if (!numbersAreValid) {
-                    return "Arabic numerals only";
-                  }
-                  return null;
-                },
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20.0),
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(
-                    width * 0.05,
-                    height * 0.025,
-                    width * 0.02,
-                    height * 0.02,
-                  ),
-                  hintText: "١٢٣",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      15.0,
-                    ),
-                  ),
-                ),
               ),
             ),
             SizedBox(width: 8),
             SizedBox(
-              width: width * 0.4,
-              child: TextFormField(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: CarPlateTextField(
+                validator: _validateLetters,
+                hintText: "أ ب ج",
                 onChanged: (letters) {
                   _plateLetters = letters;
                   widget.carPlateController.text =
                       _plateLetters + _plateNumbers;
                 },
-                validator: (value) {
-                  if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-                    return null;
-                  }
-                  if (_plateLetters.isEmpty) {
-                    return "Empty field";
-                  }
-                  bool lettersValid =
-                      RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
-                          .hasMatch(value.toString());
-                  if (!lettersValid) {
-                    return "Arabic letters only";
-                  }
-                  return null;
-                },
-                style: TextStyle(fontSize: 20.0),
-                textAlign: TextAlign.center,
-                decoration: InputDecoration(
-                  contentPadding: EdgeInsets.fromLTRB(
-                    width * 0.05,
-                    height * 0.025,
-                    width * 0.05,
-                    height * 0.02,
-                  ),
-                  hintText: "أ ب ج",
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(
-                      15.0,
-                    ),
-                  ),
-                ),
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+}
+
+class CarPlateInputTitle extends StatelessWidget {
+  CarPlateInputTitle({
+    Key key,
+  }) : super(key: key);
+
+  final _toolTipKey = GlobalKey<State<Tooltip>>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          "Car Plate",
+          style: TextStyle(fontSize: 20.0),
+        ),
+        SizedBox(width: 8),
+        GestureDetector(
+          onTap: () async {
+            final dynamic tooltip = _toolTipKey.currentState;
+            tooltip?.ensureTooltipVisible();
+          },
+          child: Tooltip(
+            key: _toolTipKey,
+            message: "Text should be in Arabic only",
+            preferBelow: false,
+            child: Icon(
+              Icons.info_outline,
+              size: 20,
+              color: Colors.grey,
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class CarPlateTextField extends StatelessWidget {
+  final void Function(String value) onChanged;
+  final String Function(String value) validator;
+  final String hintText;
+
+  const CarPlateTextField({
+    Key key,
+    this.onChanged,
+    this.validator,
+    this.hintText = "",
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    return TextFormField(
+      onChanged: onChanged,
+      validator: validator,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 20.0),
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.fromLTRB(
+          width * 0.05,
+          height * 0.025,
+          width * 0.02,
+          height * 0.02,
+        ),
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(
+            15.0,
+          ),
+        ),
+      ),
     );
   }
 }
