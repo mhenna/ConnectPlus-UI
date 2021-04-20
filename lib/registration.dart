@@ -27,6 +27,7 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
+  final carPlateController = TextEditingController();
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -46,7 +47,7 @@ class _RegistrationState extends State<Registration> {
     emController.dispose();
     pwController.dispose();
     phoneController.dispose();
-
+    carPlateController.dispose();
     super.dispose();
   }
 
@@ -195,13 +196,14 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
-            bool loggedIn = await authService.register(
+            bool registered = await authService.register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
+              carPlate: carPlateController.text,
             );
-            if (loggedIn) {
+            if (registered) {
               await successDialog();
               Navigator.push(
                 context,
@@ -216,10 +218,12 @@ class _RegistrationState extends State<Registration> {
             });
           }
         },
-        child: Text("Register",
-            textAlign: TextAlign.center,
-            style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.normal)),
+        child: Text(
+          "Register",
+          textAlign: TextAlign.center,
+          style: style.copyWith(
+              color: Colors.white, fontWeight: FontWeight.normal),
+        ),
       ),
     );
 
@@ -280,6 +284,12 @@ class _RegistrationState extends State<Registration> {
                                     Container(
                                       width: width * 0.85,
                                       child: phoneField,
+                                    ),
+                                    Container(
+                                      width: width * 0.85,
+                                      child: CarPlateForm(
+                                        carPlateController: carPlateController,
+                                      ),
                                     ),
                                     SizedBox(height: height * 0.027),
                                     Container(
@@ -406,6 +416,151 @@ class _RegistrationState extends State<Registration> {
           );
         }
       },
+    );
+  }
+}
+
+class CarPlateForm extends StatefulWidget {
+  const CarPlateForm({
+    Key key,
+    @required this.carPlateController,
+  }) : super(key: key);
+
+  final TextEditingController carPlateController;
+
+  @override
+  _CarPlateFormState createState() => _CarPlateFormState();
+}
+
+class _CarPlateFormState extends State<CarPlateForm> {
+  final _toolTipKey = GlobalKey<State<Tooltip>>();
+
+  String _plateLetters = "";
+  String _plateNumbers = "";
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text(
+              "Car Plate",
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(width: 8),
+            GestureDetector(
+              onTap: () async {
+                final dynamic tooltip = _toolTipKey.currentState;
+                tooltip?.ensureTooltipVisible();
+              },
+              child: Tooltip(
+                key: _toolTipKey,
+                message: "Write your car plate in arabic letters and numerals",
+                preferBelow: false,
+                child: Icon(
+                  Icons.info_outline,
+                  size: 20,
+                  color: Colors.grey,
+                ),
+              ),
+            )
+          ],
+        ),
+        SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: width * 0.4,
+              child: TextFormField(
+                onChanged: (numbers) {
+                  _plateNumbers = numbers;
+                  widget.carPlateController.text =
+                      _plateLetters + _plateNumbers;
+                },
+                validator: (value) {
+                  if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+                    return null;
+                  }
+                  if (_plateNumbers.isEmpty) {
+                    return "Invalid Input";
+                  }
+                  bool numbersAreValid =
+                      RegExp("^[\u0621-\u064A\u0660-\u0669]+\$")
+                          .hasMatch(value.toString());
+                  if (!numbersAreValid) {
+                    return "Arabic numerals only";
+                  }
+                  return null;
+                },
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 20.0),
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(
+                    width * 0.05,
+                    height * 0.025,
+                    width * 0.02,
+                    height * 0.02,
+                  ),
+                  hintText: "١٢٣",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(
+                      15.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(width: 8),
+            SizedBox(
+              width: width * 0.4,
+              child: TextFormField(
+                onChanged: (letters) {
+                  _plateLetters = letters;
+                  widget.carPlateController.text =
+                      _plateLetters + _plateNumbers;
+                },
+                validator: (value) {
+                  if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+                    return null;
+                  }
+                  if (_plateLetters.isEmpty) {
+                    return "Empty field";
+                  }
+                  bool lettersValid =
+                      RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
+                          .hasMatch(value.toString());
+                  if (!lettersValid) {
+                    return "Arabic letters only";
+                  }
+                  return null;
+                },
+                style: TextStyle(fontSize: 20.0),
+                textAlign: TextAlign.center,
+                decoration: InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(
+                    width * 0.05,
+                    height * 0.025,
+                    width * 0.05,
+                    height * 0.02,
+                  ),
+                  hintText: "أ ب ج",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(
+                      15.0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
