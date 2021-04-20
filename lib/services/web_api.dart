@@ -109,61 +109,6 @@ class WebAPI {
     return headers;
   }
 
-  static Future<UserWithToken> register(
-    RegisterRequestParameters params,
-  ) async {
-    final requestBody = jsonEncode(params);
-    final response = await post(_registerURL, requestBody);
-    final responseBody = json.decode(response);
-
-    final registeredUser = UserWithToken.fromJson(responseBody);
-
-    return registeredUser;
-  }
-
-  static Future<UserWithToken> login(
-    LoginRequestParams params,
-  ) async {
-    currentToken = null;
-    currentUser = null;
-    final requestBody = jsonEncode(params);
-    try {
-      final response = await post(_loginURL, requestBody);
-      final responseBody = json.decode(response);
-
-      final loggedInUser = UserWithToken.fromJson(responseBody);
-      // reset the current user on login
-      currentUser = loggedInUser.user;
-      currentToken = loggedInUser.jwt;
-      return loggedInUser;
-    } catch (e) {
-      currentUser = null;
-      currentToken = null;
-      throw e;
-    }
-  }
-
-  static Future<User> checkToken(String token) async {
-    final response = await get(_checkUserURL, token: token);
-    final user = User.fromJson(json.decode(response.body));
-    if (user != null) {
-      currentUser = user;
-      currentToken = token;
-    } else {
-      currentToken = null;
-    }
-    return user;
-  }
-
-  static Future<Profile> updateProfile(
-      Map<String, dynamic> params, String id) async {
-    final requestBody = jsonEncode(params);
-    final response = await put("/users/$id", requestBody);
-    final responseBody = json.decode(response.body);
-    final profile = Profile.fromJson(responseBody);
-    return profile;
-  }
-
   static Future<List<ERG>> getERGS() async {
     final response = await get(_ergsURL);
 
