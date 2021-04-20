@@ -21,22 +21,29 @@ class ProfilePage extends StatefulWidget {
 class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final LocalStorage localStorage = new LocalStorage("Connect+");
-  bool _status = true;
+  bool _notEditing = true;
   final FocusNode myFocusNode = FocusNode();
 
-  final AuthService authService = sl<AuthService>();
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
+  TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     try {
-      await authService.updateProfile(
-        username: nameController.text,
-        phoneNumber: phoneController.text,
-      );
+      if (_formKey.currentState.validate()) {
+        await sl<AuthService>().updateProfile(
+          username: nameController.text == "" ? null : nameController.text,
+          phoneNumber: phoneController.text == "" ? null : phoneController.text,
+          carPlate:
+              carPlateController.text == "" ? null : carPlateController.text,
+        );
+        setState(() {
+          _notEditing = true;
+        });
+      }
     } catch (e) {
       CupertinoAlertDialog(
         content: new Text("An Error Occured, Please try again!"),
@@ -128,14 +135,8 @@ class MapScreenState extends State<ProfilePage>
                 decoration: InputDecoration(
                   hintText: value,
                 ),
-                enabled: isEmail ? false : !_status,
-                autofocus: !_status,
-                validator: (value) {
-                  if (value.isEmpty) {
-                    return 'Please enter some text';
-                  }
-                  return null;
-                },
+                enabled: isEmail ? false : !_notEditing,
+                autofocus: !_notEditing,
               ),
             ),
           ],
@@ -219,46 +220,60 @@ class MapScreenState extends State<ProfilePage>
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
-                                      _status
+                                      _notEditing
                                           ? _getEditIcon()
                                           : new Container(),
                                     ],
                                   )
                                 ],
                               )),
-                          Form(
-                            key: _formKey,
-                            child: FutureBuilder<User>(
-                              future: authService.user,
-                              builder: (context, snapshot) {
-                                if (!snapshot.hasData) {
-                                  return Center(
-                                    child: SizedBox(
-                                      height: 60,
-                                      width: 60,
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  );
-                                }
-                                final user = snapshot.data;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    _getLabel("Full Name"),
-                                    _getField(user.username.toString(),
-                                        nameController, false),
-                                    _getLabel("Email"),
-                                    _getField(user.email.toString(),
-                                        emailController, true),
-                                    _getLabel("Phone Number"),
-                                    _getField(user.phoneNumber.toString(),
-                                        phoneController, false),
-                                  ],
+                          FutureBuilder<User>(
+                            future: sl<AuthService>().user,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                  child: SizedBox(
+                                    height: 60,
+                                    width: 60,
+                                    child: CircularProgressIndicator(),
+                                  ),
                                 );
-                              },
-                            ),
+                              }
+                              final user = snapshot.data;
+                              return Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      _getLabel("Full Name"),
+                                      _getField(user.username.toString(),
+                                          nameController, false),
+                                      _getLabel("Email"),
+                                      _getField(user.email.toString(),
+                                          emailController, true),
+                                      _getLabel("Phone Number"),
+                                      _getField(user.phoneNumber.toString(),
+                                          phoneController, false),
+                                      _getLabel("Car Plate"),
+                                      _notEditing
+                                          ? _getField(
+                                              user.carPlate,
+                                              carPlateController,
+                                              false,
+                                            )
+                                          : CarPlateForm(
+                                              carPlateController:
+                                                  carPlateController,
+                                              initialValue: user.carPlate,
+                                            ),
+                                      !_notEditing
+                                          ? _getActionButtons(user)
+                                          : new Container(),
+                                    ],
+                                  ));
+                            },
                           ),
-                          !_status ? _getActionButtons() : new Container(),
                         ],
                       ),
                     ),
@@ -273,11 +288,15 @@ class MapScreenState extends State<ProfilePage>
   @override
   void dispose() {
     // Clean up the controller when the Widget is disposed
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    carPlateController.dispose();
     myFocusNode.dispose();
     super.dispose();
   }
 
-  Widget _getActionButtons() {
+  Widget _getActionButtons(User user) {
     return Padding(
       padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
       child: new Row(
@@ -295,7 +314,6 @@ class MapScreenState extends State<ProfilePage>
                 onPressed: () {
                   editProfile();
                   setState(() {
-                    _status = true;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
@@ -315,7 +333,11 @@ class MapScreenState extends State<ProfilePage>
                 color: Colors.red,
                 onPressed: () {
                   setState(() {
-                    _status = true;
+                    _notEditing = true;
+                    nameController.text = user.username;
+                    emailController.text = user.email;
+                    phoneController.text = user.phoneNumber;
+                    carPlateController.text = user.carPlate;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
@@ -343,9 +365,148 @@ class MapScreenState extends State<ProfilePage>
       ),
       onTap: () {
         setState(() {
-          _status = false;
+          _notEditing = false;
         });
       },
+    );
+  }
+}
+
+class CarPlateForm extends StatefulWidget {
+  const CarPlateForm({
+    Key key,
+    @required this.carPlateController,
+    @required this.initialValue,
+  }) : super(key: key);
+
+  final TextEditingController carPlateController;
+  final String initialValue;
+  @override
+  _CarPlateFormState createState() => _CarPlateFormState();
+}
+
+class _CarPlateFormState extends State<CarPlateForm> {
+  String _plateLetters = "";
+  String _plateNumbers = "";
+
+  @override
+  void initState() {
+    widget.initialValue.characters.forEach((char) {
+      if (isArabicLetter(char)) {
+        _plateLetters += char;
+      } else if (isArabicNumeral(char)) {
+        _plateNumbers += char;
+      }
+    });
+    super.initState();
+  }
+
+  bool isArabicLetter(String str) =>
+      RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$").hasMatch(str);
+
+  bool isArabicNumeral(String str) =>
+      RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(str);
+
+  String _validateLetters(String letters) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (letters.isEmpty) return null;
+    if (_plateLetters.isEmpty) {
+      return "Empty field";
+    }
+
+    if (!isArabicLetter(letters)) {
+      return "Arabic letters only";
+    }
+    return null;
+  }
+
+  String _validateNumbers(String numbers) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (_plateNumbers.isEmpty) {
+      return "Invalid Input";
+    }
+    if (numbers.isEmpty) return null;
+    if (!isArabicNumeral(numbers)) {
+      return "Arabic numerals only";
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return Padding(
+      padding: EdgeInsets.only(
+        left: width * 0.08,
+        right: width * 0.08,
+        top: height * 0.01,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.2,
+                child: CarPlateTextField(
+                  validator: _validateNumbers,
+                  initialText: _plateNumbers,
+                  onChanged: (numbers) {
+                    _plateNumbers = numbers;
+                    widget.carPlateController.text =
+                        _plateLetters + _plateNumbers;
+                  },
+                ),
+              ),
+              SizedBox(width: 8),
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.2,
+                child: CarPlateTextField(
+                  validator: _validateLetters,
+                  initialText: _plateLetters,
+                  onChanged: (letters) {
+                    _plateLetters = letters;
+                    widget.carPlateController.text =
+                        _plateLetters + _plateNumbers;
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CarPlateTextField extends StatelessWidget {
+  final void Function(String value) onChanged;
+  final String Function(String value) validator;
+  final String initialText;
+  const CarPlateTextField({
+    Key key,
+    this.onChanged,
+    this.validator,
+    this.initialText = "",
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      onChanged: onChanged,
+      validator: validator,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 20.0),
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.zero,
+        hintText: initialText,
+      ),
     );
   }
 }
