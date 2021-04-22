@@ -97,6 +97,24 @@ class InfoSheet extends StatelessWidget {
     }
   }
 
+  String _deadlineDate() {
+    if (announcement.deadline != null) {
+      final date = DateFormat.yMMMMd('en_US').format(announcement.deadline);
+      return "Date: $date";
+    } else {
+      return "";
+    }
+  }
+
+  String _deadlineTime() {
+    if (announcement.deadline != null) {
+      final time = DateFormat.Hm('en_US').format(announcement.deadline);
+      return "Time: $time";
+    } else {
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -129,17 +147,23 @@ class InfoSheet extends StatelessWidget {
                   color: Colors.transparent,
                   height: 10,
                 ),
-                SelectableText(
-                  'Date: ${DateFormat.yMMMMd('en_US').format(announcement.deadline)}',
-                  style: _style(context),
+                Visibility(
+                  visible: announcement.deadline != null,
+                  child: SelectableText(
+                    _deadlineDate(),
+                    style: _style(context),
+                  ),
                 ),
                 Divider(
                   color: Colors.transparent,
                   height: 10,
                 ),
-                SelectableText(
-                  'Time: ${DateFormat.Hm('en_US').format(announcement.deadline)}',
-                  style: _style(context),
+                Visibility(
+                  visible: announcement.deadline != null,
+                  child: SelectableText(
+                    _deadlineTime(),
+                    style: _style(context),
+                  ),
                 ),
                 // trivia button
                 TriviaButton(
@@ -209,7 +233,7 @@ class LinkButton extends StatelessWidget {
             ),
             padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
             child: Text(
-              'Link',
+              'Details',
               style: TextStyle(fontSize: 18),
             ),
           ),
