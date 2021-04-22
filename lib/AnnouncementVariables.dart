@@ -134,7 +134,9 @@ class Single_Announcement extends StatelessWidget {
                   ),
                 ),
                 child: CachedNetworkImage(
-                  placeholder: (context, url) => CircularProgressIndicator(),
+                  placeholder: (context, url) => Expanded(
+                    child: Container(color: Colors.grey[300]),
+                  ),
                   imageUrl: WebAPI.baseURL + announcement.poster.url,
                 ),
               ),

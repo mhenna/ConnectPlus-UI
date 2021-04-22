@@ -98,9 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
         recent.forEach((element) {
           element.highlight.forEach((h) {
             sliderPosters.add(CachedNetworkImage(
-              placeholder: (context, url) => SizedBox(
-                height: 40,
-                child: CircularProgressIndicator(),
+              placeholder: (context, url) => Expanded(
+                child: Container(color: Colors.grey[300]),
               ),
               imageUrl: WebAPI.baseURL + h.url,
             ));
@@ -161,7 +160,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // will break when poster field changes
         posters.add(
           CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) => Expanded(
+              child: Container(color: Colors.grey[300]),
+            ),
             imageUrl: WebAPI.baseURL + items[i].poster.ur,
           ),
         );
