@@ -1,4 +1,5 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/webinar.dart';
@@ -234,10 +235,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       context,
                       MaterialPageRoute(builder: (context) => Events()),
                     );
-                  } else {
+                  } else if (view == 'Offers') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => Offers()),
+                    );
+                  } else if (view == 'Announcements') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Announcements(),
+                      ),
                     );
                   }
                 },
