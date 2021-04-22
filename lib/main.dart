@@ -1,4 +1,3 @@
-import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/version_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -9,15 +8,27 @@ import 'package:connect_plus/homepage.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'routes.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:connect_plus/injection_container.dart' as di;
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/models/user.dart';
 
 Future main() async {
   await DotEnv().load('.env');
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
+  @override
+  void initState() {
+    di.init();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,23 +47,10 @@ class MyApp extends StatelessWidget {
               title: 'Connect+',
               debugShowCheckedModeBanner: false,
               navigatorKey: NavigationService.navigationKey,
-              initialRoute: '/',
               routes: Routes.routes,
               theme: ThemeData(
-                // This is the theme of your application.
-                //
-                // Try running your application with "flutter run". You'll see the
-                // application has a blue toolbar. Then, without quitting the app, try
-                // changing the primarySwatch below to Colors.green and then invoke
-                // "hot reload" (press "r" in the console where you ran "flutter run",
-                // or simply save your changes to "hot reload" in a Flutter IDE).
-                // Notice that the counter didn't reset back to zero; the application
-                // is not restarted.
                 fontFamily: 'Roboto',
                 primarySwatch: Colors.deepOrange,
-                // This makes the visual density adapt to the platform that you run
-                // the app on. For desktop platforms, the controls will be smaller and
-                // closer together (more dense) than on mobile platforms.
                 visualDensity: VisualDensity.adaptivePlatformDensity,
               ),
               home: Splash(),
@@ -63,14 +61,28 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class Splash extends StatelessWidget {
+class Splash extends StatefulWidget {
+  @override
+  _SplashState createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+  final AuthService authService = AuthService();
   @override
   Widget build(BuildContext context) {
     return new SplashScreen(
       seconds: 5,
-      navigateAfterSeconds: new login(
-        title: "login",
-      ),
+      navigateAfterSeconds: FutureBuilder<User>(
+          future: authService.getUser(),
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Login(
+                title: "login",
+              );
+            } else {
+              return MyHomePage();
+            }
+          }),
       imageBackground: AssetImage('assets/splash.png'),
       styleTextUnderTheLoader: new TextStyle(),
       photoSize: 100.0,

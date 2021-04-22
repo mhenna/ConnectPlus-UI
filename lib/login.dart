@@ -1,7 +1,3 @@
-import 'package:connect_plus/models/login_request_params.dart';
-import 'package:connect_plus/models/profile.dart';
-import 'package:connect_plus/models/user.dart';
-import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -11,105 +7,39 @@ import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:localstorage/localstorage.dart';
 import 'widgets/pushNotification.dart';
-
+import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter/foundation.dart';
+import 'package:connect_plus/injection_container.dart';
 
-class login extends StatefulWidget {
-  login({Key key, this.title}) : super(key: key);
+class Login extends StatefulWidget {
+  Login({Key key, this.title}) : super(key: key);
   final String title;
 
   // This widget is the root of your application.
   @override
-  _loginState createState() => _loginState();
+  _LoginState createState() => _LoginState();
 }
 
-class _loginState extends State<login> {
+class _LoginState extends State<Login> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final PushNotificationService pushNotification = PushNotificationService();
 
   final emController = TextEditingController();
   final pwController = TextEditingController();
   TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
-  bool loading = true;
+  bool loading = false;
   bool asyncCall = false;
   SharedPreferences prefs;
 
   void initState() {
     super.initState();
-    checkLoggedInStatus();
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  void checkLoggedInStatus() async {
-    try {
-      prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString("token");
-      if (token != null) {
-        final user = await WebAPI.checkToken(token);
-        final profile = Profile.fromJson({
-          'username': user.username,
-          'email': user.email,
-          'phoneNumber': user.phoneNumber,
-        });
-        localStorage.setItem('user', user.toJson());
-        localStorage.setItem("profile", profile.toJson());
-        pushNotification.initialize();
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => MyHomePage()),
-        );
-      } else {
-        setState(() {
-          loading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
-
-  void loginPressed() async {
-    try {
-      final loginParams = LoginRequestParams.fromJson({
-        'identifier': emController.text,
-        // TODO: encode password in app and decode password on server
-        'password': pwController.text
-      });
-
-      final userWithToken = await WebAPI.login(loginParams);
-      prefs.setString("token", userWithToken.jwt);
-      final profile = Profile.fromJson({
-        'username': userWithToken.user.username,
-        'email': userWithToken.user.email,
-        'phoneNumber': userWithToken.user.phoneNumber,
-      });
-      localStorage.setItem("profile", profile.toJson());
-      localStorage.setItem('user', userWithToken.user.toJson());
-      setState(() {
-        asyncCall = false;
-      });
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-      );
-      pushNotification.initialize();
-    } catch (e) {
-      prefs.setString("token", null);
-      localStorage.setItem('profile', null);
-      localStorage.setItem("user", null);
-      setState(() {
-        asyncCall = false;
-      });
-      _showDialog(e.toString());
-    }
   }
 
   @override
@@ -177,7 +107,7 @@ class _loginState extends State<login> {
                 ..onTap = () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => registration()),
+                    MaterialPageRoute(builder: (context) => Registration()),
                   );
                 })
         ]),
@@ -198,14 +128,26 @@ class _loginState extends State<login> {
           minWidth: MediaQuery.of(context).size.width,
           padding: EdgeInsets.fromLTRB(
               width * 0.02, height * 0.023, width * 0.02, height * 0.023),
-          onPressed: () {
+          onPressed: () async {
             FocusScope.of(context).unfocus();
             setState(() {
               asyncCall = true;
             });
-            Future.delayed(Duration(seconds: 1), () {
-              loginPressed();
-            });
+            final AuthState state = await sl<AuthService>().login(
+              email: emController.text,
+              password: pwController.text,
+            );
+            if (state == AuthState.Loggedin) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage()),
+              );
+            } else {
+              setState(() {
+                asyncCall = false;
+              });
+              _showError(state);
+            }
           },
           child: Text("Login",
               textAlign: TextAlign.center,
@@ -294,56 +236,34 @@ class _loginState extends State<login> {
     }
   }
 
-  void _showDialog(err) {
-    // flutter defined function
+  void _showError(AuthState state) {
+    String errorMessage = "Invalid Credentials!";
+    if (state == AuthState.Unverified)
+      errorMessage = "Email is unverified!";
+    else if (state == AuthState.UserNotFound) errorMessage = "User not found!";
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        // return object of type Dialog
-        if (err == '400') {
-          return CupertinoAlertDialog(
-            title: new Text("Oops!"),
-            content: new Text('Invalid Credentials!'),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text(
-                  "Close",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+        return CupertinoAlertDialog(
+          title: Text("Oops!"),
+          content: new Text(errorMessage),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text(
+                "Close",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Utils.header,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17),
               ),
-            ],
-          );
-        } else {
-          return CupertinoAlertDialog(
-            title: new Text("Oops!"),
-            content: new Text(
-                'Connection timed out! Please check your internet connection and try again.'),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text(
-                  "Close",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        }
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
       },
     );
   }

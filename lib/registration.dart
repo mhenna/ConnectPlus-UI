@@ -1,34 +1,32 @@
 import 'package:connect_plus/login.dart';
-import 'package:connect_plus/models/register_request_params.dart';
-import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:password/password.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/injection_container.dart';
 
-class registration extends StatefulWidget {
-  registration({Key key, this.title}) : super(key: key);
+class Registration extends StatefulWidget {
+  Registration({Key key, this.title}) : super(key: key);
   final String title;
 
   // This widget is the root of your application.
   @override
-  _registrationState createState() => _registrationState();
+  _RegistrationState createState() => _RegistrationState();
 }
 
-class _registrationState extends State<registration> {
+class _RegistrationState extends State<Registration> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
   final fnController = TextEditingController();
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-  bool _success = false;
+  final carPlateController = TextEditingController();
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -36,7 +34,6 @@ class _registrationState extends State<registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -49,7 +46,7 @@ class _registrationState extends State<registration> {
     emController.dispose();
     pwController.dispose();
     phoneController.dispose();
-
+    carPlateController.dispose();
     super.dispose();
   }
 
@@ -171,7 +168,7 @@ class _registrationState extends State<registration> {
               ..onTap = () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => login()),
+                  MaterialPageRoute(builder: (context) => Login()),
                 );
               })
       ]),
@@ -192,21 +189,40 @@ class _registrationState extends State<registration> {
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(
             width * 0.02, height * 0.023, width * 0.02, height * 0.023),
-        onPressed: () {
+        onPressed: () async {
           if (_formKey.currentState.validate()) {
             FocusScope.of(context).unfocus();
             setState(() {
               asyncCall = true;
             });
-            Future.delayed(Duration(seconds: 1), () {
-              registerOnFirebase();
+            bool registered = await sl<AuthService>().register(
+              email: emController.text,
+              password: pwController.text,
+              username: fnController.text,
+              phoneNumber: phoneController.text,
+              carPlate: carPlateController.text,
+            );
+            if (registered) {
+              await successDialog();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Login()),
+              );
+            } else {
+              //TODO: change dialog logic
+              _showDialog('Could not register');
+            }
+            setState(() {
+              asyncCall = false;
             });
           }
         },
-        child: Text("Register",
-            textAlign: TextAlign.center,
-            style: style.copyWith(
-                color: Colors.white, fontWeight: FontWeight.normal)),
+        child: Text(
+          "Register",
+          textAlign: TextAlign.center,
+          style: style.copyWith(
+              color: Colors.white, fontWeight: FontWeight.normal),
+        ),
       ),
     );
 
@@ -268,6 +284,12 @@ class _registrationState extends State<registration> {
                                       width: width * 0.85,
                                       child: phoneField,
                                     ),
+                                    Container(
+                                      width: width * 0.85,
+                                      child: CarPlateForm(
+                                        carPlateController: carPlateController,
+                                      ),
+                                    ),
                                     SizedBox(height: height * 0.027),
                                     Container(
                                       width: width * 0.85,
@@ -295,124 +317,9 @@ class _registrationState extends State<registration> {
     );
   }
 
-  void registerOnFirebase() async {
-    try {
-      userCredentials = await _firebaseAuth.createUserWithEmailAndPassword(
-          email: emController.text, password: pwController.text);
-
-      userCredentials.user.sendEmailVerification();
-      _showVerifyEmailSentDialog();
-    } catch (e) {
-      _showDialog('400');
-      throw e;
-    }
-  }
-
-  void confirmEmailVerified() async {
-    await _firebaseAuth.currentUser.reload();
-    var isEmailVerified = _firebaseAuth.currentUser.emailVerified;
-    if (isEmailVerified) {
-      print("Email verified");
-      register();
-    } else {
-      _firebaseAuth.currentUser.delete();
-      notVerifiedDialog();
-    }
-  }
-
-  void _showVerifyEmailSentDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        // return object of type Dialog
-        return CupertinoAlertDialog(
-            title: new Text(
-              "Verify your account",
-              textAlign: TextAlign.center,
-            ),
-            content: Text(
-              "Verification Link has been sent to your email, Please verify then click Yes.",
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text(
-                  "Yes",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  confirmEmailVerified();
-                },
-              ),
-            ]);
-      },
-    );
-  }
-
-  void register() async {
-    try {
-      final registerParams = RegisterRequestParameters.fromJson({
-        'username': fnController.text.toString(),
-        'email': emController.text.toString(),
-        'password': pwController.text.toString(),
-        'phoneNumber': phoneController.text.toString(),
-      });
-      final registeredUser = await WebAPI.register(registerParams);
-      localStorage.setItem("user", registeredUser.user.toJson());
-      successDialog();
-
-      setState(() {
-        asyncCall = false;
-      });
-    } catch (e) {
-      setState(() {
-        asyncCall = false;
-      });
-      _showDialog(e.toString());
-    }
-  }
-
-  void notVerifiedDialog() {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return CupertinoAlertDialog(
-            title: new Text(
-              "Oops!",
-              textAlign: TextAlign.center,
-            ),
-            content: new Text(
-              "Your Account is not verified, Please try again!",
-              textAlign: TextAlign.center,
-            ),
-            actions: <Widget>[
-              new FlatButton(
-                child: new Text(
-                  "Dismiss",
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                  textAlign: TextAlign.center,
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        });
-  }
-
-  void successDialog() {
+  Future<void> successDialog() {
     // flutter defined function
-    showDialog(
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
@@ -421,21 +328,25 @@ class _registrationState extends State<registration> {
             "Welcome!",
             textAlign: TextAlign.center,
           ),
-          content: new Text('Account created successfully!'),
+          content: new Text(
+            'Account created successfully, verification Link has been sent to your email',
+          ),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Close",
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                  textAlign: TextAlign.center),
+              child: new Text(
+                "Close",
+                style: TextStyle(
+                    color: Utils.header,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17),
+                textAlign: TextAlign.center,
+              ),
               onPressed: () {
                 Navigator.of(context).pop();
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => login()),
+                  MaterialPageRoute(builder: (context) => Login()),
                 );
               },
             ),
@@ -504,6 +415,170 @@ class _registrationState extends State<registration> {
           );
         }
       },
+    );
+  }
+}
+
+class CarPlateForm extends StatefulWidget {
+  const CarPlateForm({
+    Key key,
+    @required this.carPlateController,
+  }) : super(key: key);
+
+  final TextEditingController carPlateController;
+
+  @override
+  _CarPlateFormState createState() => _CarPlateFormState();
+}
+
+class _CarPlateFormState extends State<CarPlateForm> {
+  String _plateLetters = "";
+  String _plateNumbers = "";
+
+  String _validateLetters(String letters) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (_plateLetters.isEmpty) {
+      return "Empty field";
+    }
+    bool lettersValid = RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
+        .hasMatch(letters.toString());
+    if (!lettersValid) {
+      return "Arabic letters only";
+    }
+    return null;
+  }
+
+  String _validateNumbers(String numbers) {
+    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
+      return null;
+    }
+    if (_plateNumbers.isEmpty) {
+      return "Invalid Input";
+    }
+    bool numbersAreValid =
+        RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(numbers.toString());
+    if (!numbersAreValid) {
+      return "Arabic numerals only";
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CarPlateInputTitle(),
+        SizedBox(height: 8),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: CarPlateTextField(
+                validator: _validateNumbers,
+                hintText: "١٢٣",
+                onChanged: (numbers) {
+                  _plateNumbers = numbers;
+                  widget.carPlateController.text =
+                      _plateLetters + _plateNumbers;
+                },
+              ),
+            ),
+            SizedBox(width: 8),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.4,
+              child: CarPlateTextField(
+                validator: _validateLetters,
+                hintText: "أ ب ج",
+                onChanged: (letters) {
+                  _plateLetters = letters;
+                  widget.carPlateController.text =
+                      _plateLetters + _plateNumbers;
+                },
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+class CarPlateInputTitle extends StatelessWidget {
+  CarPlateInputTitle({
+    Key key,
+  }) : super(key: key);
+
+  final _toolTipKey = GlobalKey<State<Tooltip>>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text(
+          "Car Plate",
+          style: TextStyle(fontSize: 20.0),
+        ),
+        SizedBox(width: 8),
+        GestureDetector(
+          onTap: () async {
+            final dynamic tooltip = _toolTipKey.currentState;
+            tooltip?.ensureTooltipVisible();
+          },
+          child: Tooltip(
+            key: _toolTipKey,
+            message: "Text should be in Arabic only",
+            preferBelow: false,
+            child: Icon(
+              Icons.info_outline,
+              size: 20,
+              color: Colors.grey,
+            ),
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class CarPlateTextField extends StatelessWidget {
+  final void Function(String value) onChanged;
+  final String Function(String value) validator;
+  final String hintText;
+
+  const CarPlateTextField({
+    Key key,
+    this.onChanged,
+    this.validator,
+    this.hintText = "",
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+    return TextFormField(
+      onChanged: onChanged,
+      validator: validator,
+      textAlign: TextAlign.center,
+      style: TextStyle(fontSize: 20.0),
+      decoration: InputDecoration(
+        contentPadding: EdgeInsets.fromLTRB(
+          width * 0.05,
+          height * 0.025,
+          width * 0.02,
+          height * 0.02,
+        ),
+        hintText: hintText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(
+            15.0,
+          ),
+        ),
+      ),
     );
   }
 }

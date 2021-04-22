@@ -20,6 +20,7 @@ import 'package:connect_plus/models/webinar.dart';
 import 'package:http/http.dart' as http;
 import 'package:rrule/rrule.dart';
 import 'package:time_machine/time_machine.dart';
+import 'package:connect_plus/models/announcement.dart';
 
 class WebAPI {
   static final String baseURL = "http://18.221.173.220:1337";
@@ -33,6 +34,7 @@ class WebAPI {
   static final String _ergsURL = '/ergs';
   static final String _categoriesURL = '/categories';
   static final String _eventHighlightsURL = "/event-highlights";
+  static final String _announcementURL = "/announcements";
 
   // TODO: remove this to a separate service
   static User currentUser;
@@ -107,61 +109,6 @@ class WebAPI {
       headers['Authorization'] = "Bearer $token";
     }
     return headers;
-  }
-
-  static Future<UserWithToken> register(
-    RegisterRequestParameters params,
-  ) async {
-    final requestBody = jsonEncode(params);
-    final response = await post(_registerURL, requestBody);
-    final responseBody = json.decode(response);
-
-    final registeredUser = UserWithToken.fromJson(responseBody);
-
-    return registeredUser;
-  }
-
-  static Future<UserWithToken> login(
-    LoginRequestParams params,
-  ) async {
-    currentToken = null;
-    currentUser = null;
-    final requestBody = jsonEncode(params);
-    try {
-      final response = await post(_loginURL, requestBody);
-      final responseBody = json.decode(response);
-
-      final loggedInUser = UserWithToken.fromJson(responseBody);
-      // reset the current user on login
-      currentUser = loggedInUser.user;
-      currentToken = loggedInUser.jwt;
-      return loggedInUser;
-    } catch (e) {
-      currentUser = null;
-      currentToken = null;
-      throw e;
-    }
-  }
-
-  static Future<User> checkToken(String token) async {
-    final response = await get(_checkUserURL, token: token);
-    final user = User.fromJson(json.decode(response.body));
-    if (user != null) {
-      currentUser = user;
-      currentToken = token;
-    } else {
-      currentToken = null;
-    }
-    return user;
-  }
-
-  static Future<Profile> updateProfile(
-      Map<String, dynamic> params, String id) async {
-    final requestBody = jsonEncode(params);
-    final response = await put("/users/$id", requestBody);
-    final responseBody = json.decode(response.body);
-    final profile = Profile.fromJson(responseBody);
-    return profile;
   }
 
   static Future<List<ERG>> getERGS() async {
@@ -526,5 +473,19 @@ class WebAPI {
     events.sort((b, a) => a.startDate.compareTo(b.startDate));
 
     return events;
+  }
+
+  static Future<List<Announcement>> getAnnouncements() async {
+    final response = await get(_announcementURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawAnnouncements = json.decode(response.body);
+    final List<Announcement> announcements = [];
+    for (final announcementJson in rawAnnouncements) {
+      //if (announcement.fromJson(announcementJson).endDate.isAfter(DateTime.now()))
+      announcements.add(Announcement.fromJson(announcementJson));
+    }
+
+    return announcements;
   }
 }

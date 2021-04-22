@@ -14,6 +14,8 @@ import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'EventsVariable.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/models/announcement.dart';
+import 'AnnouncementVariables.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -35,6 +37,8 @@ class _MyHomePageState extends State<MyHomePage> {
   bool offersLoaded = false;
   bool highlightsLoaded = false;
   bool sliderPostersLoaded = false;
+  bool announcementsLoaded = false;
+  List<Announcement> announcements = [];
 
   void initState() {
     events = [];
@@ -45,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
     getWebinars();
     getOffers();
     getRecentEventsPosters();
+    getAnnouncements();
   }
 
   @override
@@ -173,6 +178,16 @@ class _MyHomePageState extends State<MyHomePage> {
     sliderPostersLoaded = true;
   }
 
+  Future<void> getAnnouncements() async {
+    final allAnnouncements = await WebAPI.getAnnouncements();
+    if (this.mounted) {
+      setState(() {
+        announcements = allAnnouncements;
+        announcementsLoaded = true;
+      });
+    }
+  }
+
   Future<void> _refreshData() async {
     setState(() {
       // eventsLoaded = false;
@@ -262,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     List<Widget> list = [];
-    if (webinarsLoaded && eventsLoaded && offersLoaded) {
+    if (webinarsLoaded && eventsLoaded && offersLoaded && announcementsLoaded) {
       if (sliderPosters.isNotEmpty) {
         list.add(
           SizedBox(
@@ -301,6 +316,21 @@ class _MyHomePageState extends State<MyHomePage> {
           seeMore('Events'),
         );
       }
+      if (announcements.isNotEmpty) {
+        list.add(
+          title('Recent Announcements'),
+          //gridview
+        );
+        list.add(Container(
+            width: width * 0.97,
+            height: height * 0.50,
+            child: AnnouncementVariables(
+              announcements: announcements,
+            )));
+        list.add(
+          seeMore('Announcements'),
+        );
+      }
       if (offers.isNotEmpty) {
         list.add(title('Recent Offers'));
         list.add(
@@ -314,7 +344,10 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
         ));
         list.add(seeMore('Offers'));
-      } else if (offers.isEmpty && events.isEmpty && webinars.isEmpty) {
+      } else if (offers.isEmpty &&
+          events.isEmpty &&
+          webinars.isEmpty &&
+          announcements.isEmpty) {
         list.add(Text('No Recent Data, Coming Soon!'));
       }
       list.add(SizedBox(
@@ -346,7 +379,11 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
-    if (highlightsLoaded && webinarsLoaded && eventsLoaded && offersLoaded)
+    if (highlightsLoaded &&
+        webinarsLoaded &&
+        eventsLoaded &&
+        offersLoaded &&
+        announcementsLoaded)
       return RefreshIndicator(
           onRefresh: _refreshData,
           child: WillPopScope(
