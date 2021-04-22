@@ -7,6 +7,7 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:connect_plus/announcement_widget.dart';
 
 class Announcements extends StatefulWidget {
   @override
@@ -148,7 +149,13 @@ class AnnouncementCard extends StatelessWidget {
           child: InkWell(
             child: AnnouncementImage(announcement: announcement),
             onTap: () {
-              //TODO: Navigate to announcement widget
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => AnnouncementWidget(
+                    announcement: announcement,
+                  ),
+                ),
+              );
             },
           ),
         ),
@@ -235,7 +242,12 @@ class SearchBar extends StatelessWidget {
           );
         },
         onSuggestionSelected: (announcement) {
-          //TODO navigate to announcement widget
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) =>
+                  AnnouncementWidget(announcement: announcement),
+            ),
+          );
         },
       ),
     );
