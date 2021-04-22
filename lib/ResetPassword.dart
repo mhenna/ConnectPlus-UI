@@ -159,6 +159,7 @@ class _ResetPasswordState extends State<ResetPassword> {
     );
 
     return Scaffold(
+        backgroundColor: Colors.white,
         body: ModalProgressHUD(
             inAsyncCall: asyncCall,
             opacity: 0.5,
