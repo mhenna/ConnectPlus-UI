@@ -120,8 +120,8 @@ class InfoSheet extends StatelessWidget {
     return SizedBox(
       height: MediaQuery.of(context).size.height,
       child: DraggableScrollableSheet(
-        minChildSize: 0.4,
-        initialChildSize: 0.4,
+        minChildSize: 0.5,
+        initialChildSize: 0.5,
         maxChildSize: 0.6,
         builder: (_, cont) {
           return Container(
@@ -139,14 +139,17 @@ class InfoSheet extends StatelessWidget {
               children: [
                 Align(alignment: Alignment.center, child: DraggableIndicator()),
                 SizedBox(height: 20),
+                Text(
+                  "Description",
+                  style: _style(context),
+                ),
+                SelectableText(announcement.description),
+                Divider(color: Colors.transparent, height: 10),
                 SelectableText(
                   'On Behalf of: ${announcement.onBehalfOf}',
                   style: _style(context),
                 ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 10,
-                ),
+                Divider(color: Colors.transparent, height: 10),
                 Visibility(
                   visible: announcement.deadline != null,
                   child: SelectableText(
@@ -154,10 +157,7 @@ class InfoSheet extends StatelessWidget {
                     style: _style(context),
                   ),
                 ),
-                Divider(
-                  color: Colors.transparent,
-                  height: 10,
-                ),
+                Divider(color: Colors.transparent, height: 10),
                 Visibility(
                   visible: announcement.deadline != null,
                   child: SelectableText(
