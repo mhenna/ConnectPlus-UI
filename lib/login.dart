@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/ResetPassword.dart';
 
 class Login extends StatefulWidget {
   Login({Key key, this.title}) : super(key: key);
@@ -221,10 +222,22 @@ class _LoginState extends State<Login> {
                           height: 15,
                         ),
                         Center(
-                          child: Text(
-                            'Forgot Password? \n Please Contact ayman.hassib@dell.com',
-                            textAlign: TextAlign.center,
-                          ),
+                          child: Text.rich(TextSpan(
+                              text: ' Forgot Password? ',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Utils.header,
+                                fontSize: size * 30,
+                                fontFamily: "Roboto",
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ResetPassword()),
+                                  );
+                                })),
                         ),
                       ],
                     ),
