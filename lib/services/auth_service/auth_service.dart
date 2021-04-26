@@ -100,6 +100,15 @@ class AuthService {
       return _user;
     }
   }
+
+  Future<String> resetPassword(String email) async {
+    try {
+      await _fbAuth.sendPasswordResetEmail(email: email);
+    } catch (e) {
+      print(e.toString());
+      return e.toString();
+    }
+  }
 }
 
 enum AuthState {
