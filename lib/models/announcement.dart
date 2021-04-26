@@ -57,8 +57,9 @@ class Announcement {
         : null;
     id = json['id'];
     slider = json['slider'] ?? false;
-    trivia = json['trivia']; // will auto set to null
-    link = json['link']; // will auto set to null
+    trivia =
+        json['trivia'] == "" ? null : json['trivia']; // will auto set to null
+    link = json['link'] == "" ? null : json['link']; // will auto set to null
   }
 
   Map<String, dynamic> toJson() {
