@@ -1,4 +1,5 @@
 import 'package:carousel_pro/carousel_pro.dart';
+import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/webinar.dart';
@@ -97,9 +98,8 @@ class _MyHomePageState extends State<MyHomePage> {
         recent.forEach((element) {
           element.highlight.forEach((h) {
             sliderPosters.add(CachedNetworkImage(
-              placeholder: (context, url) => SizedBox(
-                height: 40,
-                child: CircularProgressIndicator(),
+              placeholder: (context, url) => Expanded(
+                child: Container(color: Colors.grey[300]),
               ),
               imageUrl: WebAPI.baseURL + h.url,
             ));
@@ -160,7 +160,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // will break when poster field changes
         posters.add(
           CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
+            placeholder: (context, url) => Expanded(
+              child: Container(color: Colors.grey[300]),
+            ),
             imageUrl: WebAPI.baseURL + items[i].poster.ur,
           ),
         );
@@ -234,10 +236,17 @@ class _MyHomePageState extends State<MyHomePage> {
                       context,
                       MaterialPageRoute(builder: (context) => Events()),
                     );
-                  } else {
+                  } else if (view == 'Offers') {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => Offers()),
+                    );
+                  } else if (view == 'Announcements') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Announcements(),
+                      ),
                     );
                   }
                 },

@@ -488,4 +488,21 @@ class WebAPI {
 
     return announcements;
   }
+
+  /// Returns list of all announcements future or null deadlines
+  static Future<List<Announcement>> getUnexpiredAnnouncements() async {
+    final now = DateTime.now().toIso8601String();
+    final response = await get(
+      "$_announcementURL?_where[_or][0][deadline_gt]=$now&_where[_or][1][deadline_null]=true",
+    );
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawAnnouncements = json.decode(response.body);
+    final List<Announcement> announcements = [];
+    for (final announcementJson in rawAnnouncements) {
+      //if (announcement.fromJson(announcementJson).endDate.isAfter(DateTime.now()))
+      announcements.add(Announcement.fromJson(announcementJson));
+    }
+
+    return announcements;
+  }
 }

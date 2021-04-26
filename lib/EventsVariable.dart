@@ -11,6 +11,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connect_plus/EventWidget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 class EventsVariables extends StatefulWidget {
   EventsVariables({Key key, @required this.events, @required this.webinars})
       : super(key: key);
@@ -192,31 +193,32 @@ class Single_Event extends StatelessWidget {
                   }
                 },
                 child: GridTile(
-                    footer: Container(
-                      color: Colors.white70,
-                      child: ListTile(
-                        title: Column(children: <Widget>[
-                          Text(event.name,
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                          Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Text(
-                                  DateFormat.yMMMMd('en_US')
-                                      .format(event.startDate),
-                                  style: TextStyle(
-                                      color: Utils.header,
-                                      fontWeight: FontWeight.w800),
-                                ),
-                              ])
-                        ]),
-                      ),
+                  footer: Container(
+                    color: Colors.white70,
+                    child: ListTile(
+                      title: Column(children: <Widget>[
+                        Text(event.name,
+                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text(
+                                DateFormat.yMMMMd('en_US')
+                                    .format(event.startDate),
+                                style: TextStyle(
+                                    color: Utils.header,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ])
+                      ]),
                     ),
-                    child: CachedNetworkImage(
-                      placeholder: (context, url) => CircularProgressIndicator(),
-                      imageUrl:
-                        WebAPI.baseURL + event.poster.url,
+                  ),
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Expanded(
+                      child: Container(color: Colors.grey[300]),
                     ),
+                    imageUrl: WebAPI.baseURL + event.poster.url,
+                  ),
                 ),
               ),
             ),

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+
 class OfferVariables extends StatefulWidget {
   OfferVariables({Key key, @required this.offers}) : super(key: key);
 
@@ -125,37 +126,38 @@ class Single_Offer extends StatelessWidget {
                 );
               },
               child: GridTile(
-                  footer: Container(
-                    color: Colors.white70,
-                    child: ListTile(
-                      title: Column(
-                        children: <Widget>[
-                          Text(
-                            offer.name,
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                              Text("Expires: "),
-                              Text(
-                                DateFormat.yMMMMd('en_US')
-                                    .format(offer.expiration),
-                                style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.w800),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
+                footer: Container(
+                  color: Colors.white70,
+                  child: ListTile(
+                    title: Column(
+                      children: <Widget>[
+                        Text(
+                          offer.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            Text("Expires: "),
+                            Text(
+                              DateFormat.yMMMMd('en_US')
+                                  .format(offer.expiration),
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) => CircularProgressIndicator(),
-                    imageUrl:
-                      WebAPI.baseURL + offer.logo.url,
+                ),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Expanded(
+                    child: Container(color: Colors.grey[300]),
                   ),
+                  imageUrl: WebAPI.baseURL + offer.logo.url,
+                ),
               ),
             ),
           ),
