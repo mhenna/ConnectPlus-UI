@@ -1,5 +1,6 @@
 import 'package:connect_plus/Activities.dart';
 import 'package:connect_plus/aboutus.dart';
+import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/events.dart';
 import 'package:connect_plus/included.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +87,16 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Events()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.announcement),
+            title: Text('Announcements'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Announcements()),
               )
             },
           ),
