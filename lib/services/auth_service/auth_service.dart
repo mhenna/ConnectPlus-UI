@@ -109,6 +109,10 @@ class AuthService {
       return e.toString();
     }
   }
+
+  Future<void> logout() async {
+    return await _fbAuth.signOut();
+  }
 }
 
 enum AuthState {
