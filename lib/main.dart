@@ -23,6 +23,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // TODO: move to injection container
   final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   void initState() {
