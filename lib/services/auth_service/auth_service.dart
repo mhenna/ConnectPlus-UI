@@ -104,6 +104,7 @@ class AuthService {
   Future<String> resetPassword(String email) async {
     try {
       await _fbAuth.sendPasswordResetEmail(email: email);
+      return null;
     } catch (e) {
       print(e.toString());
       return e.toString();
