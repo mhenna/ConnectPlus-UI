@@ -3,6 +3,8 @@ import 'package:connect_plus/aboutus.dart';
 import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/events.dart';
 import 'package:connect_plus/included.dart';
+import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Profile.dart';
 import 'package:connect_plus/emergencyContact.dart';
@@ -151,11 +153,12 @@ class NavDrawerState extends State<NavDrawer>
           ListTile(
             leading: Icon(Icons.exit_to_app),
             title: Text('Logout'),
-            onTap: () => {
-              prefs.remove("token"),
+            onTap: () async {
+              await sl<AuthService>().logout();
+              await prefs.remove("token");
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => Login()),
-                  (Route<dynamic> route) => false)
+                  (Route<dynamic> route) => false);
             },
           ),
         ],
