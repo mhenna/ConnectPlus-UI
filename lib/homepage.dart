@@ -1,6 +1,8 @@
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:connect_plus/announcements.dart';
+import 'package:connect_plus/models/activity.dart';
 import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/models/occurrence.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/webinar.dart';
 import 'package:connect_plus/services/web_api.dart';
@@ -46,11 +48,16 @@ class _MyHomePageState extends State<MyHomePage> {
     offers = [];
     webinars = [];
     super.initState();
-    getEvents();
-    getWebinars();
-    getOffers();
-    getRecentEventsPosters();
-    getAnnouncements();
+  }
+
+  Future<void> _loadData() async {
+    await getEvents();
+    await getWebinars();
+    await getOffers();
+    await getAnnouncements();
+    await getRecentEventsPosters();
+    await getSliderPosters();
+    return;
   }
 
   @override
@@ -61,20 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
   Future<void> getEvents() async {
     final allEvents = await WebAPI.getEvents();
     if (this.mounted) {
-      setState(() {
-        events = allEvents;
-        eventsLoaded = true;
-      });
+      events = allEvents;
+      eventsLoaded = true;
     }
   }
 
   Future<void> getWebinars() async {
     final allWebinars = await WebAPI.getWebinars();
     if (this.mounted) {
-      setState(() {
-        webinars = allWebinars;
-        webinarsLoaded = true;
-      });
+      webinars = allWebinars;
+      webinarsLoaded = true;
     }
   }
 
@@ -82,10 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
     try {
       final recentOffers = await WebAPI.getRecentOffers();
       if (this.mounted) {
-        setState(() {
-          this.offers = recentOffers;
-          offersLoaded = true;
-        });
+        this.offers = recentOffers;
+        offersLoaded = true;
       }
     } catch (e) {}
   }
@@ -94,32 +95,32 @@ class _MyHomePageState extends State<MyHomePage> {
     this.sliderPosters.clear();
     var recent = await WebAPI.getEventHighlights();
     if (this.mounted) {
-      setState(() {
-        recent.forEach((element) {
-          element.highlight.forEach((h) {
-            sliderPosters.add(CachedNetworkImage(
-              placeholder: (context, url) => Expanded(
-                child: Container(color: Colors.grey[300]),
-              ),
-              imageUrl: WebAPI.baseURL + h.url,
-            ));
-          });
+      recent.forEach((element) {
+        element.highlight.forEach((h) {
+          sliderPosters.add(CachedNetworkImage(
+            placeholder: (context, url) => Expanded(
+              child: Container(color: Colors.grey[300]),
+            ),
+            imageUrl: WebAPI.baseURL + h.url,
+          ));
         });
-        highlightsLoaded = true;
       });
+      highlightsLoaded = true;
     }
   }
 
   // TODO: Move business logic outside of UI
+  /// Gets the posters related to ERGs that will be displayed in the
+  /// carousel slider.
+  ///
+  /// Must be called after events, offers, webinars, are loaded
   Future<void> getErgSliderPosters() async {
     List<CachedNetworkImage> posters = [];
     final int ergPosterLimit = 1;
 
-    List<Event> events = await WebAPI.getSliderEvents();
-    List<Webinar> webinars = await WebAPI.getSliderWebinars();
+    List<Activity> activities = await WebAPI.getActivities();
 
-    // TODO: create a superclass for webinars and events
-    Map<ERG, List<dynamic>> ergItems = {};
+    Map<ERG, List<Occurrence>> ergItems = {};
 
     // add events to erg owner
     events.forEach((event) {
@@ -145,12 +146,31 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
+    offers.forEach((offer) {
+      if (offer.slider) {
+        ERG erg = offer.erg;
+        if (ergItems.containsKey(erg)) {
+          ergItems[erg].add(offer);
+        } else {
+          ergItems[erg] = [offer];
+        }
+      }
+    });
+    activities.forEach((activity) {
+      if (activity.slider) {
+        ERG erg = activity.erg;
+        if (ergItems.containsKey(erg)) {
+          ergItems[erg].add(activity);
+        } else {
+          ergItems[erg] = [activity];
+        }
+      }
+    });
+
     // Sorts items for each erg
-    // superclass for webinar and events will make for much safer and cleaner code
-    // The following will break if webinar/event class changes createdAt field name
     ergItems.forEach((erg, items) {
       items.sort(
-        (item1, item2) => item2.createdAt.compareTo(item1.createdAt),
+        (item1, item2) => item2.date.compareTo(item1.date),
       );
       ergItems[erg] = items;
     });
@@ -163,44 +183,72 @@ class _MyHomePageState extends State<MyHomePage> {
             placeholder: (context, url) => Expanded(
               child: Container(color: Colors.grey[300]),
             ),
-            imageUrl: WebAPI.baseURL + items[i].poster.ur,
+            imageUrl: WebAPI.baseURL + items[i].poster.url,
           ),
         );
       }
     });
-    setState(() {
-      sliderPosters.addAll(posters);
+    sliderPosters.addAll(posters);
+  }
+
+  void getSliderAnnouncements() {
+    num numberOfShownAnnouncements = 2;
+    List<Announcement> sortedAnnouncements = announcements;
+    sortedAnnouncements.sort((a1, a2) {
+      if (a1.deadline == null) return -1;
+      if (a2.deadline == null) return 1;
+      return a2.deadline.compareTo(a1.deadline);
     });
+
+    List<Announcement> unexpiredAnnouncements = sortedAnnouncements
+        .where(
+          (announcement) =>
+              announcement.slider == true &&
+              announcement.erg.name.toLowerCase() ==
+                  "internal comms" && //TODO store this somewhere else
+              (announcement.deadline == null ||
+                  announcement.deadline.isAfter(DateTime.now())),
+        )
+        .toList();
+    unexpiredAnnouncements =
+        unexpiredAnnouncements.take(numberOfShownAnnouncements).toList();
+
+    List<CachedNetworkImage> posters = unexpiredAnnouncements
+        .map(
+          (announcement) => CachedNetworkImage(
+            placeholder: (context, url) => Expanded(
+              child: Container(color: Colors.grey[300]),
+            ),
+            imageUrl: WebAPI.baseURL + announcement.poster.url,
+          ),
+        )
+        .toList();
+
+    sliderPosters.addAll(posters);
   }
 
   Future<void> getSliderPosters() async {
     sliderPosters.clear();
     await getRecentEventsPosters();
     await getErgSliderPosters();
+    getSliderAnnouncements();
     sliderPostersLoaded = true;
   }
 
   Future<void> getAnnouncements() async {
     final allAnnouncements = await WebAPI.getAnnouncements();
     if (this.mounted) {
-      setState(() {
-        announcements = allAnnouncements;
-        announcementsLoaded = true;
-      });
+      announcements = allAnnouncements;
+      announcementsLoaded = true;
     }
   }
 
   Future<void> _refreshData() async {
-    setState(() {
-      // eventsLoaded = false;
-      // webinarsLoaded = false;
-      // offersLoaded = false;
-      // highlightsLoaded = false;
-      getEvents();
-      getWebinars();
-      getOffers();
-      getSliderPosters();
-    });
+    await getEvents();
+    await getWebinars();
+    await getOffers();
+    await getSliderPosters();
+    setState(() {});
   }
 
   Widget seeMore(String view) {
@@ -382,56 +430,50 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    if (highlightsLoaded &&
-        webinarsLoaded &&
-        eventsLoaded &&
-        offersLoaded &&
-        announcementsLoaded)
-      return RefreshIndicator(
-          onRefresh: _refreshData,
-          child: WillPopScope(
-            onWillPop: () async => false,
-            child: Scaffold(
-              appBar: AppBar(
-                // Here we take the value from the MyHomePage object that was created by
-                // the App.build method, and use it to set our appbar title.
-                title: Text("Home"),
-                centerTitle: true,
-                backgroundColor: Utils.header,
-                flexibleSpace: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Utils.secondaryColor,
-                        Utils.primaryColor,
-                      ],
-                      begin: Alignment.topRight,
-                      end: Alignment.bottomLeft,
+    return FutureBuilder<void>(
+        future: _loadData(),
+        builder: (context, snapshot) {
+          if (!highlightsLoaded &&
+              !webinarsLoaded &&
+              !eventsLoaded &&
+              !offersLoaded &&
+              !announcementsLoaded) return Scaffold(body: ImageRotate());
+
+          return RefreshIndicator(
+              onRefresh: _refreshData,
+              child: WillPopScope(
+                onWillPop: () async => false,
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text("Home"),
+                    centerTitle: true,
+                    backgroundColor: Utils.header,
+                    flexibleSpace: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Utils.secondaryColor,
+                            Utils.primaryColor,
+                          ],
+                          begin: Alignment.topRight,
+                          end: Alignment.bottomLeft,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ),
-              drawer: NavDrawer(),
-              backgroundColor: Utils.background,
-              body: Stack(children: <Widget>[
-                Container(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: getContent(),
+                  drawer: NavDrawer(),
+                  backgroundColor: Utils.background,
+                  body: Stack(children: <Widget>[
+                    Container(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: getContent(),
+                        ),
+                      ),
                     ),
-                  ),
+                  ]),
                 ),
-              ]),
-            ),
-          ));
-    else {
-      return Scaffold(body: ImageRotate());
-    }
+              ));
+        });
   }
 }
