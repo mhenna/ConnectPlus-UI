@@ -5,13 +5,9 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Navbar.dart';
 import 'widgets/Utils.dart';
-import 'dart:convert';
-import 'widgets/Indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 
 class EventWidget extends StatefulWidget {
   EventWidget({Key key, @required this.event}) : super(key: key);
@@ -63,14 +59,11 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-        child: FittedBox(fit: BoxFit.contain,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl:
-            imageURL,
-          ),
-        )
-    );
+        child: FittedBox(
+            fit: BoxFit.contain,
+            child: CachedImageBox(
+              imageurl: imageURL,
+            )));
   }
 
   List<Widget> eventsByERG() {
@@ -124,10 +117,8 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl:
-              WebAPI.baseURL + event.poster.url,
+          child: CachedImageBox(
+            imageurl: WebAPI.baseURL + event.poster.url,
           ),
         )
       ],
