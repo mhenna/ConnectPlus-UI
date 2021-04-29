@@ -1,3 +1,4 @@
+import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/image_file.dart';
 
 abstract class Occurrence {
@@ -6,4 +7,5 @@ abstract class Occurrence {
   ImageFile get poster;
   DateTime get date;
   bool get slider;
+  ERG get erg;
 }

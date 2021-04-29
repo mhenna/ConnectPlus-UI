@@ -1,6 +1,7 @@
 import 'package:connect_plus/models/admin_user.dart';
 import 'package:connect_plus/models/attachment.dart';
 import 'package:connect_plus/models/category.dart';
+import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/image_file.dart';
 import 'package:connect_plus/models/occurrence.dart';
 import 'package:meta/meta.dart';
@@ -23,6 +24,7 @@ class Offer extends Occurrence {
   final Attachment _attachment;
   final String _id;
   final bool _slider;
+  final ERG _erg;
 
   @override
   String get sId => _sId;
@@ -34,6 +36,8 @@ class Offer extends Occurrence {
   ImageFile get poster => _logo;
   @override
   bool get slider => _slider;
+  @override
+  ERG get erg => _erg;
 
   Category get category => _category;
   String get details => _details;
@@ -68,6 +72,7 @@ class Offer extends Occurrence {
     @required Attachment attachment,
     @required String id,
     @required bool slider,
+    @required ERG erg,
   })  : _sId = sId,
         _name = name,
         _category = category,
@@ -84,7 +89,8 @@ class Offer extends Occurrence {
         _location = location,
         _attachment = attachment,
         _id = id,
-        _slider = slider;
+        _slider = slider,
+        _erg = erg;
 
   factory Offer.fromJson(Map<String, dynamic> json) {
     return Offer(
@@ -119,6 +125,7 @@ class Offer extends Occurrence {
           : null,
       id: json['id'],
       slider: json['slider'] ?? false,
+      erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
     );
   }
 
@@ -149,7 +156,11 @@ class Offer extends Occurrence {
     if (this._category != null) {
       data['category'] = this._category.toJson();
     }
+    if (this._erg != null) {
+      data['erg'] = this._erg.toJson();
+    }
     data['id'] = this._id;
+
     return data;
   }
 }
