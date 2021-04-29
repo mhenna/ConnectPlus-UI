@@ -19,6 +19,7 @@ class Announcement extends Occurrence {
   final String _trivia;
   final bool _slider;
   final String _link;
+  final ERG _erg;
 
   @override
   String get sId => _sId;
@@ -30,6 +31,8 @@ class Announcement extends Occurrence {
   bool get slider => _slider;
   @override
   DateTime get date => _createdAt;
+  @override
+  ERG get erg => _erg;
   String get description => _description;
   DateTime get deadline => _deadline;
   DateTime get createdAt => _createdAt;
@@ -57,6 +60,7 @@ class Announcement extends Occurrence {
     @required bool slider,
     @required String trivia,
     @required String link,
+    @required ERG erg,
   })  : _sId = sId,
         _name = name,
         _createdAt = createdAt,
@@ -70,7 +74,8 @@ class Announcement extends Occurrence {
         _id = id,
         _slider = slider,
         _trivia = trivia,
-        _link = link;
+        _link = link,
+        _erg = erg;
 
   factory Announcement.fromJson(Map<String, dynamic> json) {
     return Announcement(
@@ -101,6 +106,7 @@ class Announcement extends Occurrence {
       trivia:
           json['trivia'] == "" ? null : json['trivia'], // will auto set to null
       link: json['link'] == "" ? null : json['link'], // will auto set to null
+      erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
     );
   }
 
@@ -123,9 +129,13 @@ class Announcement extends Occurrence {
     if (this._updatedBy != null) {
       data['updated_by'] = this._updatedBy.toJson();
     }
+    if (this._erg != null) {
+      data['erg'] = this._erg.toJson();
+    }
     data['trivia'] = this._trivia;
     data['id'] = this._id;
     data['link'] = this._link;
+
     return data;
   }
 }
