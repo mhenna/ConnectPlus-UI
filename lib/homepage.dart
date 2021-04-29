@@ -122,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     events.forEach((event) {
       if (event.slider) {
         ERG erg = event.erg;
-        if (ergItems.containsKey(erg)) {
+        if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(event);
         } else {
           ergItems[erg] = [event];
@@ -134,7 +134,7 @@ class _MyHomePageState extends State<MyHomePage> {
     webinars.forEach((webinar) {
       if (webinar.slider) {
         ERG erg = webinar.erg;
-        if (ergItems.containsKey(erg)) {
+        if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(webinar);
         } else {
           ergItems[erg] = [webinar];
@@ -145,7 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
     offers.forEach((offer) {
       if (offer.slider) {
         ERG erg = offer.erg;
-        if (ergItems.containsKey(erg)) {
+        if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(offer);
         } else {
           ergItems[erg] = [offer];
@@ -155,7 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
     activities.forEach((activity) {
       if (activity.slider) {
         ERG erg = activity.erg;
-        if (ergItems.containsKey(erg)) {
+        if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(activity);
         } else {
           ergItems[erg] = [activity];
