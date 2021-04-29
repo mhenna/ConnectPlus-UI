@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/Utils.dart';
@@ -176,14 +175,11 @@ class AnnouncementImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.width * 0.5,
-      child: CachedNetworkImage(
-        fit: BoxFit.fill,
-        placeholder: (context, url) => LoadingIndicator(),
-        imageUrl: WebAPI.baseURL + announcement.poster.url,
-      ),
-    );
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.width * 0.5,
+        child: CachedImageBox(
+          imageurl: WebAPI.baseURL + announcement.poster.url,
+        ));
   }
 }
 

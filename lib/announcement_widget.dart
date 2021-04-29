@@ -2,7 +2,7 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
@@ -60,17 +60,10 @@ class AnnouncementImage extends StatelessWidget {
   }) : super(key: key);
 
   final Announcement announcement;
-
   @override
   Widget build(BuildContext context) {
-    return CachedNetworkImage(
-      height: MediaQuery.of(context).size.height * 0.3,
-      imageUrl: WebAPI.baseURL + announcement.poster.url,
-      placeholder: (_, __) => SizedBox(
-        height: 40,
-        width: 40,
-        child: CircularProgressIndicator(),
-      ),
+    return CachedImageBox(
+      imageurl: WebAPI.baseURL + announcement.poster.url,
     );
   }
 }
