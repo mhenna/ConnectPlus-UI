@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connect_plus/EventWidget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 
 class EventsVariables extends StatefulWidget {
   EventsVariables({Key key, @required this.events, @required this.webinars})
@@ -213,12 +213,8 @@ class Single_Event extends StatelessWidget {
                       ]),
                     ),
                   ),
-                  child: CachedNetworkImage(
-                    placeholder: (context, url) => Expanded(
-                      child: Container(color: Colors.grey[300]),
-                    ),
-                    imageUrl: WebAPI.baseURL + event.poster.url,
-                  ),
+                  child: CachedImageBox(
+                      imageurl: WebAPI.baseURL + event.poster.url),
                 ),
               ),
             ),

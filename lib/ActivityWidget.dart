@@ -5,15 +5,9 @@ import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'Navbar.dart';
 import 'widgets/Utils.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'dart:typed_data';
-import 'widgets/Indicator.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
+
 class ActivityWidget extends StatefulWidget {
   ActivityWidget({Key key, @required this.activity}) : super(key: key);
 
@@ -60,14 +54,12 @@ class _ActivityState extends State<ActivityWidget>
 
   Widget urlToImage(String imageURL) {
     return Expanded(
-        child: FittedBox(fit: BoxFit.contain,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl:
-              imageURL,
-          ),
-        )
-    );
+        child: FittedBox(
+      fit: BoxFit.contain,
+      child: CachedImageBox(
+        imageurl: imageURL,
+      ),
+    ));
   }
 
   List<Widget> activitiesByERG() {
@@ -116,17 +108,15 @@ class _ActivityState extends State<ActivityWidget>
   }
 
   Widget _activityPoster() {
+    String imageUrl = WebAPI.baseURL + activity.poster.url;
     return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[
         SizedBox(
-          width: MediaQuery.of(context).size.width,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl:
-              WebAPI.baseURL + activity.poster.url,
-          ),
-        )
+            width: MediaQuery.of(context).size.width,
+            child: CachedImageBox(
+              imageurl: imageUrl,
+            ))
       ],
     );
   }

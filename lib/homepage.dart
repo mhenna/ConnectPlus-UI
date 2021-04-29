@@ -17,6 +17,7 @@ import 'EventsVariable.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'AnnouncementVariables.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -29,7 +30,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   TextStyle style = TextStyle(fontFamily: 'Roboto', fontSize: 16.0);
 
-  List<CachedNetworkImage> sliderPosters = [];
+  List<CachedImageBox> sliderPosters = [];
   List<Event> events = [];
   List<Offer> offers = [];
   List<Webinar> webinars = [];
@@ -97,12 +98,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         recent.forEach((element) {
           element.highlight.forEach((h) {
-            sliderPosters.add(CachedNetworkImage(
-              placeholder: (context, url) => Expanded(
-                child: Container(color: Colors.grey[300]),
-              ),
-              imageUrl: WebAPI.baseURL + h.url,
-            ));
+            sliderPosters.add(CachedImageBox(imageurl: WebAPI.baseURL + h.url));
           });
         });
         highlightsLoaded = true;
@@ -112,7 +108,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   // TODO: Move business logic outside of UI
   Future<void> getErgSliderPosters() async {
-    List<CachedNetworkImage> posters = [];
+    List<CachedImageBox> posters = [];
     final int ergPosterLimit = 1;
 
     List<Event> events = await WebAPI.getSliderEvents();
@@ -159,12 +155,7 @@ class _MyHomePageState extends State<MyHomePage> {
       for (int i = 0; i < ergPosterLimit; i++) {
         // will break when poster field changes
         posters.add(
-          CachedNetworkImage(
-            placeholder: (context, url) => Expanded(
-              child: Container(color: Colors.grey[300]),
-            ),
-            imageUrl: WebAPI.baseURL + items[i].poster.ur,
-          ),
+          CachedImageBox(imageurl: WebAPI.baseURL + items[i].poster.ur),
         );
       }
     });

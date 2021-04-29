@@ -3,7 +3,7 @@ import 'package:connect_plus/models/announcement.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'announcement_widget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
 
 class AnnouncementVariables extends StatefulWidget {
   AnnouncementVariables({Key key, @required this.announcements})
@@ -117,29 +117,25 @@ class Single_Announcement extends StatelessWidget {
                 );
               },
               child: GridTile(
-                footer: Container(
-                  color: Colors.white70,
-                  child: ListTile(
-                    title: Column(
-                      children: <Widget>[
-                        Text(
-                          announcement.name,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                        )
-                      ],
+                  footer: Container(
+                    color: Colors.white70,
+                    child: ListTile(
+                      title: Column(
+                        children: <Widget>[
+                          Text(
+                            announcement.name,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                          )
+                        ],
+                      ),
                     ),
                   ),
-                ),
-                child: CachedNetworkImage(
-                  placeholder: (context, url) => Expanded(
-                    child: Container(color: Colors.grey[300]),
-                  ),
-                  imageUrl: WebAPI.baseURL + announcement.poster.url,
-                ),
-              ),
+                  child: CachedImageBox(
+                    imageurl: WebAPI.baseURL + announcement.poster.url,
+                  )),
             ),
           ),
         ),

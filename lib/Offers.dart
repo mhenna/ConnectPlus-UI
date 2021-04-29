@@ -9,7 +9,8 @@ import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/OfferWidget.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:connect_plus/utils/map_indexed.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
+
 class Offers extends StatefulWidget {
   Offers({Key key, this.offerCategory}) : super(key: key);
 
@@ -88,10 +89,8 @@ class _OffersState extends State<Offers> {
       setState(() {
         recent.forEach((element) {
           element.highlight.forEach((h) {
-            recentOffers.add(CachedNetworkImage(
-              placeholder: (context, url) => CircularProgressIndicator(),
-              imageUrl:
-              WebAPI.baseURL + h.url,
+            recentOffers.add(CachedImageBox(
+              imageurl: WebAPI.baseURL + h.url,
             ));
           });
         });
@@ -128,13 +127,11 @@ class _OffersState extends State<Offers> {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: FittedBox(fit: BoxFit.contain,
-            child: CachedNetworkImage(
-              placeholder: (context, url) => CircularProgressIndicator(),
-              imageUrl:
-                imageURL,
-          )
-        ),
+        child: FittedBox(
+            fit: BoxFit.contain,
+            child: CachedImageBox(
+              imageurl: imageURL,
+            )),
       ),
     );
   }
@@ -144,10 +141,8 @@ class _OffersState extends State<Offers> {
       final url = WebAPI.baseURL + offers[randIndexOffer].logo.url;
       return FittedBox(
         fit: BoxFit.contain,
-        child: CachedNetworkImage(
-          placeholder: (context, url) => CircularProgressIndicator(),
-          imageUrl:
-            url,
+        child: CachedImageBox(
+          imageurl: url,
         ),
       );
     } catch (Exception) {

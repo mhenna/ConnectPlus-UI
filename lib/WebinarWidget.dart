@@ -6,12 +6,10 @@ import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'Navbar.dart';
 import 'widgets/Utils.dart';
-import 'dart:convert';
-import 'widgets/Indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:connect_plus/widgets/CachedImageBox.dart';
+
 class WebinarWidget extends StatefulWidget {
   WebinarWidget({Key key, @required this.webinar}) : super(key: key);
 
@@ -55,10 +53,8 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
     return Expanded(
       child: SizedBox(
         width: 250, // otherwise the logo will be tiny
-        child: CachedNetworkImage(
-          placeholder: (context, url) => CircularProgressIndicator(),
-          imageUrl:
-          imageURL,
+        child: CachedImageBox(
+          imageurl: imageURL,
         ),
       ),
     );
@@ -96,7 +92,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                       ergwebinar.name,
                       textAlign: TextAlign.center,
                       style:
-                      TextStyle(fontSize: size * 35, color: Utils.header),
+                          TextStyle(fontSize: size * 35, color: Utils.header),
                     ),
                   )
                 ],
@@ -134,13 +130,13 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
   }
 
   Widget _icon(
-      IconData icon, {
-        Color color = Utils.iconColor,
-        double size = 20,
-        double padding = 10,
-        bool isOutLine = false,
-        Function onPressed,
-      }) {
+    IconData icon, {
+    Color color = Utils.iconColor,
+    double size = 20,
+    double padding = 10,
+    bool isOutLine = false,
+    Function onPressed,
+  }) {
     return Container(
       height: 40,
       width: 40,
@@ -167,10 +163,8 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
       children: <Widget>[
         SizedBox(
           width: MediaQuery.of(context).size.width,
-          child: CachedNetworkImage(
-            placeholder: (context, url) => CircularProgressIndicator(),
-            imageUrl:
-            WebAPI.baseURL + webinar.poster.url,
+          child: CachedImageBox(
+            imageurl: WebAPI.baseURL + webinar.poster.url,
           ),
         )
       ],
