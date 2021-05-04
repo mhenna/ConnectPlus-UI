@@ -13,7 +13,9 @@ import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/models/user.dart';
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await DotEnv().load('.env');
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -23,8 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  // TODO: move to injection container
-  final Future<FirebaseApp> _initialization = Firebase.initializeApp();
   @override
   void initState() {
     di.init();
@@ -33,32 +33,18 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        // Initialize FlutterFire:
-        future: _initialization,
-        builder: (context, snapshot) {
-          versionCheck(context);
-          if (snapshot.hasError) {
-            return Splash();
-          }
-
-          // Once complete, show your application
-          if (snapshot.connectionState == ConnectionState.done) {
-            return GetMaterialApp(
-              title: 'Connect+',
-              debugShowCheckedModeBanner: false,
-              navigatorKey: NavigationService.navigationKey,
-              routes: Routes.routes,
-              theme: ThemeData(
-                fontFamily: 'Roboto',
-                primarySwatch: Colors.deepOrange,
-                visualDensity: VisualDensity.adaptivePlatformDensity,
-              ),
-              home: Splash(),
-            );
-          }
-          return Splash();
-        });
+    return GetMaterialApp(
+      title: 'Connect+',
+      debugShowCheckedModeBanner: false,
+      navigatorKey: NavigationService.navigationKey,
+      routes: Routes.routes,
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+        primarySwatch: Colors.deepOrange,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: Splash(),
+    );
   }
 }
 
