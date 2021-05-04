@@ -99,15 +99,6 @@ class InfoSheet extends StatelessWidget {
     }
   }
 
-  String _deadlineTime() {
-    if (announcement.deadline != null) {
-      final time = DateFormat.Hm('en_US').format(announcement.deadline);
-      return "Time: $time";
-    } else {
-      return "";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -151,13 +142,7 @@ class InfoSheet extends StatelessWidget {
                   ),
                 ),
                 Divider(color: Colors.transparent, height: 10),
-                Visibility(
-                  visible: announcement.deadline != null,
-                  child: SelectableText(
-                    _deadlineTime(),
-                    style: _style(context),
-                  ),
-                ),
+
                 // trivia button
                 TriviaButton(
                   announcement: announcement,
