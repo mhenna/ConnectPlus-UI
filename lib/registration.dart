@@ -530,7 +530,7 @@ class CarPlateInputTitle extends StatelessWidget {
           },
           child: Tooltip(
             key: _toolTipKey,
-            message: "Text should be in Arabic only",
+            message: "Car plate data will be used for move your car feature",
             preferBelow: false,
             child: Icon(
               Icons.info_outline,
