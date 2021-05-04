@@ -77,8 +77,14 @@ class _AnnouncementsState extends State<Announcements> {
                 toSuggest: (pattern) {
                   if (pattern == "") return null;
                   return announcements
-                      .where((a) => filter(a) && a.name.startsWith(pattern))
-                      .take(5); // suggests only 5
+                      .where(
+                        (a) =>
+                            filter(a) &&
+                            a.name
+                                .toLowerCase()
+                                .startsWith(pattern.toLowerCase()),
+                      )
+                      .take(5); // suggests only 5 results
                 },
               ),
               preferredSize: Size.fromHeight(kToolbarHeight + 10),
