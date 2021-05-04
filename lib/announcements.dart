@@ -26,7 +26,7 @@ class _AnnouncementsState extends State<Announcements> {
         : onBehalfOfFilter;
     return await FilterListDialog.display(
       context,
-      allTextList: announcements.map((a) => a.onBehalfOf).toList(),
+      allTextList: announcements.map((a) => a.onBehalfOf).toSet().toList(),
       height: 480,
       borderRadius: 20,
       headlineText: "Select Announcements on Behalf of",
@@ -49,7 +49,8 @@ class _AnnouncementsState extends State<Announcements> {
 
     if (onBehalfOfFilter == null) {
       // will only run once
-      onBehalfOfFilter = announcements.map((a) => a.onBehalfOf).toList();
+      onBehalfOfFilter =
+          announcements.map((a) => a.onBehalfOf).toSet().toList();
     }
     return announcements;
   }
