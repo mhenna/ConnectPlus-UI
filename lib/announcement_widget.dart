@@ -23,13 +23,13 @@ class AnnouncementWidget extends StatelessWidget {
         backgroundColor: Colors.transparent,
       ),
       body: Container(
-        padding: const EdgeInsets.only(top: 100),
+        padding: const EdgeInsets.only(top: 112),
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
+            end: Alignment.topLeft,
             colors: [
               Utils.secondaryColor,
               Utils.primaryColor,
@@ -62,8 +62,11 @@ class AnnouncementImage extends StatelessWidget {
   final Announcement announcement;
   @override
   Widget build(BuildContext context) {
-    return CachedImageBox(
-      imageurl: WebAPI.baseURL + announcement.poster.url,
+    return Container(
+      padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+      child: CachedImageBox(
+        imageurl: WebAPI.baseURL + announcement.poster.url,
+      ),
     );
   }
 }
