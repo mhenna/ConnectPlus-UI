@@ -169,7 +169,7 @@ class Single_Event extends StatelessWidget {
         height: height,
         child: Card(
           child: Hero(
-            tag: event.name,
+            tag: event.id,
             child: Material(
               child: InkWell(
                 onTap: () {

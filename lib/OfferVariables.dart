@@ -111,7 +111,7 @@ class Single_Offer extends StatelessWidget {
       height: height,
       child: Card(
         child: Hero(
-          tag: offer.name,
+          tag: offer.id,
           child: Material(
             child: InkWell(
               onTap: () {
