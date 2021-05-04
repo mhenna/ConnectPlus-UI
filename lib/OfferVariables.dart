@@ -111,7 +111,7 @@ class Single_Offer extends StatelessWidget {
       height: height,
       child: Card(
         child: Hero(
-          tag: offer.name,
+          tag: offer.id,
           child: Material(
             child: InkWell(
               onTap: () {
@@ -135,18 +135,20 @@ class Single_Offer extends StatelessWidget {
                           offer.name,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            Text("Expires: "),
-                            Text(
-                              DateFormat.yMMMMd('en_US')
-                                  .format(offer.expiration),
-                              style: TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.w800),
-                            ),
-                          ],
+                        FittedBox(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Expires: "),
+                              Text(
+                                DateFormat.yMMMMd('en_US')
+                                    .format(offer.expiration),
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
                         )
                       ],
                     ),

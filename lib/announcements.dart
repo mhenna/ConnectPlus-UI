@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
@@ -21,12 +22,9 @@ class _AnnouncementsState extends State<Announcements> {
   }
 
   Future<void> _showFilters(List<Announcement> announcements) async {
-    final selectedFilters = onBehalfOfFilter.isEmpty
-        ? announcements.map((a) => a.onBehalfOf).toList()
-        : onBehalfOfFilter;
     return await FilterListDialog.display(
       context,
-      allTextList: announcements.map((a) => a.onBehalfOf).toList(),
+      allTextList: announcements.map((a) => a.onBehalfOf).toSet().toList(),
       height: 480,
       borderRadius: 20,
       headlineText: "Select Announcements on Behalf of",
@@ -34,7 +32,7 @@ class _AnnouncementsState extends State<Announcements> {
       allResetButonColor: Utils.header,
       selectedTextBackgroundColor: Utils.header,
       searchFieldHintText: "Search Here",
-      selectedTextList: selectedFilters,
+      selectedTextList: onBehalfOfFilter,
       onApplyButtonClick: (onBehalfOfFilterList) {
         setState(() {
           onBehalfOfFilter = onBehalfOfFilterList;
@@ -49,7 +47,8 @@ class _AnnouncementsState extends State<Announcements> {
 
     if (onBehalfOfFilter == null) {
       // will only run once
-      onBehalfOfFilter = announcements.map((a) => a.onBehalfOf).toList();
+      onBehalfOfFilter =
+          announcements.map((a) => a.onBehalfOf).toSet().toList();
     }
     return announcements;
   }
@@ -60,7 +59,7 @@ class _AnnouncementsState extends State<Announcements> {
     return FutureBuilder<List<Announcement>>(
       future: _getAnnouncements(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return Scaffold(body: LoadingIndicator());
+        if (!snapshot.hasData) return Scaffold(body: ImageRotate());
         final List<Announcement> announcements = snapshot.data;
         return Scaffold(
           floatingActionButton: FloatingActionButton(
@@ -77,8 +76,14 @@ class _AnnouncementsState extends State<Announcements> {
                 toSuggest: (pattern) {
                   if (pattern == "") return null;
                   return announcements
-                      .where((a) => filter(a) && a.name.startsWith(pattern))
-                      .take(5); // suggests only 5
+                      .where(
+                        (a) =>
+                            filter(a) &&
+                            a.name
+                                .toLowerCase()
+                                .startsWith(pattern.toLowerCase()),
+                      )
+                      .take(5); // suggests only 5 results
                 },
               ),
               preferredSize: Size.fromHeight(kToolbarHeight + 10),

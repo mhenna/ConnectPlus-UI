@@ -103,7 +103,7 @@ class Single_Announcement extends StatelessWidget {
       height: height,
       child: Card(
         child: Hero(
-          tag: announcement.name,
+          tag: announcement.id,
           child: Material(
             child: InkWell(
               onTap: () {
