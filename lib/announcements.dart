@@ -21,9 +21,6 @@ class _AnnouncementsState extends State<Announcements> {
   }
 
   Future<void> _showFilters(List<Announcement> announcements) async {
-    final selectedFilters = onBehalfOfFilter.isEmpty
-        ? announcements.map((a) => a.onBehalfOf).toList()
-        : onBehalfOfFilter;
     return await FilterListDialog.display(
       context,
       allTextList: announcements.map((a) => a.onBehalfOf).toSet().toList(),
@@ -34,7 +31,7 @@ class _AnnouncementsState extends State<Announcements> {
       allResetButonColor: Utils.header,
       selectedTextBackgroundColor: Utils.header,
       searchFieldHintText: "Search Here",
-      selectedTextList: selectedFilters,
+      selectedTextList: onBehalfOfFilter,
       onApplyButtonClick: (onBehalfOfFilterList) {
         setState(() {
           onBehalfOfFilter = onBehalfOfFilterList;
