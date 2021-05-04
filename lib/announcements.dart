@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'package:connect_plus/services/web_api.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
@@ -58,7 +59,7 @@ class _AnnouncementsState extends State<Announcements> {
     return FutureBuilder<List<Announcement>>(
       future: _getAnnouncements(),
       builder: (context, snapshot) {
-        if (!snapshot.hasData) return Scaffold(body: LoadingIndicator());
+        if (!snapshot.hasData) return Scaffold(body: ImageRotate());
         final List<Announcement> announcements = snapshot.data;
         return Scaffold(
           floatingActionButton: FloatingActionButton(
