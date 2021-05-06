@@ -31,6 +31,7 @@ class _RegistrationState extends State<Registration> {
   var asyncCall = false;
   var ip;
   var port;
+  bool haveCar = true;
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
@@ -48,6 +49,12 @@ class _RegistrationState extends State<Registration> {
     phoneController.dispose();
     carPlateController.dispose();
     super.dispose();
+  }
+
+  void _displayCarPlate(bool _haveCar) {
+    setState(() {
+      haveCar = _haveCar;
+    });
   }
 
   @override
@@ -286,10 +293,19 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                     Container(
                                       width: width * 0.85,
-                                      child: CarPlateForm(
-                                        carPlateController: carPlateController,
+                                      child: carRadioButton(
+                                        displayCarPlate: _displayCarPlate,
                                       ),
                                     ),
+                                    haveCar == true
+                                        ? Container(
+                                            width: width * 0.85,
+                                            child: CarPlateForm(
+                                              carPlateController:
+                                                  carPlateController,
+                                            ),
+                                          )
+                                        : Container(),
                                     SizedBox(height: height * 0.027),
                                     Container(
                                       width: width * 0.85,
@@ -436,9 +452,6 @@ class _CarPlateFormState extends State<CarPlateForm> {
   String _plateNumbers = "";
 
   String _validateLetters(String letters) {
-    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-      return null;
-    }
     if (_plateLetters.isEmpty) {
       return "Empty field";
     }
@@ -451,11 +464,8 @@ class _CarPlateFormState extends State<CarPlateForm> {
   }
 
   String _validateNumbers(String numbers) {
-    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-      return null;
-    }
     if (_plateNumbers.isEmpty) {
-      return "Invalid Input";
+      return "Empty field";
     }
     bool numbersAreValid =
         RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(numbers.toString());
@@ -579,6 +589,69 @@ class CarPlateTextField extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class carRadioButton extends StatefulWidget {
+  final void Function(bool value) displayCarPlate;
+  carRadioButton({
+    Key key,
+    this.displayCarPlate,
+  }) : super(key: key);
+  @override
+  _State createState() => _State();
+}
+
+class QuestionsOptions {
+  String name;
+  int index;
+  QuestionsOptions({this.name, this.index});
+}
+
+class _State extends State<carRadioButton> {
+  String radioItem = 'Yes';
+  int id = 1;
+  List<QuestionsOptions> optionsList = [
+    QuestionsOptions(
+      index: 1,
+      name: "Yes",
+    ),
+    QuestionsOptions(
+      index: 0,
+      name: "No",
+    ),
+  ];
+
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Text(
+              "Have a car ?",
+              style: TextStyle(fontSize: 20.0),
+            ),
+            Column(children: <Widget>[
+              Row(
+                children: optionsList
+                    .map((data) => Expanded(
+                            child: RadioListTile(
+                          title: Text("${data.name}"),
+                          groupValue: id,
+                          value: data.index,
+                          onChanged: (val) {
+                            widget.displayCarPlate(data.index == 1);
+                            setState(() {
+                              radioItem = data.name;
+                              id = data.index;
+                            });
+                          },
+                        )))
+                    .toList(),
+              )
+            ])
+          ]),
     );
   }
 }
