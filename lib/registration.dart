@@ -53,6 +53,7 @@ class _RegistrationState extends State<Registration> {
 
   void _displayCarPlate(bool _haveCar) {
     setState(() {
+      if (_haveCar == false) carPlateController.clear();
       haveCar = _haveCar;
     });
   }
