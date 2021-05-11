@@ -64,6 +64,13 @@ class _RegistrationState extends State<Registration> {
     BusinessUnit = Value;
   }
 
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      asyncCall = value;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
@@ -304,6 +311,8 @@ class _RegistrationState extends State<Registration> {
                                       child: BusinessUnitWidget(
                                         BusinessUnitController:
                                             businessUnitController,
+                                        asyncCallController:
+                                            _asyncCallController,
                                       ),
                                     ),
                                     SizedBox(height: 20.0),
@@ -674,16 +683,19 @@ class _State extends State<carRadioButton> {
 
 class BusinessUnitWidget extends StatelessWidget {
   final void Function(String value) BusinessUnitController;
-
+  final void Function(bool value) asyncCallController;
   const BusinessUnitWidget({
     Key key,
     @required this.BusinessUnitController,
+    @required this.asyncCallController,
   }) : super(key: key);
 
   void onChange(String val) {
-    // _value = val;
     BusinessUnitController(val);
-    print(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
   }
 
   @override
@@ -703,6 +715,7 @@ class BusinessUnitWidget extends StatelessWidget {
           width: width * 0.85,
           child: BusinessUnit(
             PassValue: onChange,
+            asyncCallController: onLoaded,
           ),
         ),
       ],
