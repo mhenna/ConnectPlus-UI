@@ -28,7 +28,6 @@ class _RegistrationState extends State<Registration> {
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
   final carPlateController = TextEditingController();
-
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -37,6 +36,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
+  String BusinessUnit;
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -58,6 +58,10 @@ class _RegistrationState extends State<Registration> {
       if (_haveCar == false) carPlateController.clear();
       haveCar = _haveCar;
     });
+  }
+
+  void businessUnitController(String Value) {
+    BusinessUnit = Value;
   }
 
   @override
@@ -211,6 +215,7 @@ class _RegistrationState extends State<Registration> {
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlate: carPlateController.text,
+              businessUnit: BusinessUnit,
             );
             if (registered) {
               await successDialog();
@@ -296,7 +301,10 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                     Container(
                                       width: width * 0.85,
-                                      child: BusinessUnitWidget(),
+                                      child: BusinessUnitWidget(
+                                        BusinessUnitController:
+                                            businessUnitController,
+                                      ),
                                     ),
                                     SizedBox(height: 20.0),
                                     Container(
@@ -665,10 +673,17 @@ class _State extends State<carRadioButton> {
 }
 
 class BusinessUnitWidget extends StatelessWidget {
-  String _value = "";
+  final void Function(String value) BusinessUnitController;
+
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+  }) : super(key: key);
+
   void onChange(String val) {
-    _value = val;
-    print(_value);
+    // _value = val;
+    BusinessUnitController(val);
+    print(val);
   }
 
   @override
