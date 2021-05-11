@@ -25,6 +25,7 @@ class AuthService {
     @required String username,
     @required String phoneNumber,
     String carPlate,
+    String businessUnit,
   }) async {
     try {
       final UserCredential cred = await _fbAuth.createUserWithEmailAndPassword(
@@ -43,6 +44,7 @@ class AuthService {
           'updatedAt': DateTime.now().toString(),
           'blocked': false,
           'id': cred.user.uid,
+          'businessUnit': businessUnit,
         });
         return true;
       }
