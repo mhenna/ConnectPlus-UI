@@ -33,6 +33,7 @@ class User {
   Role role;
   String id;
   String carPlate;
+  String businessUnit;
 
   User({
     this.confirmed,
@@ -48,6 +49,7 @@ class User {
     this.role,
     this.id,
     this.carPlate,
+    this.businessUnit,
   });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -64,6 +66,7 @@ class User {
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
     carPlate = json['carPlate'];
+    businessUnit = json['businessUnit'];
   }
 
   Map<String, dynamic> toJson() {
@@ -83,6 +86,7 @@ class User {
       data['role'] = this.role.toJson();
     }
     data['id'] = this.id;
+    data['businessUnit'] = this.businessUnit;
     return data;
   }
 
@@ -100,22 +104,23 @@ class User {
     Role role,
     String id,
     String carPlate,
+    String businessUnit,
   }) {
     return User(
-      confirmed: confirmed ?? this.confirmed,
-      blocked: blocked ?? this.blocked,
-      sId: sId ?? this.sId,
-      username: username ?? this.username,
-      email: email ?? this.email,
-      phoneNumber: phoneNumber ?? this.phoneNumber,
-      provider: provider ?? this.provider,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      iV: iV ?? this.iV,
-      role: role ?? this.role,
-      id: id ?? this.id,
-      carPlate: carPlate ?? this.carPlate,
-    );
+        confirmed: confirmed ?? this.confirmed,
+        blocked: blocked ?? this.blocked,
+        sId: sId ?? this.sId,
+        username: username ?? this.username,
+        email: email ?? this.email,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
+        provider: provider ?? this.provider,
+        createdAt: createdAt ?? this.createdAt,
+        updatedAt: updatedAt ?? this.updatedAt,
+        iV: iV ?? this.iV,
+        role: role ?? this.role,
+        id: id ?? this.id,
+        carPlate: carPlate ?? this.carPlate,
+        businessUnit: businessUnit ?? this.businessUnit);
   }
 }
 
