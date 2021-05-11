@@ -10,6 +10,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -27,6 +28,7 @@ class _RegistrationState extends State<Registration> {
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
   final carPlateController = TextEditingController();
+
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -292,6 +294,11 @@ class _RegistrationState extends State<Registration> {
                                       width: width * 0.85,
                                       child: phoneField,
                                     ),
+                                    Container(
+                                      width: width * 0.85,
+                                      child: BusinessUnitWidget(),
+                                    ),
+                                    SizedBox(height: 20.0),
                                     Container(
                                       width: width * 0.85,
                                       child: carRadioButton(
@@ -653,6 +660,37 @@ class _State extends State<carRadioButton> {
               )
             ])
           ]),
+    );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  String _value = "";
+  void onChange(String val) {
+    _value = val;
+    print(_value);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        SizedBox(height: 20.0),
+        Container(
+          width: width * 0.85,
+          child: Text(
+            'Business Unit',
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
+        Container(
+          width: width * 0.85,
+          child: BusinessUnit(
+            PassValue: onChange,
+          ),
+        ),
+      ],
     );
   }
 }
