@@ -269,6 +269,16 @@ class MapScreenState extends State<ProfilePage>
                                                   carPlateController,
                                               initialValue: user.carPlate,
                                             ),
+                                      _getLabel("Business Unit"),
+                                      _notEditing
+                                          ? _getField(
+                                              user.businessUnit, null, false)
+                                          : BusinessUnitWidget(
+                                              userBu: user.businessUnit,
+                                            ),
+                                      !_notEditing
+                                          ? _getActionButtons(user)
+                                          : new Container(),
                                     ],
                                   ));
                             },
@@ -526,7 +536,7 @@ class BusinessUnitWidget extends StatelessWidget {
   }
 
   void onLoaded(bool val) {
-    asyncCallController(val);
+    //asyncCallController(val);
   }
 
   @override
