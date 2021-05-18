@@ -1,4 +1,5 @@
 import 'package:connect_plus/login.dart';
+import 'package:connect_plus/registration/car_plate_widget.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -487,102 +488,46 @@ class _CarPlateFormState extends State<CarPlateForm> {
     return null;
   }
 
-  final List<String> letters = ['A', 'B', 'C', 'D', 'E'];
-  final List<String> numbers = ['1', '2', '3', '4', '5'];
-
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CarPlateInputTitle(),
-        SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: CarPlateTextField(
-                validator: _validateNumbers,
-                hintText: "١٢٣",
-                onChanged: (numbers) {
-                  _plateNumbers = numbers;
-                  widget.carPlateController.text =
-                      _plateLetters + _plateNumbers;
-                },
-              ),
-            ),
-            SizedBox(width: 8),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: CarPlateTextField(
-                validator: _validateLetters,
-                hintText: "أ ب ج",
-                onChanged: (letters) {
-                  _plateLetters = letters;
-                  widget.carPlateController.text =
-                      _plateLetters + _plateNumbers;
-                },
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 20),
-        Container(
-          width: MediaQuery.of(context).size.width,
-          height: 64,
-          decoration: BoxDecoration(
-            color: Color(0xFF0060FF),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(8),
-            ),
-            border: Border.all(color: Colors.black, width: 5.0),
-          ),
-        ),
-        Container(
-          alignment: Alignment.center,
-          height: 120,
-          width: MediaQuery.of(context).size.width,
-          decoration: BoxDecoration(
-            color: Color(0xFFE6E6E6),
-            border: Border(
-              bottom: BorderSide(width: 5.0),
-              left: BorderSide(width: 5.0),
-              right: BorderSide(width: 5.0),
-              top: BorderSide(width: 0.0),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(
-                width: 100,
-                height: 100,
-                child: PageView(
-                  scrollDirection: Axis.vertical,
-                  onPageChanged: (int idx) {},
-                  controller: PageController(viewportFraction: 0.5),
-                  children: [
-                    Text("A"),
-                    Text("B"),
-                    Text("C"),
-                    Text("D"),
-                  ],
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Container(
-                  width: 12,
-                  height: 120,
-                  color: Colors.grey,
-                ),
-              ),
-              Text("asd"),
-            ],
-          ),
-        ),
+        CarPlatePicker(),
+
+        // SizedBox(height: 8),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   children: [
+        //     SizedBox(
+        //       width: MediaQuery.of(context).size.width * 0.4,
+        //       child: CarPlateTextField(
+        //         validator: _validateNumbers,
+        //         hintText: "١٢٣",
+        //         onChanged: (numbers) {
+        //           _plateNumbers = numbers;
+        //           widget.carPlateController.text =
+        //               _plateLetters + _plateNumbers;
+        //         },
+        //       ),
+        //     ),
+        //     SizedBox(width: 8),
+        //     SizedBox(
+        //       width: MediaQuery.of(context).size.width * 0.4,
+        //       child: CarPlateTextField(
+        //         validator: _validateLetters,
+        //         hintText: "أ ب ج",
+        //         onChanged: (letters) {
+        //           _plateLetters = letters;
+        //           widget.carPlateController.text =
+        //               _plateLetters + _plateNumbers;
+        //         },
+        //       ),
+        //     ),
+        //   ],
+        // ),
+        // SizedBox(height: 20),
       ],
     );
   }
