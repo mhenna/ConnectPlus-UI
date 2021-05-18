@@ -10,6 +10,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -35,6 +36,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
+  String BusinessUnit;
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -55,6 +57,17 @@ class _RegistrationState extends State<Registration> {
     setState(() {
       if (_haveCar == false) carPlateController.clear();
       haveCar = _haveCar;
+    });
+  }
+
+  void businessUnitController(String Value) {
+    BusinessUnit = Value;
+  }
+
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      asyncCall = value;
     });
   }
 
@@ -209,6 +222,7 @@ class _RegistrationState extends State<Registration> {
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlate: carPlateController.text,
+              businessUnit: BusinessUnit,
             );
             if (registered) {
               await successDialog();
@@ -292,6 +306,16 @@ class _RegistrationState extends State<Registration> {
                                       width: width * 0.85,
                                       child: phoneField,
                                     ),
+                                    Container(
+                                      width: width * 0.85,
+                                      child: BusinessUnitWidget(
+                                        BusinessUnitController:
+                                            businessUnitController,
+                                        asyncCallController:
+                                            _asyncCallController,
+                                      ),
+                                    ),
+                                    SizedBox(height: 20.0),
                                     Container(
                                       width: width * 0.85,
                                       child: carRadioButton(
@@ -653,6 +677,48 @@ class _State extends State<carRadioButton> {
               )
             ])
           ]),
+    );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  final void Function(String value) BusinessUnitController;
+  final void Function(bool value) asyncCallController;
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+    @required this.asyncCallController,
+  }) : super(key: key);
+
+  void onChange(String val) {
+    BusinessUnitController(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        SizedBox(height: 20.0),
+        Container(
+          width: width * 0.85,
+          child: Text(
+            'Business Unit',
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
+        Container(
+          width: width * 0.85,
+          child: BusinessUnit(
+            PassValue: onChange,
+            asyncCallController: onLoaded,
+          ),
+        ),
+      ],
     );
   }
 }

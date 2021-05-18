@@ -35,7 +35,7 @@ class WebAPI {
   static final String _categoriesURL = '/categories';
   static final String _eventHighlightsURL = "/event-highlights";
   static final String _announcementURL = "/announcements";
-
+  static final String _businessUnitURL = "/business-units";
   // TODO: remove this to a separate service
   static User currentUser;
   static String currentToken;
@@ -504,5 +504,18 @@ class WebAPI {
     }
 
     return announcements;
+  }
+
+  static Future<List<String>> getBusinessUnits() async {
+    final response = await get(_businessUnitURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawBU = json.decode(response.body);
+    final List<String> BUs = [];
+    for (final BU in rawBU) {
+      BUs.add(BU["name"]);
+    }
+    print(BUs);
+    return BUs;
   }
 }
