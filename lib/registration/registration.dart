@@ -27,12 +27,13 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-  final carPlateController = TextEditingController();
+
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
   var port;
   bool haveCar = true;
+  String carPlate;
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
@@ -48,13 +49,11 @@ class _RegistrationState extends State<Registration> {
     emController.dispose();
     pwController.dispose();
     phoneController.dispose();
-    carPlateController.dispose();
     super.dispose();
   }
 
   void _displayCarPlate(bool _haveCar) {
     setState(() {
-      if (_haveCar == false) carPlateController.clear();
       haveCar = _haveCar;
     });
   }
@@ -213,7 +212,7 @@ class _RegistrationState extends State<Registration> {
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
-              carPlate: carPlateController.text,
+              carPlate: carPlate,
             );
             if (registered) {
               await successDialog();
@@ -311,10 +310,7 @@ class _RegistrationState extends State<Registration> {
                                   haveCar == true
                                       ? Container(
                                           width: width * 0.85,
-                                          child: CarPlateForm(
-                                            carPlateController:
-                                                carPlateController,
-                                          ),
+                                          child: CarPlateForm(),
                                         )
                                       : Container(),
                                   SizedBox(height: height * 0.027),
@@ -448,86 +444,19 @@ class _RegistrationState extends State<Registration> {
   }
 }
 
-class CarPlateForm extends StatefulWidget {
-  const CarPlateForm({
-    Key key,
-    @required this.carPlateController,
-  }) : super(key: key);
-
-  final TextEditingController carPlateController;
-
-  @override
-  _CarPlateFormState createState() => _CarPlateFormState();
-}
-
-class _CarPlateFormState extends State<CarPlateForm> {
-  String _plateLetters = "";
-  String _plateNumbers = "";
-
-  String _validateLetters(String letters) {
-    if (_plateLetters.isEmpty) {
-      return "Empty field";
-    }
-    bool lettersValid = RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
-        .hasMatch(letters.toString());
-    if (!lettersValid) {
-      return "Arabic letters only";
-    }
-    return null;
-  }
-
-  String _validateNumbers(String numbers) {
-    if (_plateNumbers.isEmpty) {
-      return "Empty field";
-    }
-    bool numbersAreValid =
-        RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(numbers.toString());
-    if (!numbersAreValid) {
-      return "Arabic numerals only";
-    }
-    return null;
-  }
-
+class CarPlateForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CarPlateInputTitle(),
-        CarPlatePicker(),
-
-        // SizedBox(height: 8),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   children: [
-        //     SizedBox(
-        //       width: MediaQuery.of(context).size.width * 0.4,
-        //       child: CarPlateTextField(
-        //         validator: _validateNumbers,
-        //         hintText: "١٢٣",
-        //         onChanged: (numbers) {
-        //           _plateNumbers = numbers;
-        //           widget.carPlateController.text =
-        //               _plateLetters + _plateNumbers;
-        //         },
-        //       ),
-        //     ),
-        //     SizedBox(width: 8),
-        //     SizedBox(
-        //       width: MediaQuery.of(context).size.width * 0.4,
-        //       child: CarPlateTextField(
-        //         validator: _validateLetters,
-        //         hintText: "أ ب ج",
-        //         onChanged: (letters) {
-        //           _plateLetters = letters;
-        //           widget.carPlateController.text =
-        //               _plateLetters + _plateNumbers;
-        //         },
-        //       ),
-        //     ),
-        //   ],
-        // ),
-        // SizedBox(height: 20),
+        SizedBox(height: 10),
+        CarPlatePicker(
+          onChanged: (carPlate) {
+            print(carPlate);
+          },
+        ),
       ],
     );
   }
