@@ -147,15 +147,19 @@ class _RegistrationState extends State<Registration> {
       },
     );
     final registerTitle = Text.rich(
-      TextSpan(children: <TextSpan>[
-        TextSpan(
+      TextSpan(
+        children: <TextSpan>[
+          TextSpan(
             text: ' Register ',
             style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Utils.header,
-                fontSize: size * 55,
-                fontFamily: "Roboto"))
-      ]),
+              fontWeight: FontWeight.bold,
+              color: Utils.header,
+              fontSize: size * 55,
+              fontFamily: "Roboto",
+            ),
+          )
+        ],
+      ),
     );
     final loginPath = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -237,100 +241,107 @@ class _RegistrationState extends State<Registration> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
-          inAsyncCall: asyncCall,
-          opacity: 0.5,
-          progressIndicator: ImageRotate(),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    image: DecorationImage(
-                      image: AssetImage("assets/logo2.png"),
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                    ),
+        inAsyncCall: asyncCall,
+        opacity: 0.5,
+        progressIndicator: ImageRotate(),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  image: DecorationImage(
+                    image: AssetImage("assets/logo2.png"),
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.topCenter,
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(width * 0.05,
-                            height * 0.25, width * 0.05, height * 0.03),
-                        child: Card(
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(height: height * 0.03),
-                              Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: width * 0.01),
-                                      child: registerTitle)),
-                              SizedBox(height: height * 0.03),
-                              Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: <Widget>[
-                                    Container(
-                                      width: width * 0.85,
-                                      child: firstNameField,
-                                    ),
-                                    SizedBox(height: height * 0.03),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: emailField,
-                                    ),
-                                    SizedBox(height: height * 0.03),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: passwordField,
-                                    ),
-                                    SizedBox(height: 20.0),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: phoneField,
-                                    ),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: carRadioButton(
-                                        displayCarPlate: _displayCarPlate,
-                                      ),
-                                    ),
-                                    haveCar == true
-                                        ? Container(
-                                            width: width * 0.85,
-                                            child: CarPlateForm(
-                                              carPlateController:
-                                                  carPlateController,
-                                            ),
-                                          )
-                                        : Container(),
-                                    SizedBox(height: height * 0.027),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: Padding(
-                                          padding: EdgeInsets.only(bottom: 20),
-                                          child: registerButton),
-                                    ),
-                                  ],
-                                ),
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(
+                        width * 0.05,
+                        height * 0.25,
+                        width * 0.05,
+                        height * 0.03,
+                      ),
+                      child: Card(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: height * 0.03),
+                            Container(
+                              alignment: Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: width * 0.01),
+                                child: registerTitle,
                               ),
-                            ],
-                          ),
+                            ),
+                            SizedBox(height: height * 0.03),
+                            Form(
+                              key: _formKey,
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    width: width * 0.85,
+                                    child: firstNameField,
+                                  ),
+                                  SizedBox(height: height * 0.03),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: emailField,
+                                  ),
+                                  SizedBox(height: height * 0.03),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: passwordField,
+                                  ),
+                                  SizedBox(height: 20.0),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: phoneField,
+                                  ),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: CarPlateRadioButton(
+                                      displayCarPlate: _displayCarPlate,
+                                    ),
+                                  ),
+                                  haveCar == true
+                                      ? Container(
+                                          width: width * 0.85,
+                                          child: CarPlateForm(
+                                            carPlateController:
+                                                carPlateController,
+                                          ),
+                                        )
+                                      : Container(),
+                                  SizedBox(height: height * 0.027),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      child: registerButton,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      loginPath,
-                      SizedBox(
-                        height: 20,
-                      )
-                    ],
-                  ),
+                    ),
+                    loginPath,
+                    SizedBox(
+                      height: 20,
+                    )
+                  ],
                 ),
               ),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -594,9 +605,9 @@ class CarPlateTextField extends StatelessWidget {
   }
 }
 
-class carRadioButton extends StatefulWidget {
+class CarPlateRadioButton extends StatefulWidget {
   final void Function(bool value) displayCarPlate;
-  carRadioButton({
+  CarPlateRadioButton({
     Key key,
     this.displayCarPlate,
   }) : super(key: key);
@@ -610,7 +621,7 @@ class QuestionsOptions {
   QuestionsOptions({this.name, this.index});
 }
 
-class _State extends State<carRadioButton> {
+class _State extends State<CarPlateRadioButton> {
   String radioItem = 'Yes';
   int id = 1;
   List<QuestionsOptions> optionsList = [
@@ -627,13 +638,14 @@ class _State extends State<carRadioButton> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Have a car ?",
-              style: TextStyle(fontSize: 20.0),
-            ),
-            Column(children: <Widget>[
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            "Have a car ?",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          Column(
+            children: <Widget>[
               Row(
                 children: optionsList
                     .map((data) => Expanded(
@@ -651,8 +663,10 @@ class _State extends State<carRadioButton> {
                         )))
                     .toList(),
               )
-            ])
-          ]),
+            ],
+          )
+        ],
+      ),
     );
   }
 }
