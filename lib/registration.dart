@@ -1,7 +1,7 @@
 import 'package:connect_plus/login.dart';
-import 'package:connect_plus/registration/car_plate_widget.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
