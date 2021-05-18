@@ -3,7 +3,7 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:connect_plus/registration/registration.dart';
+import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:localstorage/localstorage.dart';
 import 'widgets/pushNotification.dart';
