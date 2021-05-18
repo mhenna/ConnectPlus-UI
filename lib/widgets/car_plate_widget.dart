@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 
+/// Car Plate Picker that shows a design of an Egyptian License plate
+/// with a scroll wheel to choose the letters and numbers from.
+///
+/// If using for editing then moving to non-editing, make sure to change the
+/// initial plate to the new value in case of confirmation in order to
+/// see the changes
 class CarPlatePicker extends StatefulWidget {
+  /// Callback that runs whenever a change happens to the picker.
+  /// It is also called with the initial license plate during
+  /// initialization
   final void Function(String carPlate) onChanged;
+
+  /// The initial plate letters and numbers to show instead of
+  /// starting the picker at the top
   final String initialPlate;
+
+  /// Set to false to change the picker to read-only mode
   final bool editable;
-  CarPlatePicker(
-      {Key key,
-      @required this.onChanged,
-      this.editable = true,
-      this.initialPlate})
-      : super(key: key);
+
+  CarPlatePicker({
+    Key key,
+    @required this.onChanged,
+    this.editable = true,
+    this.initialPlate,
+  }) : super(key: key);
 
   @override
   _CarPlatePickerState createState() => _CarPlatePickerState();
@@ -60,9 +75,11 @@ class _CarPlatePickerState extends State<CarPlatePicker> {
     '٩'
   ];
 
+  // to store values during editing
   String _letters;
   String _numbers;
 
+  /// Returns list of letters from the initial license plate
   List<String> _getInitialLetters() {
     List<String> ltrs = [];
     if (widget.initialPlate != null) {
@@ -76,6 +93,7 @@ class _CarPlatePickerState extends State<CarPlatePicker> {
     return null;
   }
 
+  /// Returns list of numbers from the initial license plate
   List<String> _getInitialNumbers() {
     List<String> nums = [];
     if (widget.initialPlate != null) {
@@ -168,6 +186,8 @@ class CarPlateLetters extends StatefulWidget {
 
 class _CarPlateLettersState extends State<CarPlateLetters> {
   String _char1, _char2, _char3;
+
+  /// Returns the letters at a certain position from the initial letters
   String _getInitialLetterAt(int position) {
     if (widget.initialLetters != null) {
       return widget.initialLetters[position];
@@ -240,6 +260,7 @@ class CarPlateNumbers extends StatefulWidget {
 class _CarPlateNumbersState extends State<CarPlateNumbers> {
   String _no1, _no2, _no3, _no4;
 
+  /// Returns the number at a certain position from the initial numbers
   String _getInitialNumberAt(int position) {
     if (widget.initialNumbers != null) {
       return widget.initialNumbers[position];
@@ -338,6 +359,8 @@ class CarPlateHeader extends StatelessWidget {
   }
 }
 
+/// This widget is responsible for scrolling and selection logic
+/// of one character (letter / number) only
 class CarPlateScrollColumn extends StatefulWidget {
   final List<String> items;
   final String initialItem;
@@ -368,6 +391,10 @@ class _CarPlateScrollColumnState extends State<CarPlateScrollColumn> {
     super.initState();
   }
 
+  /// To restore to initial license plate when moving from editing mode to non-editing mode.
+  ///
+  /// If the mode change was due to confirmation not cancellation, the initialItem should
+  /// be replaced with the new confirmed plate
   @override
   void didUpdateWidget(old) {
     if (!widget.editable && widget.initialItem != null) {
