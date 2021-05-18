@@ -14,6 +14,7 @@ import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/BusinessUnit.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -181,7 +182,7 @@ class MapScreenState extends State<ProfilePage>
         body: ModalProgressHUD(
             inAsyncCall: _loading,
             opacity: 0.5,
-            progressIndicator: CircularProgressIndicator(),
+            progressIndicator: ImageRotate(),
             child: new Container(
               child: new ListView(
                 children: <Widget>[
