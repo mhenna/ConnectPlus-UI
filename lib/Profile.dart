@@ -26,6 +26,7 @@ class MapScreenState extends State<ProfilePage>
   final LocalStorage localStorage = new LocalStorage("Connect+");
   bool _notEditing = true;
   bool _loading = false;
+  String _BusinessUnit = "";
   final FocusNode myFocusNode = FocusNode();
 
   TextEditingController nameController = TextEditingController();
@@ -37,6 +38,12 @@ class MapScreenState extends State<ProfilePage>
     print(value);
     setState(() {
       _loading = value;
+    });
+  }
+
+  void businessUnitController(String value) {
+    setState(() {
+      _BusinessUnit = value;
     });
   }
 
@@ -294,6 +301,8 @@ class MapScreenState extends State<ProfilePage>
                                                   userBu: user.businessUnit,
                                                   asyncCallController:
                                                       _asyncCallController,
+                                                  BusinessUnitController:
+                                                      businessUnitController,
                                                 ),
                                           !_notEditing
                                               ? _getActionButtons(user)
@@ -551,7 +560,7 @@ class BusinessUnitWidget extends StatelessWidget {
   }) : super(key: key);
 
   void onChange(String val) {
-    //BusinessUnitController(val);
+    BusinessUnitController(val);
   }
 
   void onLoaded(bool val) {
