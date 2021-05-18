@@ -1,15 +1,9 @@
-import 'package:connect_plus/models/profile.dart';
-import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:connect_plus/widgets/app_scaffold.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 
@@ -27,9 +21,8 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
+  String _carPlate;
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     try {
@@ -37,8 +30,7 @@ class MapScreenState extends State<ProfilePage>
         await sl<AuthService>().updateProfile(
           username: nameController.text == "" ? null : nameController.text,
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
-          carPlate:
-              carPlateController.text == "" ? null : carPlateController.text,
+          carPlate: _carPlate,
         );
         setState(() {
           _notEditing = true;
@@ -256,16 +248,21 @@ class MapScreenState extends State<ProfilePage>
                                       _getField(user.phoneNumber.toString(),
                                           phoneController, false),
                                       _getLabel("Car Plate"),
-                                      _notEditing
-                                          ? _getField(
-                                              user.carPlate,
-                                              carPlateController,
-                                              false,
-                                            )
-                                          : CarPlateForm(
-                                              carPlateController:
-                                                  carPlateController,
-                                              initialValue: user.carPlate,
+                                      user.carPlate == null
+                                          ? Container()
+                                          : Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 32,
+                                                      vertical: 12),
+                                              child: CarPlatePicker(
+                                                initialPlate:
+                                                    _carPlate ?? user.carPlate,
+                                                onChanged: (plate) {
+                                                  _carPlate = plate;
+                                                },
+                                                editable: !_notEditing,
+                                              ),
                                             ),
                                       !_notEditing
                                           ? _getActionButtons(user)
@@ -291,7 +288,6 @@ class MapScreenState extends State<ProfilePage>
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
-    carPlateController.dispose();
     myFocusNode.dispose();
     super.dispose();
   }
@@ -337,7 +333,7 @@ class MapScreenState extends State<ProfilePage>
                     nameController.text = user.username;
                     emailController.text = user.email;
                     phoneController.text = user.phoneNumber;
-                    carPlateController.text = user.carPlate;
+                    _carPlate = user.carPlate;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
