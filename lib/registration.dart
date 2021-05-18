@@ -11,6 +11,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -37,6 +38,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
+  String BusinessUnit = "";
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -55,6 +57,17 @@ class _RegistrationState extends State<Registration> {
   void _displayCarPlate(bool _haveCar) {
     setState(() {
       haveCar = _haveCar;
+    });
+  }
+
+  void businessUnitController(String Value) {
+    BusinessUnit = Value;
+  }
+
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      asyncCall = value;
     });
   }
 
@@ -213,6 +226,7 @@ class _RegistrationState extends State<Registration> {
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlate: carPlate,
+              businessUnit: BusinessUnit,
             );
             if (registered) {
               await successDialog();
@@ -260,23 +274,18 @@ class _RegistrationState extends State<Registration> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.fromLTRB(
-                        width * 0.05,
-                        height * 0.25,
-                        width * 0.05,
-                        height * 0.03,
-                      ),
+                      padding: EdgeInsets.fromLTRB(width * 0.05, height * 0.25,
+                          width * 0.05, height * 0.03),
                       child: Card(
                         child: Column(
                           children: <Widget>[
                             SizedBox(height: height * 0.03),
                             Container(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: EdgeInsets.only(left: width * 0.01),
-                                child: registerTitle,
-                              ),
-                            ),
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                    padding:
+                                        EdgeInsets.only(left: width * 0.01),
+                                    child: registerTitle)),
                             SizedBox(height: height * 0.03),
                             Form(
                               key: _formKey,
@@ -301,6 +310,15 @@ class _RegistrationState extends State<Registration> {
                                     width: width * 0.85,
                                     child: phoneField,
                                   ),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: BusinessUnitWidget(
+                                      BusinessUnitController:
+                                          businessUnitController,
+                                      asyncCallController: _asyncCallController,
+                                    ),
+                                  ),
+                                  SizedBox(height: 20.0),
                                   Container(
                                     width: width * 0.85,
                                     child: CarPlateRadioButton(
@@ -488,7 +506,7 @@ class CarPlateInputTitle extends StatelessWidget {
           },
           child: Tooltip(
             key: _toolTipKey,
-            message: "Text should be in Arabic only",
+            message: "Car plate data will be used for move your car feature",
             preferBelow: false,
             child: Icon(
               Icons.info_outline,
@@ -498,45 +516,6 @@ class CarPlateInputTitle extends StatelessWidget {
           ),
         )
       ],
-    );
-  }
-}
-
-class CarPlateTextField extends StatelessWidget {
-  final void Function(String value) onChanged;
-  final String Function(String value) validator;
-  final String hintText;
-
-  const CarPlateTextField({
-    Key key,
-    this.onChanged,
-    this.validator,
-    this.hintText = "",
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    return TextFormField(
-      onChanged: onChanged,
-      validator: validator,
-      textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 20.0),
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.fromLTRB(
-          width * 0.05,
-          height * 0.025,
-          width * 0.02,
-          height * 0.02,
-        ),
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            15.0,
-          ),
-        ),
-      ),
     );
   }
 }
@@ -603,6 +582,48 @@ class _State extends State<CarPlateRadioButton> {
           )
         ],
       ),
+    );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  final void Function(String value) BusinessUnitController;
+  final void Function(bool value) asyncCallController;
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+    @required this.asyncCallController,
+  }) : super(key: key);
+
+  void onChange(String val) {
+    BusinessUnitController(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    return Column(
+      children: [
+        SizedBox(height: 20.0),
+        Container(
+          width: width * 0.85,
+          child: Text(
+            'Business Unit',
+            style: TextStyle(fontSize: 20.0),
+          ),
+        ),
+        Container(
+          width: width * 0.85,
+          child: BusinessUnit(
+            PassValue: onChange,
+            asyncCallController: onLoaded,
+          ),
+        ),
+      ],
     );
   }
 }

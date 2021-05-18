@@ -6,6 +6,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -16,13 +19,30 @@ class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final LocalStorage localStorage = new LocalStorage("Connect+");
   bool _notEditing = true;
+  bool _loading = false;
+  String _BusinessUnit = "";
   final FocusNode myFocusNode = FocusNode();
 
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
   String _carPlate;
+
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      _loading = value;
+    });
+  }
+
+  void businessUnitController(String value) {
+    setState(() {
+      _BusinessUnit = value;
+    });
+  }
+
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
     try {
@@ -31,6 +51,7 @@ class MapScreenState extends State<ProfilePage>
           username: nameController.text == "" ? null : nameController.text,
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
           carPlate: _carPlate,
+          businessUnit: _BusinessUnit == "" ? null : _BusinessUnit,
         );
         setState(() {
           _notEditing = true;
@@ -140,27 +161,31 @@ class MapScreenState extends State<ProfilePage>
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-        backgroundColor: Utils.background,
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("Profile Details"),
-          centerTitle: true,
-          backgroundColor: Utils.header,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Utils.secondaryColor,
-                  Utils.primaryColor,
-                ],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
+      backgroundColor: Utils.background,
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text("Profile Details"),
+        centerTitle: true,
+        backgroundColor: Utils.header,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
             ),
           ),
         ),
-        body: new Container(
+      ),
+      body: ModalProgressHUD(
+        inAsyncCall: _loading,
+        opacity: 0.5,
+        progressIndicator: ImageRotate(),
+        child: new Container(
           child: new ListView(
             children: <Widget>[
               Column(
@@ -203,22 +228,23 @@ class MapScreenState extends State<ProfilePage>
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: <Widget>[
                           Padding(
-                              padding: EdgeInsets.only(right: width * 0.08),
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      _notEditing
-                                          ? _getEditIcon()
-                                          : new Container(),
-                                    ],
-                                  )
-                                ],
-                              )),
+                            padding: EdgeInsets.only(right: width * 0.08),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                new Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    _notEditing
+                                        ? _getEditIcon()
+                                        : new Container(),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
                           FutureBuilder<User>(
                             future: sl<AuthService>().user,
                             builder: (context, snapshot) {
@@ -248,7 +274,7 @@ class MapScreenState extends State<ProfilePage>
                                       _getField(user.phoneNumber.toString(),
                                           phoneController, false),
                                       _getLabel("Car Plate"),
-                                      user.carPlate == null
+                                      user.carPlate == null && _notEditing
                                           ? Container()
                                           : Padding(
                                               padding:
@@ -264,6 +290,17 @@ class MapScreenState extends State<ProfilePage>
                                                 editable: !_notEditing,
                                               ),
                                             ),
+                                      _getLabel("Business Unit"),
+                                      _notEditing
+                                          ? _getField(
+                                              user.businessUnit, null, false)
+                                          : BusinessUnitWidget(
+                                              userBu: user.businessUnit,
+                                              asyncCallController:
+                                                  _asyncCallController,
+                                              BusinessUnitController:
+                                                  businessUnitController,
+                                            ),
                                       !_notEditing
                                           ? _getActionButtons(user)
                                           : new Container(),
@@ -274,12 +311,14 @@ class MapScreenState extends State<ProfilePage>
                         ],
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 
   @override
@@ -504,5 +543,46 @@ class CarPlateTextField extends StatelessWidget {
         hintText: initialText,
       ),
     );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  final void Function(String value) BusinessUnitController;
+  final void Function(bool value) asyncCallController;
+  final String userBu;
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+    @required this.asyncCallController,
+    this.userBu,
+  }) : super(key: key);
+
+  void onChange(String val) {
+    BusinessUnitController(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.08, right: width * 0.08, top: height * 0.01),
+        child: Column(
+          children: [
+            Container(
+              width: width * 0.85,
+              child: BusinessUnit(
+                PassValue: onChange,
+                asyncCallController: onLoaded,
+                userBU: userBu,
+              ),
+            ),
+          ],
+        ));
   }
 }
