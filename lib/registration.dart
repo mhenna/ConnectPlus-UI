@@ -36,7 +36,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-  String BusinessUnit;
+  String BusinessUnit = "";
   UserCredential userCredentials;
   void initState() {
     super.initState();

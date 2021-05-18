@@ -12,6 +12,9 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:connect_plus/widgets/ImageRotate.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -22,6 +25,8 @@ class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final LocalStorage localStorage = new LocalStorage("Connect+");
   bool _notEditing = true;
+  bool _loading = false;
+  String _BusinessUnit = "";
   final FocusNode myFocusNode = FocusNode();
 
   TextEditingController nameController = TextEditingController();
@@ -29,6 +34,18 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController phoneController = TextEditingController();
   TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      _loading = value;
+    });
+  }
+
+  void businessUnitController(String value) {
+    setState(() {
+      _BusinessUnit = value;
+    });
+  }
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
@@ -39,6 +56,7 @@ class MapScreenState extends State<ProfilePage>
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
           carPlate:
               carPlateController.text == "" ? null : carPlateController.text,
+          businessUnit: _BusinessUnit == "" ? null : _BusinessUnit,
         );
         setState(() {
           _notEditing = true;
@@ -168,121 +186,140 @@ class MapScreenState extends State<ProfilePage>
             ),
           ),
         ),
-        body: new Container(
-          child: new ListView(
-            children: <Widget>[
-              Column(
+        body: ModalProgressHUD(
+            inAsyncCall: _loading,
+            opacity: 0.5,
+            progressIndicator: ImageRotate(),
+            child: new Container(
+              child: new ListView(
                 children: <Widget>[
-                  new Container(
-                    height: height * 0.23,
-                    child: new Column(
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(top: height * 0.05),
-                          child:
-                              new Stack(fit: StackFit.loose, children: <Widget>[
-                            new Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                new Container(
-                                    width: width * 0.20,
-                                    height: height * 0.14,
-                                    decoration: new BoxDecoration(
-                                      image: new DecorationImage(
-                                        image: new ExactAssetImage(
-                                            'assets/as.png'),
-                                        fit: BoxFit.contain,
-                                      ),
-                                    )),
-                              ],
-                            ),
-                          ]),
-                        )
-                      ],
-                    ),
-                  ),
-                  new Container(
-                    color: Utils.background,
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: height * 0.03),
-                      child: new Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                              padding: EdgeInsets.only(right: width * 0.08),
-                              child: new Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  new Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      _notEditing
-                                          ? _getEditIcon()
-                                          : new Container(),
-                                    ],
-                                  )
-                                ],
-                              )),
-                          FutureBuilder<User>(
-                            future: sl<AuthService>().user,
-                            builder: (context, snapshot) {
-                              if (!snapshot.hasData) {
-                                return Center(
-                                  child: SizedBox(
-                                    height: 60,
-                                    width: 60,
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                );
-                              }
-                              final user = snapshot.data;
-                              return Form(
-                                  key: _formKey,
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      _getLabel("Full Name"),
-                                      _getField(user.username.toString(),
-                                          nameController, false),
-                                      _getLabel("Email"),
-                                      _getField(user.email.toString(),
-                                          emailController, true),
-                                      _getLabel("Phone Number"),
-                                      _getField(user.phoneNumber.toString(),
-                                          phoneController, false),
-                                      _getLabel("Car Plate"),
-                                      _notEditing
-                                          ? _getField(
-                                              user.carPlate,
-                                              carPlateController,
-                                              false,
-                                            )
-                                          : CarPlateForm(
-                                              carPlateController:
-                                                  carPlateController,
-                                              initialValue: user.carPlate,
-                                            ),
-                                      !_notEditing
-                                          ? _getActionButtons(user)
-                                          : new Container(),
-                                    ],
-                                  ));
-                            },
-                          ),
-                        ],
+                  Column(
+                    children: <Widget>[
+                      new Container(
+                        height: height * 0.23,
+                        child: new Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: EdgeInsets.only(top: height * 0.05),
+                              child: new Stack(
+                                  fit: StackFit.loose,
+                                  children: <Widget>[
+                                    new Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: <Widget>[
+                                        new Container(
+                                            width: width * 0.20,
+                                            height: height * 0.14,
+                                            decoration: new BoxDecoration(
+                                              image: new DecorationImage(
+                                                image: new ExactAssetImage(
+                                                    'assets/as.png'),
+                                                fit: BoxFit.contain,
+                                              ),
+                                            )),
+                                      ],
+                                    ),
+                                  ]),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  )
+                      new Container(
+                        color: Utils.background,
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom: height * 0.03),
+                          child: new Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              Padding(
+                                  padding: EdgeInsets.only(right: width * 0.08),
+                                  child: new Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: <Widget>[
+                                      new Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          _notEditing
+                                              ? _getEditIcon()
+                                              : new Container(),
+                                        ],
+                                      )
+                                    ],
+                                  )),
+                              FutureBuilder<User>(
+                                future: sl<AuthService>().user,
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return Center(
+                                      child: SizedBox(
+                                        height: 60,
+                                        width: 60,
+                                        child: CircularProgressIndicator(),
+                                      ),
+                                    );
+                                  }
+                                  final user = snapshot.data;
+                                  return Form(
+                                      key: _formKey,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          _getLabel("Full Name"),
+                                          _getField(user.username.toString(),
+                                              nameController, false),
+                                          _getLabel("Email"),
+                                          _getField(user.email.toString(),
+                                              emailController, true),
+                                          _getLabel("Phone Number"),
+                                          _getField(user.phoneNumber.toString(),
+                                              phoneController, false),
+                                          _getLabel("Car Plate"),
+                                          _notEditing
+                                              ? _getField(
+                                                  user.carPlate,
+                                                  carPlateController,
+                                                  false,
+                                                )
+                                              : CarPlateForm(
+                                                  carPlateController:
+                                                      carPlateController,
+                                                  initialValue: user.carPlate,
+                                                ),
+                                          _getLabel("Business Unit"),
+                                          _notEditing
+                                              ? _getField(user.businessUnit,
+                                                  null, false)
+                                              : BusinessUnitWidget(
+                                                  userBu: user.businessUnit,
+                                                  asyncCallController:
+                                                      _asyncCallController,
+                                                  BusinessUnitController:
+                                                      businessUnitController,
+                                                ),
+                                          !_notEditing
+                                              ? _getActionButtons(user)
+                                              : new Container(),
+                                        ],
+                                      ));
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        ));
+            )));
   }
 
   @override
@@ -508,5 +545,46 @@ class CarPlateTextField extends StatelessWidget {
         hintText: initialText,
       ),
     );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  final void Function(String value) BusinessUnitController;
+  final void Function(bool value) asyncCallController;
+  final String userBu;
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+    @required this.asyncCallController,
+    this.userBu,
+  }) : super(key: key);
+
+  void onChange(String val) {
+    BusinessUnitController(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.08, right: width * 0.08, top: height * 0.01),
+        child: Column(
+          children: [
+            Container(
+              width: width * 0.85,
+              child: BusinessUnit(
+                PassValue: onChange,
+                asyncCallController: onLoaded,
+                userBU: userBu,
+              ),
+            ),
+          ],
+        ));
   }
 }
