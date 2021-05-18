@@ -190,7 +190,16 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
   /// Returns the letters at a certain position from the initial letters
   String _getInitialLetterAt(int position) {
     if (widget.initialLetters != null) {
-      return widget.initialLetters[position];
+      // shift letters to right by 1 if 2 letters
+      if (widget.initialLetters.length == 2) {
+        if (position == 2) {
+          return null;
+        } else if (position == 1) {
+          return widget.initialLetters[position];
+        }
+      } else if (widget.initialLetters.length == 3) {
+        return widget.initialLetters[position];
+      }
     }
     return null;
   }
@@ -207,7 +216,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
         CarPlateScrollColumn(
           editable: widget.editable,
           items: ['', ...widget.letters],
-          initialItem: _getInitialLetterAt(0),
+          initialItem: _getInitialLetterAt(2),
           onChanged: (character) {
             _char3 = character;
             // characters are switched as arabic switched alignments
@@ -226,7 +235,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
         CarPlateScrollColumn(
           editable: widget.editable,
           items: widget.letters,
-          initialItem: _getInitialLetterAt(2),
+          initialItem: _getInitialLetterAt(0),
           onChanged: (character) {
             _char1 = character;
             widget.onChanged('$_char1$_char2$_char3');
@@ -263,7 +272,16 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
   /// Returns the number at a certain position from the initial numbers
   String _getInitialNumberAt(int position) {
     if (widget.initialNumbers != null) {
-      return widget.initialNumbers[position];
+      if (widget.initialNumbers.length == 2) {
+        if (position == 0) return null;
+        if (position == 1) return null;
+        return widget.initialNumbers[position - 2];
+      } else if (widget.initialNumbers.length == 3) {
+        if (position == 0) return null;
+        return widget.initialNumbers[position - 1];
+      } else if (widget.initialNumbers.length == 4) {
+        return widget.initialNumbers[position];
+      }
     }
     return null;
   }
