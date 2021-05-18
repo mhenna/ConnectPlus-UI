@@ -23,6 +23,7 @@ class MapScreenState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final LocalStorage localStorage = new LocalStorage("Connect+");
   bool _notEditing = true;
+  bool _loading = false;
   final FocusNode myFocusNode = FocusNode();
 
   TextEditingController nameController = TextEditingController();
@@ -30,6 +31,12 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController phoneController = TextEditingController();
   TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  void _asyncCallController(bool value) {
+    print(value);
+    setState(() {
+      _loading = value;
+    });
+  }
 
   //Missing validation that edit profile is success or a failure .. but tested it is working
   void editProfile() async {
@@ -275,6 +282,8 @@ class MapScreenState extends State<ProfilePage>
                                               user.businessUnit, null, false)
                                           : BusinessUnitWidget(
                                               userBu: user.businessUnit,
+                                              asyncCallController:
+                                                  _asyncCallController,
                                             ),
                                       !_notEditing
                                           ? _getActionButtons(user)
@@ -536,7 +545,7 @@ class BusinessUnitWidget extends StatelessWidget {
   }
 
   void onLoaded(bool val) {
-    //asyncCallController(val);
+    asyncCallController(val);
   }
 
   @override
