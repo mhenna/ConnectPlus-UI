@@ -56,7 +56,7 @@ class MapScreenState extends State<ProfilePage>
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
           carPlate:
               carPlateController.text == "" ? null : carPlateController.text,
-          //businessUnit: businessUnitController
+          businessUnit: _BusinessUnit == "" ? null : _BusinessUnit,
         );
         setState(() {
           _notEditing = true;
