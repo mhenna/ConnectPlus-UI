@@ -12,6 +12,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/BusinessUnit.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -39,6 +40,7 @@ class MapScreenState extends State<ProfilePage>
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
           carPlate:
               carPlateController.text == "" ? null : carPlateController.text,
+          //businessUnit: businessUnitController
         );
         setState(() {
           _notEditing = true;
@@ -267,9 +269,6 @@ class MapScreenState extends State<ProfilePage>
                                                   carPlateController,
                                               initialValue: user.carPlate,
                                             ),
-                                      !_notEditing
-                                          ? _getActionButtons(user)
-                                          : new Container(),
                                     ],
                                   ));
                             },
@@ -508,5 +507,46 @@ class CarPlateTextField extends StatelessWidget {
         hintText: initialText,
       ),
     );
+  }
+}
+
+class BusinessUnitWidget extends StatelessWidget {
+  final void Function(String value) BusinessUnitController;
+  final void Function(bool value) asyncCallController;
+  final String userBu;
+  const BusinessUnitWidget({
+    Key key,
+    @required this.BusinessUnitController,
+    @required this.asyncCallController,
+    this.userBu,
+  }) : super(key: key);
+
+  void onChange(String val) {
+    //BusinessUnitController(val);
+  }
+
+  void onLoaded(bool val) {
+    asyncCallController(val);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+    return Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.08, right: width * 0.08, top: height * 0.01),
+        child: Column(
+          children: [
+            Container(
+              width: width * 0.85,
+              child: BusinessUnit(
+                PassValue: onChange,
+                asyncCallController: onLoaded,
+                userBU: userBu,
+              ),
+            ),
+          ],
+        ));
   }
 }
