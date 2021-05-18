@@ -310,7 +310,11 @@ class _RegistrationState extends State<Registration> {
                                   haveCar == true
                                       ? Container(
                                           width: width * 0.85,
-                                          child: CarPlateForm(),
+                                          child: CarPlateForm(
+                                            onChanged: (plate) {
+                                              carPlate = plate;
+                                            },
+                                          ),
                                         )
                                       : Container(),
                                   SizedBox(height: height * 0.027),
@@ -407,7 +411,6 @@ class _RegistrationState extends State<Registration> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -433,7 +436,6 @@ class _RegistrationState extends State<Registration> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -445,6 +447,9 @@ class _RegistrationState extends State<Registration> {
 }
 
 class CarPlateForm extends StatelessWidget {
+  final Function(String) onChanged;
+
+  const CarPlateForm({Key key, @required this.onChanged}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -453,9 +458,7 @@ class CarPlateForm extends StatelessWidget {
         CarPlateInputTitle(),
         SizedBox(height: 10),
         CarPlatePicker(
-          onChanged: (carPlate) {
-            print(carPlate);
-          },
+          onChanged: onChanged,
         ),
       ],
     );
