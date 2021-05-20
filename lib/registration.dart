@@ -38,7 +38,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-  String BusinessUnit = "";
+  String businessUnit = "";
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -60,8 +60,8 @@ class _RegistrationState extends State<Registration> {
     });
   }
 
-  void businessUnitController(String Value) {
-    BusinessUnit = Value;
+  void businessUnitController(String value) {
+    businessUnit = value;
   }
 
   void _asyncCallController(bool value) {
@@ -226,7 +226,7 @@ class _RegistrationState extends State<Registration> {
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlate: carPlate,
-              businessUnit: BusinessUnit,
+              businessUnit: businessUnit,
             );
             if (registered) {
               await successDialog();
@@ -313,7 +313,7 @@ class _RegistrationState extends State<Registration> {
                                   Container(
                                     width: width * 0.85,
                                     child: BusinessUnitWidget(
-                                      BusinessUnitController:
+                                      businessUnitController:
                                           businessUnitController,
                                       asyncCallController: _asyncCallController,
                                     ),
@@ -587,16 +587,16 @@ class _State extends State<CarPlateRadioButton> {
 }
 
 class BusinessUnitWidget extends StatelessWidget {
-  final void Function(String value) BusinessUnitController;
+  final void Function(String value) businessUnitController;
   final void Function(bool value) asyncCallController;
   const BusinessUnitWidget({
     Key key,
-    @required this.BusinessUnitController,
+    @required this.businessUnitController,
     @required this.asyncCallController,
   }) : super(key: key);
 
   void onChange(String val) {
-    BusinessUnitController(val);
+    businessUnitController(val);
   }
 
   void onLoaded(bool val) {
