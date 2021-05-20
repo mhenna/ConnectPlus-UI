@@ -24,6 +24,7 @@ class AuthService {
     @required String password,
     @required String username,
     @required String phoneNumber,
+    @required String pushNotificationToken,
     String carPlate,
     String businessUnit,
   }) async {
@@ -45,6 +46,7 @@ class AuthService {
           'blocked': false,
           'id': cred.user.uid,
           'businessUnit': businessUnit,
+          'pushNotificationToken': pushNotificationToken,
         });
         return true;
       }
@@ -54,7 +56,10 @@ class AuthService {
     }
   }
 
-  Future<AuthState> login({@required String email, @required password}) async {
+  Future<AuthState> login({
+    @required String email,
+    @required String password,
+  }) async {
     try {
       final userCred = await _fbAuth.signInWithEmailAndPassword(
         email: email,
@@ -77,23 +82,29 @@ class AuthService {
     }
   }
 
-  Future<void> updateProfile(
-      {String username,
-      String phoneNumber,
-      String carPlate,
-      String businessUnit}) async {
+  Future<void> updateProfile({
+    String username,
+    String phoneNumber,
+    String carPlate,
+    String businessUnit,
+    String pushNotificationToken,
+  }) async {
     final userUid = _fbAuth.currentUser.uid;
     await _fs.collection('users').doc(userUid).update({
       'username': username ?? _user.username,
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
       'carPlate': carPlate ?? _user.carPlate,
       'businessUnit': businessUnit ?? _user.businessUnit,
+      'pushNotificationToken':
+          pushNotificationToken ?? _user.pushNotificationToken,
     });
     _user = _user.copyWith(
-        username: username,
-        phoneNumber: phoneNumber,
-        carPlate: carPlate,
-        businessUnit: businessUnit);
+      username: username,
+      phoneNumber: phoneNumber,
+      carPlate: carPlate,
+      businessUnit: businessUnit,
+      pushNotificationToken: pushNotificationToken,
+    );
   }
 
   Future<user_model.User> get user async {
@@ -116,6 +127,14 @@ class AuthService {
 
   Future<void> logout() async {
     return await _fbAuth.signOut();
+  }
+
+  Future<void> updatePushNotificationToken(String pnToken) async {
+    final userUid = _fbAuth.currentUser.uid;
+    return await _fs
+        .collection('users')
+        .doc(userUid)
+        .update({'pushNotificationToken': pnToken});
   }
 }
 

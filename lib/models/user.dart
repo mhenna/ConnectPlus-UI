@@ -34,6 +34,7 @@ class User {
   String id;
   String carPlate;
   String businessUnit;
+  String pushNotificationToken;
 
   User({
     this.confirmed,
@@ -50,6 +51,7 @@ class User {
     this.id,
     this.carPlate,
     this.businessUnit,
+    this.pushNotificationToken,
   });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -67,6 +69,7 @@ class User {
     id = json['id'];
     carPlate = json['carPlate'];
     businessUnit = json['businessUnit'];
+    pushNotificationToken = json['pushNotificationToken'];
   }
 
   Map<String, dynamic> toJson() {
@@ -87,6 +90,7 @@ class User {
     }
     data['id'] = this.id;
     data['businessUnit'] = this.businessUnit;
+    data['pushNotificationToken'] = this.pushNotificationToken;
     return data;
   }
 
@@ -105,22 +109,26 @@ class User {
     String id,
     String carPlate,
     String businessUnit,
+    String pushNotificationToken,
   }) {
     return User(
-        confirmed: confirmed ?? this.confirmed,
-        blocked: blocked ?? this.blocked,
-        sId: sId ?? this.sId,
-        username: username ?? this.username,
-        email: email ?? this.email,
-        phoneNumber: phoneNumber ?? this.phoneNumber,
-        provider: provider ?? this.provider,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        iV: iV ?? this.iV,
-        role: role ?? this.role,
-        id: id ?? this.id,
-        carPlate: carPlate ?? this.carPlate,
-        businessUnit: businessUnit ?? this.businessUnit);
+      confirmed: confirmed ?? this.confirmed,
+      blocked: blocked ?? this.blocked,
+      sId: sId ?? this.sId,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      provider: provider ?? this.provider,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      iV: iV ?? this.iV,
+      role: role ?? this.role,
+      id: id ?? this.id,
+      carPlate: carPlate ?? this.carPlate,
+      businessUnit: businessUnit ?? this.businessUnit,
+      pushNotificationToken:
+          pushNotificationToken ?? this.pushNotificationToken,
+    );
   }
 }
 
