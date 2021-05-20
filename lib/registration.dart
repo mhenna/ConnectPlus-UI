@@ -312,7 +312,7 @@ class _RegistrationState extends State<Registration> {
                                     Container(
                                       width: width * 0.85,
                                       child: BusinessUnitWidget(
-                                        BusinessUnitController:
+                                        businessUnitController:
                                             businessUnitController,
                                         asyncCallController:
                                             _asyncCallController,
@@ -685,16 +685,16 @@ class _State extends State<carRadioButton> {
 }
 
 class BusinessUnitWidget extends StatelessWidget {
-  final void Function(String value) BusinessUnitController;
+  final void Function(String value) businessUnitController;
   final void Function(bool value) asyncCallController;
   const BusinessUnitWidget({
     Key key,
-    @required this.BusinessUnitController,
+    @required this.businessUnitController,
     @required this.asyncCallController,
   }) : super(key: key);
 
   void onChange(String val) {
-    BusinessUnitController(val);
+    businessUnitController(val);
   }
 
   void onLoaded(bool val) {
@@ -717,7 +717,7 @@ class BusinessUnitWidget extends StatelessWidget {
         Container(
           width: width * 0.85,
           child: BusinessUnit(
-            PassValue: onChange,
+            passValue: onChange,
             asyncCallController: onLoaded,
           ),
         ),
