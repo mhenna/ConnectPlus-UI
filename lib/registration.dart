@@ -1,4 +1,5 @@
 import 'package:connect_plus/login.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,7 +37,7 @@ class _RegistrationState extends State<Registration> {
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
-  String BusinessUnit = "";
+  String businessUnit = "";
   UserCredential userCredentials;
   void initState() {
     super.initState();
@@ -60,8 +61,8 @@ class _RegistrationState extends State<Registration> {
     });
   }
 
-  void businessUnitController(String Value) {
-    BusinessUnit = Value;
+  void businessUnitController(String value) {
+    businessUnit = value;
   }
 
   void _asyncCallController(bool value) {
@@ -216,13 +217,15 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
+            final pnToken = await sl<PushNotificationsService>().token;
             bool registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlate: carPlateController.text,
-              businessUnit: BusinessUnit,
+              businessUnit: businessUnit,
+              pushNotificationToken: pnToken,
             );
             if (registered) {
               await successDialog();
