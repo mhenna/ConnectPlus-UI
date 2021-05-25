@@ -328,7 +328,11 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? ListView.builder(
+                                      ? ListView.separated(
+                                          separatorBuilder: (context, index) =>
+                                              Divider(
+                                                color: Colors.white,
+                                              ),
                                           shrinkWrap: true,
                                           itemCount: carPlates.length,
                                           itemBuilder: (BuildContext context,
@@ -665,7 +669,7 @@ class addCarPlateButton extends StatefulWidget {
 
 class _addCarPlateButtonState extends State<addCarPlateButton> {
   bool addBool = true;
-
+  Color color = Color.fromRGBO(67, 132, 45, 50);
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
@@ -681,32 +685,39 @@ class _addCarPlateButtonState extends State<addCarPlateButton> {
 
     void _update() {
       setState(() {
-        if (addBool == true)
+        if (addBool == true) {
           addBool = false;
-        else
+          color = Color.fromRGBO(0, 0, 0, 100);
+        } else {
           addBool = true;
+          color = Color.fromRGBO(67, 132, 45, 50);
+        }
       });
     }
 
     return Container(
       decoration: BoxDecoration(
+        //border: Border.all(color: Color.fromRGBO(201, 201, 201, 100)),
         borderRadius: BorderRadius.circular(25.0),
-        color: Color.fromRGBO(67, 132, 45, 50),
+        color: color,
       ),
       child: MaterialButton(
-        minWidth: MediaQuery.of(context).size.width,
+        //minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(
             width * 0.02, height * 0.023, width * 0.02, height * 0.023),
         onPressed: () {
           (addBool == true) ? widget.add() : widget.delete();
           _update();
         },
-        child: Text(
-          (addBool == true) ? "Add another car plate" : "Remove",
-          textAlign: TextAlign.center,
-          style: style.copyWith(
-              color: Colors.white, fontWeight: FontWeight.normal),
-        ),
+        child: (addBool == true)
+            ? Icon(
+                Icons.add_box,
+                color: Colors.white,
+              )
+            : Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
       ),
     );
   }
