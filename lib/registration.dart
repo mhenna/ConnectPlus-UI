@@ -34,13 +34,14 @@ class _RegistrationState extends State<Registration> {
   var ip;
   var port;
   bool haveCar = true;
-  String carPlate;
+  List<String> carPlates = new List<String>();
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
   String businessUnit = "";
   UserCredential userCredentials;
   void initState() {
+    carPlates.add("");
     super.initState();
   }
 
@@ -220,12 +221,13 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
+
             bool registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
-              carPlate: carPlate,
+              carPlates: carPlates,
               businessUnit: businessUnit,
             );
             if (registered) {
@@ -326,14 +328,25 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? Container(
-                                          width: width * 0.85,
-                                          child: CarPlateForm(
-                                            onChanged: (plate) {
-                                              carPlate = plate;
-                                            },
-                                          ),
-                                        )
+                                      ? ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: carPlates.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Dismissible(
+                                              key: Key(index.toString()),
+                                              child: Container(
+                                                  width: width * 0.85,
+                                                  child: CarPlateForm(
+                                                    key: ObjectKey(carPlates
+                                                        .length
+                                                        .toString()),
+                                                    onChanged: (plate) {
+                                                      carPlates[index] = plate;
+                                                    },
+                                                  )),
+                                            );
+                                          })
                                       : Container(),
                                   SizedBox(height: height * 0.027),
                                   Container(
