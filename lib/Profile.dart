@@ -276,7 +276,11 @@ class MapScreenState extends State<ProfilePage>
                                           phoneController, false),
                                       _getLabel("Car Plate"),
                                       user.carPlates.length != 0
-                                          ? ListView.builder(
+                                          ? ListView.separated(
+                                              separatorBuilder:
+                                                  (context, index) => Divider(
+                                                        color: Colors.white,
+                                                      ),
                                               shrinkWrap: true,
                                               itemCount: user.carPlates.length,
                                               itemBuilder:
