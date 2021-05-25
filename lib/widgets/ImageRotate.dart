@@ -2,6 +2,19 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 
 class ImageRotate extends StatefulWidget {
+  final bool _overlay;
+
+  /// Will show a white screen with the connect+ logo loading
+  const ImageRotate({Key key})
+      : _overlay = false,
+        super(key: key);
+
+  /// Will overlay the current screen with the connect+ logo loading
+  const ImageRotate.overlay({
+    Key key,
+  })  : _overlay = true,
+        super(key: key);
+
   @override
   _ImageRotateState createState() => new _ImageRotateState();
 }
@@ -37,7 +50,9 @@ class _ImageRotateState extends State<ImageRotate>
         child: new Container(
           height: 100.0,
           width: 100.0,
-          child: new Image.asset('assets/logoC.png'),
+          child: new Image.asset(
+            widget._overlay ? 'assets/logoC_white.png' : 'assets/logoC.png',
+          ),
         ),
         builder: (BuildContext context, Widget _widget) {
           return new Transform.rotate(

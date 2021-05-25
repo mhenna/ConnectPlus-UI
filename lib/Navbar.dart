@@ -4,6 +4,7 @@ import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/events.dart';
 import 'package:connect_plus/included.dart';
 import 'package:connect_plus/injection_container.dart';
+import 'package:connect_plus/move_your_car_screen.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/Profile.dart';
@@ -119,6 +120,16 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Calendar()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.car_repair),
+            title: Text('Move Your Car'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MoveYourCarScreen()),
               )
             },
           ),
