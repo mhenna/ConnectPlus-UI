@@ -349,6 +349,19 @@ class _RegistrationState extends State<Registration> {
                                           })
                                       : Container(),
                                   SizedBox(height: height * 0.027),
+                                  addCarPlateButton(
+                                    add: () {
+                                      setState(() {
+                                        carPlates.add("");
+                                      });
+                                    },
+                                    delete: () {
+                                      setState(() {
+                                        carPlates.removeLast();
+                                      });
+                                    },
+                                  ),
+                                  SizedBox(height: height * 0.027),
                                   Container(
                                     width: width * 0.85,
                                     child: Padding(
@@ -637,6 +650,64 @@ class BusinessUnitWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class addCarPlateButton extends StatefulWidget {
+  final Function() add;
+  final Function() delete;
+  const addCarPlateButton({Key key, @required this.add, @required this.delete})
+      : super(key: key);
+  @override
+  _addCarPlateButtonState createState() => _addCarPlateButtonState();
+}
+
+class _addCarPlateButtonState extends State<addCarPlateButton> {
+  bool addBool = true;
+
+  @override
+  Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+    @override
+    void initState() {
+      super.initState();
+      setState(() {
+        addBool = true;
+      });
+    }
+
+    void _update() {
+      setState(() {
+        if (addBool == true)
+          addBool = false;
+        else
+          addBool = true;
+      });
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        color: Color.fromRGBO(67, 132, 45, 50),
+      ),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(
+            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
+        onPressed: () {
+          (addBool == true) ? widget.add() : widget.delete();
+          _update();
+        },
+        child: Text(
+          (addBool == true) ? "Add another car plate" : "Remove",
+          textAlign: TextAlign.center,
+          style: style.copyWith(
+              color: Colors.white, fontWeight: FontWeight.normal),
+        ),
+      ),
     );
   }
 }
