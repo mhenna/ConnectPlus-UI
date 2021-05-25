@@ -24,7 +24,7 @@ class AuthService {
     @required String password,
     @required String username,
     @required String phoneNumber,
-    String carPlate,
+    List<String> carPlates,
     String businessUnit,
   }) async {
     try {
@@ -39,7 +39,7 @@ class AuthService {
           'username': username,
           'email': email,
           'phoneNumber': phoneNumber,
-          'carPlate': carPlate,
+          'carPlates': carPlates,
           'createdAt': DateTime.now().toString(),
           'updatedAt': DateTime.now().toString(),
           'blocked': false,
@@ -80,19 +80,19 @@ class AuthService {
   Future<void> updateProfile(
       {String username,
       String phoneNumber,
-      String carPlate,
+      List<String> carPlates,
       String businessUnit}) async {
     final userUid = _fbAuth.currentUser.uid;
     await _fs.collection('users').doc(userUid).update({
       'username': username ?? _user.username,
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
-      'carPlate': carPlate ?? _user.carPlate,
+      'carPlates': carPlates ?? _user.carPlates,
       'businessUnit': businessUnit ?? _user.businessUnit,
     });
     _user = _user.copyWith(
       username: username,
       phoneNumber: phoneNumber,
-      carPlate: carPlate,
+      carPlates: carPlates,
       businessUnit: businessUnit,
     );
   }
