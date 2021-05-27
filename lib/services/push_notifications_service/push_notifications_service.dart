@@ -14,8 +14,8 @@ class PushNotificationsService {
       final HttpsCallable callable =
           _fbFunctions.httpsCallable('alertCarOwner');
       final response = await callable.call({'carPlate': carPlate});
-      final bool carFound = response.data['carFound'];
-      final bool sentSuccessfully = response.data['sent'];
+      final bool carFound = response.data['carFound'] == true;
+      final bool sentSuccessfully = response.data['sent'] == true;
       if (sentSuccessfully) return NotificationResponse.Success;
       if (!carFound) return NotificationResponse.CarNotFound;
       return NotificationResponse.GenericError;
