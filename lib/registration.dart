@@ -337,19 +337,13 @@ class _RegistrationState extends State<Registration> {
                                           itemCount: carPlates.length,
                                           itemBuilder: (BuildContext context,
                                               int index) {
-                                            return Dismissible(
-                                              key: Key(index.toString()),
-                                              child: Container(
-                                                  width: width * 0.85,
-                                                  child: CarPlateForm(
-                                                    key: ObjectKey(carPlates
-                                                        .length
-                                                        .toString()),
-                                                    onChanged: (plate) {
-                                                      carPlates[index] = plate;
-                                                    },
-                                                  )),
-                                            );
+                                            return Container(
+                                                width: width * 0.85,
+                                                child: CarPlateForm(
+                                                  onChanged: (plate) {
+                                                    carPlates[index] = plate;
+                                                  },
+                                                ));
                                           })
                                       : Container(),
                                   SizedBox(height: height * 0.027),

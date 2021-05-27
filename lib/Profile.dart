@@ -304,20 +304,6 @@ class MapScreenState extends State<ProfilePage>
                                                 );
                                               })
                                           : Container(),
-                                      // : Padding(
-                                      //     padding:
-                                      //         const EdgeInsets.symmetric(
-                                      //             horizontal: 32,
-                                      //             vertical: 12),
-                                      //     child: CarPlatePicker(
-                                      //       initialPlate:
-                                      //           _carPlate ?? user.carPlate,
-                                      //       onChanged: (plate) {
-                                      //         _carPlate = plate;
-                                      //       },
-                                      //       editable: !_notEditing,
-                                      //     ),
-                                      //   ),
                                       _getLabel("Business Unit"),
                                       _notEditing
                                           ? _getField(
