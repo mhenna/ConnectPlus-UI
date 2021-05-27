@@ -18,9 +18,9 @@ class PushNotificationsService {
       final bool sentSuccessfully = response.data['sent'];
       if (sentSuccessfully) return NotificationResponse.Success;
       if (!carFound) return NotificationResponse.CarNotFound;
-      return NotificationResponse.TimedOut;
+      return NotificationResponse.GenericError;
     } catch (e) {
-      return NotificationResponse.TimedOut;
+      return NotificationResponse.GenericError;
     }
   }
 }
@@ -28,5 +28,5 @@ class PushNotificationsService {
 enum NotificationResponse {
   Success,
   CarNotFound,
-  TimedOut,
+  GenericError,
 }
