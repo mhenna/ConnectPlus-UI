@@ -34,13 +34,14 @@ class _RegistrationState extends State<Registration> {
   var ip;
   var port;
   bool haveCar = true;
-  String carPlate;
+  List<String> carPlates = new List<String>();
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
   String businessUnit = "";
   UserCredential userCredentials;
   void initState() {
+    carPlates.add("");
     super.initState();
   }
 
@@ -220,12 +221,13 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
+
             bool registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
-              carPlate: carPlate,
+              carPlates: carPlates,
               businessUnit: businessUnit,
             );
             if (registered) {
@@ -326,15 +328,37 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? Container(
-                                          width: width * 0.85,
-                                          child: CarPlateForm(
-                                            onChanged: (plate) {
-                                              carPlate = plate;
-                                            },
-                                          ),
-                                        )
+                                      ? ListView.separated(
+                                          separatorBuilder: (context, index) =>
+                                              Divider(
+                                                color: Colors.white,
+                                              ),
+                                          shrinkWrap: true,
+                                          itemCount: carPlates.length,
+                                          itemBuilder: (BuildContext context,
+                                              int index) {
+                                            return Container(
+                                                width: width * 0.85,
+                                                child: CarPlateForm(
+                                                  onChanged: (plate) {
+                                                    carPlates[index] = plate;
+                                                  },
+                                                ));
+                                          })
                                       : Container(),
+                                  SizedBox(height: height * 0.027),
+                                  addCarPlateButton(
+                                    add: () {
+                                      setState(() {
+                                        carPlates.add("");
+                                      });
+                                    },
+                                    delete: () {
+                                      setState(() {
+                                        carPlates.removeLast();
+                                      });
+                                    },
+                                  ),
                                   SizedBox(height: height * 0.027),
                                   Container(
                                     width: width * 0.85,
@@ -624,6 +648,71 @@ class BusinessUnitWidget extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class addCarPlateButton extends StatefulWidget {
+  final Function() add;
+  final Function() delete;
+  const addCarPlateButton({Key key, @required this.add, @required this.delete})
+      : super(key: key);
+  @override
+  _addCarPlateButtonState createState() => _addCarPlateButtonState();
+}
+
+class _addCarPlateButtonState extends State<addCarPlateButton> {
+  bool addBool = true;
+  Color color = Color.fromRGBO(67, 132, 45, 50);
+  @override
+  Widget build(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+    @override
+    void initState() {
+      super.initState();
+      setState(() {
+        addBool = true;
+      });
+    }
+
+    void _update() {
+      setState(() {
+        if (addBool == true) {
+          addBool = false;
+          color = Color.fromRGBO(0, 0, 0, 100);
+        } else {
+          addBool = true;
+          color = Color.fromRGBO(67, 132, 45, 50);
+        }
+      });
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        //border: Border.all(color: Color.fromRGBO(201, 201, 201, 100)),
+        borderRadius: BorderRadius.circular(25.0),
+        color: color,
+      ),
+      child: MaterialButton(
+        //minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(
+            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
+        onPressed: () {
+          (addBool == true) ? widget.add() : widget.delete();
+          _update();
+        },
+        child: (addBool == true)
+            ? Icon(
+                Icons.add_box,
+                color: Colors.white,
+              )
+            : Icon(
+                Icons.delete,
+                color: Colors.white,
+              ),
+      ),
     );
   }
 }

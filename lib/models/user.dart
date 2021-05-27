@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class UserWithToken {
   String jwt;
   User user;
@@ -32,7 +34,7 @@ class User {
   int iV;
   Role role;
   String id;
-  String carPlate;
+  List<String> carPlates;
   String businessUnit;
 
   User({
@@ -48,9 +50,16 @@ class User {
     this.iV,
     this.role,
     this.id,
-    this.carPlate,
+    this.carPlates,
     this.businessUnit,
   });
+  void addCarplates(List<dynamic> _carPlates) {
+    carPlates = new List<String>();
+    for (final carplate in _carPlates) {
+      carPlates.add(carplate.toString());
+    }
+    return;
+  }
 
   User.fromJson(Map<String, dynamic> json) {
     confirmed = json['confirmed'];
@@ -65,7 +74,7 @@ class User {
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
-    carPlate = json['carPlate'];
+    addCarplates(json['carPlates']);
     businessUnit = json['businessUnit'];
   }
 
@@ -81,7 +90,7 @@ class User {
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
-    data['carPlate'] = this.carPlate;
+    data['carPlates'] = this.carPlates;
     if (this.role != null) {
       data['role'] = this.role.toJson();
     }
@@ -103,7 +112,7 @@ class User {
     int iV,
     Role role,
     String id,
-    String carPlate,
+    List<String> carPlates,
     String businessUnit,
   }) {
     return User(
@@ -119,7 +128,7 @@ class User {
         iV: iV ?? this.iV,
         role: role ?? this.role,
         id: id ?? this.id,
-        carPlate: carPlate ?? this.carPlate,
+        carPlates: carPlates ?? this.carPlates,
         businessUnit: businessUnit ?? this.businessUnit);
   }
 }
