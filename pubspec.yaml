@@ -84,6 +84,7 @@ flutter:
   assets:
     - assets/logo.png
     - assets/logoC.png
+    - assets/logoC_white.png
     - assets/logo2.png
     - assets/splash.png
     - assets/WIAlogo.png

@@ -2,6 +2,7 @@ import 'package:connect_plus/login.dart';
 import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -28,12 +29,13 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-  final carPlateController = TextEditingController();
+
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
   var port;
   bool haveCar = true;
+  String carPlate;
   bool reloaded = false;
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
   final _formKey = GlobalKey<FormState>();
@@ -50,13 +52,11 @@ class _RegistrationState extends State<Registration> {
     emController.dispose();
     pwController.dispose();
     phoneController.dispose();
-    carPlateController.dispose();
     super.dispose();
   }
 
   void _displayCarPlate(bool _haveCar) {
     setState(() {
-      if (_haveCar == false) carPlateController.clear();
       haveCar = _haveCar;
     });
   }
@@ -161,15 +161,19 @@ class _RegistrationState extends State<Registration> {
       },
     );
     final registerTitle = Text.rich(
-      TextSpan(children: <TextSpan>[
-        TextSpan(
+      TextSpan(
+        children: <TextSpan>[
+          TextSpan(
             text: ' Register ',
             style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Utils.header,
-                fontSize: size * 55,
-                fontFamily: "Roboto"))
-      ]),
+              fontWeight: FontWeight.bold,
+              color: Utils.header,
+              fontSize: size * 55,
+              fontFamily: "Roboto",
+            ),
+          )
+        ],
+      ),
     );
     final loginPath = Text.rich(
       TextSpan(children: <TextSpan>[
@@ -223,7 +227,7 @@ class _RegistrationState extends State<Registration> {
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
-              carPlate: carPlateController.text,
+              carPlate: carPlate,
               businessUnit: businessUnit,
               pushNotificationToken: pnToken,
             );
@@ -254,110 +258,112 @@ class _RegistrationState extends State<Registration> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: ModalProgressHUD(
-          inAsyncCall: asyncCall,
-          opacity: 0.5,
-          progressIndicator: ImageRotate(),
-          child: Center(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    image: DecorationImage(
-                      image: AssetImage("assets/logo2.png"),
-                      fit: BoxFit.fitWidth,
-                      alignment: Alignment.topCenter,
-                    ),
+        inAsyncCall: asyncCall,
+        opacity: 0.5,
+        progressIndicator: ImageRotate(),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  image: DecorationImage(
+                    image: AssetImage("assets/logo2.png"),
+                    fit: BoxFit.fitWidth,
+                    alignment: Alignment.topCenter,
                   ),
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(width * 0.05,
-                            height * 0.25, width * 0.05, height * 0.03),
-                        child: Card(
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(height: height * 0.03),
-                              Container(
-                                  alignment: Alignment.centerLeft,
-                                  child: Padding(
-                                      padding:
-                                          EdgeInsets.only(left: width * 0.01),
-                                      child: registerTitle)),
-                              SizedBox(height: height * 0.03),
-                              Form(
-                                key: _formKey,
-                                child: Column(
-                                  children: <Widget>[
-                                    Container(
-                                      width: width * 0.85,
-                                      child: firstNameField,
+                ),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(width * 0.05, height * 0.25,
+                          width * 0.05, height * 0.03),
+                      child: Card(
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: height * 0.03),
+                            Container(
+                                alignment: Alignment.centerLeft,
+                                child: Padding(
+                                    padding:
+                                        EdgeInsets.only(left: width * 0.01),
+                                    child: registerTitle)),
+                            SizedBox(height: height * 0.03),
+                            Form(
+                              key: _formKey,
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    width: width * 0.85,
+                                    child: firstNameField,
+                                  ),
+                                  SizedBox(height: height * 0.03),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: emailField,
+                                  ),
+                                  SizedBox(height: height * 0.03),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: passwordField,
+                                  ),
+                                  SizedBox(height: 20.0),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: phoneField,
+                                  ),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: BusinessUnitWidget(
+                                      businessUnitController:
+                                          businessUnitController,
+                                      asyncCallController: _asyncCallController,
                                     ),
-                                    SizedBox(height: height * 0.03),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: emailField,
+                                  ),
+                                  SizedBox(height: 20.0),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: CarPlateRadioButton(
+                                      displayCarPlate: _displayCarPlate,
                                     ),
-                                    SizedBox(height: height * 0.03),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: passwordField,
+                                  ),
+                                  haveCar == true
+                                      ? Container(
+                                          width: width * 0.85,
+                                          child: CarPlateForm(
+                                            onChanged: (plate) {
+                                              carPlate = plate;
+                                            },
+                                          ),
+                                        )
+                                      : Container(),
+                                  SizedBox(height: height * 0.027),
+                                  Container(
+                                    width: width * 0.85,
+                                    child: Padding(
+                                      padding: EdgeInsets.only(bottom: 20),
+                                      child: registerButton,
                                     ),
-                                    SizedBox(height: 20.0),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: phoneField,
-                                    ),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: BusinessUnitWidget(
-                                        businessUnitController:
-                                            businessUnitController,
-                                        asyncCallController:
-                                            _asyncCallController,
-                                      ),
-                                    ),
-                                    SizedBox(height: 20.0),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: carRadioButton(
-                                        displayCarPlate: _displayCarPlate,
-                                      ),
-                                    ),
-                                    haveCar == true
-                                        ? Container(
-                                            width: width * 0.85,
-                                            child: CarPlateForm(
-                                              carPlateController:
-                                                  carPlateController,
-                                            ),
-                                          )
-                                        : Container(),
-                                    SizedBox(height: height * 0.027),
-                                    Container(
-                                      width: width * 0.85,
-                                      child: Padding(
-                                          padding: EdgeInsets.only(bottom: 20),
-                                          child: registerButton),
-                                    ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
-                      loginPath,
-                      SizedBox(
-                        height: 20,
-                      )
-                    ],
-                  ),
+                    ),
+                    loginPath,
+                    SizedBox(
+                      height: 20,
+                    )
+                  ],
                 ),
               ),
             ),
-          )),
+          ),
+        ),
+      ),
     );
   }
 
@@ -426,7 +432,6 @@ class _RegistrationState extends State<Registration> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -452,7 +457,6 @@ class _RegistrationState extends State<Registration> {
                 ),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                 },
               ),
             ],
@@ -463,82 +467,19 @@ class _RegistrationState extends State<Registration> {
   }
 }
 
-class CarPlateForm extends StatefulWidget {
-  const CarPlateForm({
-    Key key,
-    @required this.carPlateController,
-  }) : super(key: key);
+class CarPlateForm extends StatelessWidget {
+  final Function(String) onChanged;
 
-  final TextEditingController carPlateController;
-
-  @override
-  _CarPlateFormState createState() => _CarPlateFormState();
-}
-
-class _CarPlateFormState extends State<CarPlateForm> {
-  String _plateLetters = "";
-  String _plateNumbers = "";
-
-  String _validateLetters(String letters) {
-    if (_plateLetters.isEmpty) {
-      return "Empty field";
-    }
-    bool lettersValid = RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$")
-        .hasMatch(letters.toString());
-    if (!lettersValid) {
-      return "Arabic letters only";
-    }
-    return null;
-  }
-
-  String _validateNumbers(String numbers) {
-    if (_plateNumbers.isEmpty) {
-      return "Empty field";
-    }
-    bool numbersAreValid =
-        RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(numbers.toString());
-    if (!numbersAreValid) {
-      return "Arabic numerals only";
-    }
-    return null;
-  }
-
+  const CarPlateForm({Key key, @required this.onChanged}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         CarPlateInputTitle(),
-        SizedBox(height: 8),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: CarPlateTextField(
-                validator: _validateNumbers,
-                hintText: "١٢٣",
-                onChanged: (numbers) {
-                  _plateNumbers = numbers;
-                  widget.carPlateController.text =
-                      _plateLetters + _plateNumbers;
-                },
-              ),
-            ),
-            SizedBox(width: 8),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.4,
-              child: CarPlateTextField(
-                validator: _validateLetters,
-                hintText: "أ ب ج",
-                onChanged: (letters) {
-                  _plateLetters = letters;
-                  widget.carPlateController.text =
-                      _plateLetters + _plateNumbers;
-                },
-              ),
-            ),
-          ],
+        SizedBox(height: 10),
+        CarPlatePicker(
+          onChanged: onChanged,
         ),
       ],
     );
@@ -582,48 +523,9 @@ class CarPlateInputTitle extends StatelessWidget {
   }
 }
 
-class CarPlateTextField extends StatelessWidget {
-  final void Function(String value) onChanged;
-  final String Function(String value) validator;
-  final String hintText;
-
-  const CarPlateTextField({
-    Key key,
-    this.onChanged,
-    this.validator,
-    this.hintText = "",
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-    final width = MediaQuery.of(context).size.width;
-    return TextFormField(
-      onChanged: onChanged,
-      validator: validator,
-      textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 20.0),
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.fromLTRB(
-          width * 0.05,
-          height * 0.025,
-          width * 0.02,
-          height * 0.02,
-        ),
-        hintText: hintText,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(
-            15.0,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class carRadioButton extends StatefulWidget {
+class CarPlateRadioButton extends StatefulWidget {
   final void Function(bool value) displayCarPlate;
-  carRadioButton({
+  CarPlateRadioButton({
     Key key,
     this.displayCarPlate,
   }) : super(key: key);
@@ -637,7 +539,7 @@ class QuestionsOptions {
   QuestionsOptions({this.name, this.index});
 }
 
-class _State extends State<carRadioButton> {
+class _State extends State<CarPlateRadioButton> {
   String radioItem = 'Yes';
   int id = 1;
   List<QuestionsOptions> optionsList = [
@@ -654,13 +556,14 @@ class _State extends State<carRadioButton> {
   Widget build(BuildContext context) {
     return Container(
       child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text(
-              "Have a car ?",
-              style: TextStyle(fontSize: 20.0),
-            ),
-            Column(children: <Widget>[
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(
+            "Have a car ?",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          Column(
+            children: <Widget>[
               Row(
                 children: optionsList
                     .map((data) => Expanded(
@@ -678,8 +581,10 @@ class _State extends State<carRadioButton> {
                         )))
                     .toList(),
               )
-            ])
-          ]),
+            ],
+          )
+        ],
+      ),
     );
   }
 }

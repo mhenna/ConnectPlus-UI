@@ -1,15 +1,9 @@
-import 'package:connect_plus/models/profile.dart';
-import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:connect_plus/widgets/app_scaffold.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:localstorage/localstorage.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/BusinessUnit.dart';
@@ -32,8 +26,10 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController nameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController phoneController = TextEditingController();
-  TextEditingController carPlateController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  String _carPlate;
+
   void _asyncCallController(bool value) {
     print(value);
     setState(() {
@@ -54,8 +50,7 @@ class MapScreenState extends State<ProfilePage>
         await sl<AuthService>().updateProfile(
           username: nameController.text == "" ? null : nameController.text,
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
-          carPlate:
-              carPlateController.text == "" ? null : carPlateController.text,
+          carPlate: _carPlate,
           businessUnit: _BusinessUnit == "" ? null : _BusinessUnit,
         );
         setState(() {
@@ -166,160 +161,164 @@ class MapScreenState extends State<ProfilePage>
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-        backgroundColor: Utils.background,
-        appBar: AppBar(
-          // Here we take the value from the MyHomePage object that was created by
-          // the App.build method, and use it to set our appbar title.
-          title: Text("Profile Details"),
-          centerTitle: true,
-          backgroundColor: Utils.header,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Utils.secondaryColor,
-                  Utils.primaryColor,
-                ],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
+      backgroundColor: Utils.background,
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text("Profile Details"),
+        centerTitle: true,
+        backgroundColor: Utils.header,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
             ),
           ),
         ),
-        body: ModalProgressHUD(
-            inAsyncCall: _loading,
-            opacity: 0.5,
-            progressIndicator: ImageRotate(),
-            child: new Container(
-              child: new ListView(
+      ),
+      body: ModalProgressHUD(
+        inAsyncCall: _loading,
+        opacity: 0.5,
+        progressIndicator: ImageRotate(),
+        child: new Container(
+          child: new ListView(
+            children: <Widget>[
+              Column(
                 children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      new Container(
-                        height: height * 0.23,
-                        child: new Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(top: height * 0.05),
-                              child: new Stack(
-                                  fit: StackFit.loose,
-                                  children: <Widget>[
-                                    new Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: <Widget>[
-                                        new Container(
-                                            width: width * 0.20,
-                                            height: height * 0.14,
-                                            decoration: new BoxDecoration(
-                                              image: new DecorationImage(
-                                                image: new ExactAssetImage(
-                                                    'assets/as.png'),
-                                                fit: BoxFit.contain,
-                                              ),
-                                            )),
-                                      ],
-                                    ),
-                                  ]),
-                            )
-                          ],
-                        ),
-                      ),
-                      new Container(
-                        color: Utils.background,
-                        child: Padding(
-                          padding: EdgeInsets.only(bottom: height * 0.03),
-                          child: new Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                  padding: EdgeInsets.only(right: width * 0.08),
-                                  child: new Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      new Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: <Widget>[
-                                          _notEditing
-                                              ? _getEditIcon()
-                                              : new Container(),
-                                        ],
-                                      )
-                                    ],
-                                  )),
-                              FutureBuilder<User>(
-                                future: sl<AuthService>().user,
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return Center(
-                                      child: SizedBox(
-                                        height: 60,
-                                        width: 60,
-                                        child: CircularProgressIndicator(),
+                  new Container(
+                    height: height * 0.23,
+                    child: new Column(
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(top: height * 0.05),
+                          child:
+                              new Stack(fit: StackFit.loose, children: <Widget>[
+                            new Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                new Container(
+                                    width: width * 0.20,
+                                    height: height * 0.14,
+                                    decoration: new BoxDecoration(
+                                      image: new DecorationImage(
+                                        image: new ExactAssetImage(
+                                            'assets/as.png'),
+                                        fit: BoxFit.contain,
                                       ),
-                                    );
-                                  }
-                                  final user = snapshot.data;
-                                  return Form(
-                                      key: _formKey,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          _getLabel("Full Name"),
-                                          _getField(user.username.toString(),
-                                              nameController, false),
-                                          _getLabel("Email"),
-                                          _getField(user.email.toString(),
-                                              emailController, true),
-                                          _getLabel("Phone Number"),
-                                          _getField(user.phoneNumber.toString(),
-                                              phoneController, false),
-                                          _getLabel("Car Plate"),
-                                          _notEditing
-                                              ? _getField(
-                                                  user.carPlate,
-                                                  carPlateController,
-                                                  false,
-                                                )
-                                              : CarPlateForm(
-                                                  carPlateController:
-                                                      carPlateController,
-                                                  initialValue: user.carPlate,
-                                                ),
-                                          _getLabel("Business Unit"),
-                                          _notEditing
-                                              ? _getField(user.businessUnit,
-                                                  null, false)
-                                              : BusinessUnitWidget(
-                                                  userBu: user.businessUnit,
-                                                  asyncCallController:
-                                                      _asyncCallController,
-                                                  businessUnitController:
-                                                      businessUnitController,
-                                                ),
-                                          !_notEditing
-                                              ? _getActionButtons(user)
-                                              : new Container(),
-                                        ],
-                                      ));
-                                },
-                              ),
-                            ],
+                                    )),
+                              ],
+                            ),
+                          ]),
+                        )
+                      ],
+                    ),
+                  ),
+                  new Container(
+                    color: Utils.background,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: height * 0.03),
+                      child: new Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: <Widget>[
+                          Padding(
+                            padding: EdgeInsets.only(right: width * 0.08),
+                            child: new Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                new Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    _notEditing
+                                        ? _getEditIcon()
+                                        : new Container(),
+                                  ],
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                      )
-                    ],
+                          FutureBuilder<User>(
+                            future: sl<AuthService>().user,
+                            builder: (context, snapshot) {
+                              if (!snapshot.hasData) {
+                                return Center(
+                                  child: SizedBox(
+                                    height: 60,
+                                    width: 60,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              }
+                              final user = snapshot.data;
+                              return Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      _getLabel("Full Name"),
+                                      _getField(user.username.toString(),
+                                          nameController, false),
+                                      _getLabel("Email"),
+                                      _getField(user.email.toString(),
+                                          emailController, true),
+                                      _getLabel("Phone Number"),
+                                      _getField(user.phoneNumber.toString(),
+                                          phoneController, false),
+                                      _getLabel("Car Plate"),
+                                      user.carPlate == null && _notEditing
+                                          ? Container()
+                                          : Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 32,
+                                                      vertical: 12),
+                                              child: CarPlatePicker(
+                                                initialPlate:
+                                                    _carPlate ?? user.carPlate,
+                                                onChanged: (plate) {
+                                                  _carPlate = plate;
+                                                },
+                                                editable: !_notEditing,
+                                              ),
+                                            ),
+                                      _getLabel("Business Unit"),
+                                      _notEditing
+                                          ? _getField(
+                                              user.businessUnit, null, false)
+                                          : BusinessUnitWidget(
+                                              userBu: user.businessUnit,
+                                              asyncCallController:
+                                                  _asyncCallController,
+                                              businessUnitController:
+                                                  businessUnitController,
+                                            ),
+                                      !_notEditing
+                                          ? _getActionButtons(user)
+                                          : new Container(),
+                                    ],
+                                  ));
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
-            )));
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -328,7 +327,6 @@ class MapScreenState extends State<ProfilePage>
     nameController.dispose();
     emailController.dispose();
     phoneController.dispose();
-    carPlateController.dispose();
     myFocusNode.dispose();
     super.dispose();
   }
@@ -374,7 +372,7 @@ class MapScreenState extends State<ProfilePage>
                     nameController.text = user.username;
                     emailController.text = user.email;
                     phoneController.text = user.phoneNumber;
-                    carPlateController.text = user.carPlate;
+                    _carPlate = user.carPlate;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
