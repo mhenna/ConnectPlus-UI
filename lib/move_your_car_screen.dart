@@ -16,19 +16,15 @@ class _MoveYourCarScreenState extends State<MoveYourCarScreen> {
   String _carPlate;
 
   Future<void> _sendNotification() async {
-    try {
-      _showLoading();
-      final NotificationResponse response = await sl<PushNotificationsService>()
-          .sendNotificationToCarOwner(carPlate: _carPlate);
-      Navigator.pop(context);
-      if (response == NotificationResponse.Success) {
-        _showSuccess();
-      } else if (response == NotificationResponse.CarNotFound) {
-        _showCarNotFound();
-      } else {
-        _showFailed();
-      }
-    } catch (e) {
+    _showLoading();
+    final NotificationResponse response = await sl<PushNotificationsService>()
+        .sendNotificationToCarOwner(carPlate: _carPlate);
+    Navigator.pop(context);
+    if (response == NotificationResponse.Success) {
+      _showSuccess();
+    } else if (response == NotificationResponse.CarNotFound) {
+      _showCarNotFound();
+    } else {
       _showFailed();
     }
   }

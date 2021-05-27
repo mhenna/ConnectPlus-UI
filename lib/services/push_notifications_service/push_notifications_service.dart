@@ -10,13 +10,18 @@ class PushNotificationsService {
   Future<NotificationResponse> sendNotificationToCarOwner({
     @required String carPlate,
   }) async {
-    final HttpsCallable callable = _fbFunctions.httpsCallable('alertCarOwner');
-    final response = await callable.call({'carPlate': carPlate});
-    final bool carFound = response.data['carFound'];
-    final bool sentSuccessfully = response.data['sent'];
-    if (sentSuccessfully) return NotificationResponse.Success;
-    if (!carFound) return NotificationResponse.CarNotFound;
-    return NotificationResponse.TimedOut;
+    try {
+      final HttpsCallable callable =
+          _fbFunctions.httpsCallable('alertCarOwner');
+      final response = await callable.call({'carPlate': carPlate});
+      final bool carFound = response.data['carFound'];
+      final bool sentSuccessfully = response.data['sent'];
+      if (sentSuccessfully) return NotificationResponse.Success;
+      if (!carFound) return NotificationResponse.CarNotFound;
+      return NotificationResponse.TimedOut;
+    } catch (e) {
+      return NotificationResponse.TimedOut;
+    }
   }
 }
 
