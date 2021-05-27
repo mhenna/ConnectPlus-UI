@@ -22,11 +22,10 @@ versionCheck(context) async {
     // Using default duration to force fetching from remote server.
     await remoteConfig.fetch(expiration: const Duration(seconds: 0));
     await remoteConfig.activateFetched();
-    remoteConfig.getString('force_update_current_version');
-    double newVersion = double.parse(remoteConfig
-        .getString('force_update_current_version')
-        .trim()
-        .replaceAll(".", ""));
+    String device = "android";
+    if (Platform.isIOS) device = "ios";
+    String query = "force_update_current_version_" + device;
+    double newVersion = double.parse(remoteConfig.getString(query));
     if (newVersion > currentVersion) {
       _showVersionDialog(context);
     }
