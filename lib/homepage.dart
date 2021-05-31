@@ -20,6 +20,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'AnnouncementVariables.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
+import 'package:connect_plus/widgets/version_check.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -417,6 +418,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    versionCheck(context);
     return FutureBuilder<void>(
         future: _loadData(),
         builder: (context, snapshot) {

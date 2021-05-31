@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:package_info/package_info.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 versionCheck(context) async {
   //Get Current installed version of app
@@ -73,6 +74,7 @@ _showVersionDialog(context) async {
             );
     },
   );
+  await SystemChannels.platform.invokeMethod<void>('SystemNavigator.pop', true);
 }
 
 _launchURL(String url) async {
