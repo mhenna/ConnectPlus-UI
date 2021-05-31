@@ -25,7 +25,7 @@ class AuthService {
     @required String username,
     @required String phoneNumber,
     @required String pushNotificationToken,
-    String carPlate,
+    List<String> carPlates,
     String businessUnit,
   }) async {
     try {
@@ -40,7 +40,7 @@ class AuthService {
           'username': username,
           'email': email,
           'phoneNumber': phoneNumber,
-          'carPlate': carPlate,
+          'carPlates': carPlates,
           'createdAt': DateTime.now().toString(),
           'updatedAt': DateTime.now().toString(),
           'blocked': false,
@@ -85,7 +85,7 @@ class AuthService {
   Future<void> updateProfile({
     String username,
     String phoneNumber,
-    String carPlate,
+    List<String> carPlates,
     String businessUnit,
     String pushNotificationToken,
   }) async {
@@ -93,7 +93,7 @@ class AuthService {
     await _fs.collection('users').doc(userUid).update({
       'username': username ?? _user.username,
       'phoneNumber': phoneNumber ?? _user.phoneNumber,
-      'carPlate': carPlate ?? _user.carPlate,
+      'carPlates': carPlates ?? _user.carPlates,
       'businessUnit': businessUnit ?? _user.businessUnit,
       'pushNotificationToken':
           pushNotificationToken ?? _user.pushNotificationToken,
@@ -101,7 +101,7 @@ class AuthService {
     _user = _user.copyWith(
       username: username,
       phoneNumber: phoneNumber,
-      carPlate: carPlate,
+      carPlates: carPlates,
       businessUnit: businessUnit,
       pushNotificationToken: pushNotificationToken,
     );

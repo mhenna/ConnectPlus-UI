@@ -28,7 +28,7 @@ class MapScreenState extends State<ProfilePage>
   TextEditingController phoneController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-  String _carPlate;
+  List<String> _carPlates;
 
   void _asyncCallController(bool value) {
     print(value);
@@ -50,7 +50,7 @@ class MapScreenState extends State<ProfilePage>
         await sl<AuthService>().updateProfile(
           username: nameController.text == "" ? null : nameController.text,
           phoneNumber: phoneController.text == "" ? null : phoneController.text,
-          carPlate: _carPlate,
+          carPlates: _carPlates,
           businessUnit: _BusinessUnit == "" ? null : _BusinessUnit,
         );
         setState(() {
@@ -258,6 +258,7 @@ class MapScreenState extends State<ProfilePage>
                                 );
                               }
                               final user = snapshot.data;
+
                               return Form(
                                   key: _formKey,
                                   child: Column(
@@ -274,22 +275,35 @@ class MapScreenState extends State<ProfilePage>
                                       _getField(user.phoneNumber.toString(),
                                           phoneController, false),
                                       _getLabel("Car Plate"),
-                                      user.carPlate == null && _notEditing
-                                          ? Container()
-                                          : Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
+                                      user.carPlates.length != 0
+                                          ? ListView.separated(
+                                              separatorBuilder:
+                                                  (context, index) => Divider(
+                                                        color: Colors.white,
+                                                      ),
+                                              shrinkWrap: true,
+                                              itemCount: user.carPlates.length,
+                                              itemBuilder:
+                                                  (BuildContext context,
+                                                      int index) {
+                                                return Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
                                                       horizontal: 32,
                                                       vertical: 12),
-                                              child: CarPlatePicker(
-                                                initialPlate:
-                                                    _carPlate ?? user.carPlate,
-                                                onChanged: (plate) {
-                                                  _carPlate = plate;
-                                                },
-                                                editable: !_notEditing,
-                                              ),
-                                            ),
+                                                  child: CarPlatePicker(
+                                                    initialPlate: user
+                                                            .carPlates[index] ??
+                                                        user.carPlates[index],
+                                                    onChanged: (plate) {
+                                                      user.carPlates[index] =
+                                                          plate;
+                                                    },
+                                                    editable: !_notEditing,
+                                                  ),
+                                                );
+                                              })
+                                          : Container(),
                                       _getLabel("Business Unit"),
                                       _notEditing
                                           ? _getField(
@@ -372,7 +386,7 @@ class MapScreenState extends State<ProfilePage>
                     nameController.text = user.username;
                     emailController.text = user.email;
                     phoneController.text = user.phoneNumber;
-                    _carPlate = user.carPlate;
+                    _carPlates = user.carPlates;
                     FocusScope.of(context).requestFocus(new FocusNode());
                   });
                 },
