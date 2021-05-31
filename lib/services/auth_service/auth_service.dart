@@ -118,6 +118,17 @@ class AuthService {
   Future<void> logout() async {
     return await _fbAuth.signOut();
   }
+
+  Future<void> resendVerificationEmail({
+    @required String email,
+    @required String password,
+  }) async {
+    final userCred = await _fbAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return await userCred.user.sendEmailVerification();
+  }
 }
 
 enum AuthState {
