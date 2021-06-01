@@ -63,6 +63,7 @@ class _SplashState extends State<Splash> {
           future: authService.getUser(),
           builder: (context, snapshot) {
             if (!snapshot.hasData) {
+              versionCheck(context);
               return Login(
                 title: "login",
               );
