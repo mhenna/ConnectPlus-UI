@@ -6,7 +6,6 @@ import 'package:flutter/gestures.dart';
 import 'package:connect_plus/registration.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:localstorage/localstorage.dart';
-import 'widgets/pushNotification.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -25,7 +24,6 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final LocalStorage localStorage = new LocalStorage('Connect+');
-  final PushNotificationService pushNotification = PushNotificationService();
 
   final emController = TextEditingController();
   final pwController = TextEditingController();

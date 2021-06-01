@@ -1,10 +1,13 @@
 import 'package:carousel_pro/carousel_pro.dart';
 import 'package:connect_plus/announcements.dart';
+import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/models/activity.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/occurrence.dart';
 import 'package:connect_plus/models/offer.dart';
 import 'package:connect_plus/models/webinar.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
@@ -16,10 +19,10 @@ import 'package:connect_plus/OfferVariables.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'EventsVariable.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'AnnouncementVariables.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
+import 'package:connect_plus/widgets/version_check.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -52,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> _loadData() async {
+    await updatePushNotificationsToken();
     await getEvents();
     await getWebinars();
     await getOffers();
@@ -64,6 +68,16 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  /// Called to ensure push notifications token is up to date.
+  /// Bad place to put this logic, but this is the only place to implement and
+  ///  call this logic after all login events / scenarios
+  ///
+  /// TODO: relocate it you find a better place to call this function
+  Future<void> updatePushNotificationsToken() async {
+    final pnToken = await sl<PushNotificationsService>().token;
+    return await sl<AuthService>().updatePushNotificationToken(pnToken);
   }
 
   Future<void> getEvents() async {
@@ -417,6 +431,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    versionCheck(context);
     return FutureBuilder<void>(
         future: _loadData(),
         builder: (context, snapshot) {

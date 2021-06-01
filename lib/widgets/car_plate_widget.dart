@@ -127,18 +127,21 @@ class _CarPlatePickerState extends State<CarPlatePicker> {
           ),
           child: Row(
             mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CarPlateNumbers(
-                editable: widget.editable,
-                numbers: numbers,
-                initialNumbers: _getInitialNumbers(),
-                onChanged: (numbers) {
-                  _numbers = numbers;
-                  if (widget.onChanged != null) {
-                    widget.onChanged('$_letters$_numbers');
-                  }
-                },
+              Flexible(
+                flex: 1,
+                child: CarPlateNumbers(
+                  editable: widget.editable,
+                  numbers: numbers,
+                  initialNumbers: _getInitialNumbers(),
+                  onChanged: (numbers) {
+                    _numbers = numbers;
+                    if (widget.onChanged != null) {
+                      widget.onChanged('$_letters$_numbers');
+                    }
+                  },
+                ),
               ),
               Align(
                 alignment: Alignment.center,
@@ -148,16 +151,19 @@ class _CarPlatePickerState extends State<CarPlatePicker> {
                   color: Colors.grey,
                 ),
               ),
-              CarPlateLetters(
-                editable: widget.editable,
-                letters: letters,
-                initialLetters: _getInitialLetters(),
-                onChanged: (letters) {
-                  _letters = letters;
-                  if (widget.onChanged != null) {
-                    widget.onChanged('$_letters$_numbers');
-                  }
-                },
+              Flexible(
+                flex: 1,
+                child: CarPlateLetters(
+                  editable: widget.editable,
+                  letters: letters,
+                  initialLetters: _getInitialLetters(),
+                  onChanged: (letters) {
+                    _letters = letters;
+                    if (widget.onChanged != null) {
+                      widget.onChanged('$_letters$_numbers');
+                    }
+                  },
+                ),
               ),
             ],
           ),
@@ -208,11 +214,11 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        SizedBox(
-          width: 19, // makes letters and numbers containers have same size
-        ),
+        // SizedBox(
+        //   width: 19, // makes letters and numbers containers have same size
+        // ),
         CarPlateScrollColumn(
           editable: widget.editable,
           items: ['', ...widget.letters],
@@ -241,9 +247,9 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
             widget.onChanged('$_char1$_char2$_char3');
           },
         ),
-        SizedBox(
-          width: 19, // makes letters and numbers containers have same size
-        ),
+        // SizedBox(
+        //   width: 19, // makes letters and numbers containers have same size
+        // ),
       ],
     );
   }
@@ -290,6 +296,7 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         CarPlateScrollColumn(
           editable: widget.editable,
@@ -300,7 +307,6 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
             widget.onChanged("$_no1$_no2$_no3$_no4");
           },
         ),
-        SizedBox(width: 4),
         CarPlateScrollColumn(
           editable: widget.editable,
           items: ['', ...widget.numbers],
@@ -310,7 +316,6 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
             widget.onChanged("$_no1$_no2$_no3$_no4");
           },
         ),
-        SizedBox(width: 4),
         CarPlateScrollColumn(
           editable: widget.editable,
           items: widget.numbers,
@@ -320,7 +325,6 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
             widget.onChanged("$_no1$_no2$_no3$_no4");
           },
         ),
-        SizedBox(width: 4),
         CarPlateScrollColumn(
           editable: widget.editable,
           items: widget.numbers,
@@ -425,7 +429,7 @@ class _CarPlateScrollColumnState extends State<CarPlateScrollColumn> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 38,
+      width: 28,
       height: 120,
       child: widget.editable
           ? PageView.builder(
