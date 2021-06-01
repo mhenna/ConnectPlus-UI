@@ -129,6 +129,17 @@ class AuthService {
     return await _fbAuth.signOut();
   }
 
+  Future<void> resendVerificationEmail({
+    @required String email,
+    @required String password,
+  }) async {
+    final userCred = await _fbAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+    return await userCred.user.sendEmailVerification();
+  }
+
   Future<void> updatePushNotificationToken(String pnToken) async {
     final userUid = _fbAuth.currentUser.uid;
     return await _fs

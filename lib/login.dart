@@ -260,7 +260,24 @@ class _LoginState extends State<Login> {
           title: Text("Oops!"),
           content: new Text(errorMessage),
           actions: <Widget>[
-            new FlatButton(
+            FlatButton(
+              child: new Text(
+                "Resend",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    color: Utils.header,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 17),
+              ),
+              onPressed: () async {
+                sl<AuthService>().resendVerificationEmail(
+                  email: emController.text,
+                  password: pwController.text,
+                );
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
               child: new Text(
                 "Close",
                 textAlign: TextAlign.center,
