@@ -312,7 +312,7 @@ class MapScreenState extends State<ProfilePage>
                                               userBu: user.businessUnit,
                                               asyncCallController:
                                                   _asyncCallController,
-                                              BusinessUnitController:
+                                              businessUnitController:
                                                   businessUnitController,
                                             ),
                                       !_notEditing
@@ -561,18 +561,18 @@ class CarPlateTextField extends StatelessWidget {
 }
 
 class BusinessUnitWidget extends StatelessWidget {
-  final void Function(String value) BusinessUnitController;
+  final void Function(String value) businessUnitController;
   final void Function(bool value) asyncCallController;
   final String userBu;
   const BusinessUnitWidget({
     Key key,
-    @required this.BusinessUnitController,
+    @required this.businessUnitController,
     @required this.asyncCallController,
     this.userBu,
   }) : super(key: key);
 
   void onChange(String val) {
-    BusinessUnitController(val);
+    businessUnitController(val);
   }
 
   void onLoaded(bool val) {
@@ -591,7 +591,7 @@ class BusinessUnitWidget extends StatelessWidget {
             Container(
               width: width * 0.85,
               child: BusinessUnit(
-                PassValue: onChange,
+                passValue: onChange,
                 asyncCallController: onLoaded,
                 userBU: userBu,
               ),

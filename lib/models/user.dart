@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class UserWithToken {
   String jwt;
   User user;
@@ -36,6 +34,7 @@ class User {
   String id;
   List<String> carPlates;
   String businessUnit;
+  String pushNotificationToken;
 
   User({
     this.confirmed,
@@ -52,6 +51,7 @@ class User {
     this.id,
     this.carPlates,
     this.businessUnit,
+    this.pushNotificationToken,
   });
   void addCarplates(List<dynamic> _carPlates) {
     carPlates = new List<String>();
@@ -76,6 +76,7 @@ class User {
     id = json['id'];
     addCarplates(json['carPlates']);
     businessUnit = json['businessUnit'];
+    pushNotificationToken = json['pushNotificationToken'];
   }
 
   Map<String, dynamic> toJson() {
@@ -96,6 +97,7 @@ class User {
     }
     data['id'] = this.id;
     data['businessUnit'] = this.businessUnit;
+    data['pushNotificationToken'] = this.pushNotificationToken;
     return data;
   }
 
@@ -114,22 +116,26 @@ class User {
     String id,
     List<String> carPlates,
     String businessUnit,
+    String pushNotificationToken,
   }) {
     return User(
-        confirmed: confirmed ?? this.confirmed,
-        blocked: blocked ?? this.blocked,
-        sId: sId ?? this.sId,
-        username: username ?? this.username,
-        email: email ?? this.email,
-        phoneNumber: phoneNumber ?? this.phoneNumber,
-        provider: provider ?? this.provider,
-        createdAt: createdAt ?? this.createdAt,
-        updatedAt: updatedAt ?? this.updatedAt,
-        iV: iV ?? this.iV,
-        role: role ?? this.role,
-        id: id ?? this.id,
-        carPlates: carPlates ?? this.carPlates,
-        businessUnit: businessUnit ?? this.businessUnit);
+      confirmed: confirmed ?? this.confirmed,
+      blocked: blocked ?? this.blocked,
+      sId: sId ?? this.sId,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      provider: provider ?? this.provider,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      iV: iV ?? this.iV,
+      role: role ?? this.role,
+      id: id ?? this.id,
+      carPlates: carPlates ?? this.carPlates,
+      businessUnit: businessUnit ?? this.businessUnit,
+      pushNotificationToken:
+          pushNotificationToken ?? this.pushNotificationToken,
+    );
   }
 }
 

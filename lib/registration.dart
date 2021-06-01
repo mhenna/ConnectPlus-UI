@@ -1,4 +1,5 @@
 import 'package:connect_plus/login.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/car_plate_widget.dart';
@@ -221,7 +222,7 @@ class _RegistrationState extends State<Registration> {
             setState(() {
               asyncCall = true;
             });
-
+            final pnToken = await sl<PushNotificationsService>().token;
             bool registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
@@ -229,6 +230,7 @@ class _RegistrationState extends State<Registration> {
               phoneNumber: phoneController.text,
               carPlates: carPlates,
               businessUnit: businessUnit,
+              pushNotificationToken: pnToken,
             );
             if (registered) {
               await successDialog();
@@ -643,7 +645,7 @@ class BusinessUnitWidget extends StatelessWidget {
         Container(
           width: width * 0.85,
           child: BusinessUnit(
-            PassValue: onChange,
+            passValue: onChange,
             asyncCallController: onLoaded,
           ),
         ),

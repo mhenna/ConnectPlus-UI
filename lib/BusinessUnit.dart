@@ -3,9 +3,9 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/services/web_api.dart';
 
 class BusinessUnit extends StatefulWidget {
-  BusinessUnit({Key key, this.PassValue, this.asyncCallController, this.userBU})
+  BusinessUnit({Key key, this.passValue, this.asyncCallController, this.userBU})
       : super(key: key);
-  final void Function(String value) PassValue;
+  final void Function(String value) passValue;
   final void Function(bool value) asyncCallController;
   final String userBU;
 
@@ -15,34 +15,37 @@ class BusinessUnit extends StatefulWidget {
 
 class _BusinessUnit extends State<BusinessUnit> {
   String dropdownValue = '';
-  bool Loaded = false;
-  List<String> BUs = new List<String>();
+  bool loaded = false;
+  List<String> businessUnits = new List<String>();
 
   void _getBusinessUnits() async {
-    BUs = new List<String>();
-    BUs = await WebAPI.getBusinessUnits();
+    businessUnits = new List<String>();
+    businessUnits = await WebAPI.getBusinessUnits();
     widget.asyncCallController(false);
-    if (dropdownValue == '') dropdownValue = BUs[0];
-    widget.PassValue(dropdownValue);
+    if (dropdownValue == '') dropdownValue = businessUnits[0];
+    widget.passValue(dropdownValue);
     setState(() {
-      Loaded = true;
+      loaded = true;
     });
   }
 
+  @override
   void initState() {
     if (widget.userBU != null) {
       dropdownValue = widget.userBU;
-      BUs.add(dropdownValue);
+      businessUnits.add(dropdownValue);
     }
     WidgetsBinding.instance
         .addPostFrameCallback((_) => {widget.asyncCallController(true)});
     _getBusinessUnits();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Loaded
+    return loaded
         ? DropdownButton<String>(
+            isExpanded: true,
             value: dropdownValue,
             icon: const Icon(Icons.arrow_downward),
             iconSize: 24,
@@ -57,10 +60,10 @@ class _BusinessUnit extends State<BusinessUnit> {
             onChanged: (String newValue) {
               setState(() {
                 dropdownValue = newValue;
-                widget.PassValue(dropdownValue);
+                widget.passValue(dropdownValue);
               });
             },
-            items: BUs.map<DropdownMenuItem<String>>((String value) {
+            items: businessUnits.map<DropdownMenuItem<String>>((String value) {
               return DropdownMenuItem<String>(
                 value: value,
                 child: Text(value),
