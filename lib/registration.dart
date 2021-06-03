@@ -330,37 +330,45 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? ListView.separated(
-                                          separatorBuilder: (context, index) =>
-                                              Divider(
-                                                color: Colors.white,
-                                              ),
-                                          shrinkWrap: true,
-                                          itemCount: carPlates.length,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return Container(
-                                                width: width * 0.85,
-                                                child: CarPlateForm(
-                                                  onChanged: (plate) {
-                                                    carPlates[index] = plate;
-                                                  },
-                                                ));
-                                          })
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                              ListView.separated(
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          Divider(
+                                                            color: Colors.white,
+                                                          ),
+                                                  shrinkWrap: true,
+                                                  itemCount: carPlates.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return Container(
+                                                        width: width * 0.85,
+                                                        child: CarPlateForm(
+                                                          onChanged: (plate) {
+                                                            carPlates[index] =
+                                                                plate;
+                                                          },
+                                                        ));
+                                                  }),
+                                              SizedBox(height: height * 0.027),
+                                              addCarPlateButton(
+                                                add: () {
+                                                  setState(() {
+                                                    carPlates.add("");
+                                                  });
+                                                },
+                                                delete: () {
+                                                  setState(() {
+                                                    carPlates.removeLast();
+                                                  });
+                                                },
+                                              )
+                                            ])
                                       : Container(),
-                                  SizedBox(height: height * 0.027),
-                                  addCarPlateButton(
-                                    add: () {
-                                      setState(() {
-                                        carPlates.add("");
-                                      });
-                                    },
-                                    delete: () {
-                                      setState(() {
-                                        carPlates.removeLast();
-                                      });
-                                    },
-                                  ),
                                   SizedBox(height: height * 0.027),
                                   Container(
                                     width: width * 0.85,
