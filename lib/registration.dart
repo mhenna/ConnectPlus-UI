@@ -228,7 +228,7 @@ class _RegistrationState extends State<Registration> {
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
-              carPlates: carPlates,
+              carPlates: haveCar ? carPlates : null,
               businessUnit: businessUnit,
               pushNotificationToken: pnToken,
             );
