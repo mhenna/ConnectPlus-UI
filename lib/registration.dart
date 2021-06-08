@@ -330,37 +330,45 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? ListView.separated(
-                                          separatorBuilder: (context, index) =>
-                                              Divider(
-                                                color: Colors.white,
-                                              ),
-                                          shrinkWrap: true,
-                                          itemCount: carPlates.length,
-                                          itemBuilder: (BuildContext context,
-                                              int index) {
-                                            return Container(
-                                                width: width * 0.85,
-                                                child: CarPlateForm(
-                                                  onChanged: (plate) {
-                                                    carPlates[index] = plate;
-                                                  },
-                                                ));
-                                          })
+                                      ? Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                              ListView.separated(
+                                                  separatorBuilder:
+                                                      (context, index) =>
+                                                          Divider(
+                                                            color: Colors.white,
+                                                          ),
+                                                  shrinkWrap: true,
+                                                  itemCount: carPlates.length,
+                                                  itemBuilder:
+                                                      (BuildContext context,
+                                                          int index) {
+                                                    return Container(
+                                                        width: width * 0.85,
+                                                        child: CarPlateForm(
+                                                          onChanged: (plate) {
+                                                            carPlates[index] =
+                                                                plate;
+                                                          },
+                                                        ));
+                                                  }),
+                                              SizedBox(height: height * 0.027),
+                                              addCarPlateButton(
+                                                add: () {
+                                                  setState(() {
+                                                    carPlates.add("");
+                                                  });
+                                                },
+                                                delete: () {
+                                                  setState(() {
+                                                    carPlates.removeLast();
+                                                  });
+                                                },
+                                              )
+                                            ])
                                       : Container(),
-                                  SizedBox(height: height * 0.027),
-                                  addCarPlateButton(
-                                    add: () {
-                                      setState(() {
-                                        carPlates.add("");
-                                      });
-                                    },
-                                    delete: () {
-                                      setState(() {
-                                        carPlates.removeLast();
-                                      });
-                                    },
-                                  ),
                                   SizedBox(height: height * 0.027),
                                   Container(
                                     width: width * 0.85,
@@ -665,8 +673,7 @@ class addCarPlateButton extends StatefulWidget {
 
 class _addCarPlateButtonState extends State<addCarPlateButton> {
   bool addBool = true;
-  Color color = Color.fromRGBO(67, 132, 45, 50);
-  @override
+  Color color = Color.fromRGBO(255, 255, 255, 50);
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -683,10 +690,10 @@ class _addCarPlateButtonState extends State<addCarPlateButton> {
       setState(() {
         if (addBool == true) {
           addBool = false;
-          color = Color.fromRGBO(0, 0, 0, 100);
+          color = Color.fromRGBO(255, 255, 255, 100);
         } else {
           addBool = true;
-          color = Color.fromRGBO(67, 132, 45, 50);
+          color = Color.fromRGBO(255, 255, 255, 50);
         }
       });
     }
@@ -695,6 +702,9 @@ class _addCarPlateButtonState extends State<addCarPlateButton> {
       decoration: BoxDecoration(
         //border: Border.all(color: Color.fromRGBO(201, 201, 201, 100)),
         borderRadius: BorderRadius.circular(25.0),
+        border: Border.all(
+          color: Colors.grey,
+        ),
         color: color,
       ),
       child: MaterialButton(
@@ -708,11 +718,11 @@ class _addCarPlateButtonState extends State<addCarPlateButton> {
         child: (addBool == true)
             ? Icon(
                 Icons.add_box,
-                color: Colors.white,
+                color: Colors.grey,
               )
             : Icon(
                 Icons.delete,
-                color: Colors.white,
+                color: Colors.grey,
               ),
       ),
     );
