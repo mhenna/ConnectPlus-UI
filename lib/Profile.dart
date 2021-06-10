@@ -208,7 +208,8 @@ class MapScreenState extends State<ProfilePage>
                                     decoration: new BoxDecoration(
                                       image: new DecorationImage(
                                         image: new ExactAssetImage(
-                                            'assets/as.png'),
+                                          'assets/as.png',
+                                        ),
                                         fit: BoxFit.contain,
                                       ),
                                     )),
@@ -275,35 +276,14 @@ class MapScreenState extends State<ProfilePage>
                                       _getField(user.phoneNumber.toString(),
                                           phoneController, false),
                                       _getLabel("Car Plate"),
-                                      user.carPlates.length != 0
-                                          ? ListView.separated(
-                                              separatorBuilder:
-                                                  (context, index) => Divider(
-                                                        color: Colors.white,
-                                                      ),
-                                              shrinkWrap: true,
-                                              itemCount: user.carPlates.length,
-                                              itemBuilder:
-                                                  (BuildContext context,
-                                                      int index) {
-                                                return Padding(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 32,
-                                                      vertical: 12),
-                                                  child: CarPlatePicker(
-                                                    initialPlate: user
-                                                            .carPlates[index] ??
-                                                        user.carPlates[index],
-                                                    onChanged: (plate) {
-                                                      user.carPlates[index] =
-                                                          plate;
-                                                    },
-                                                    editable: !_notEditing,
-                                                  ),
-                                                );
-                                              })
-                                          : Container(),
+                                      user.carPlates.isEmpty && _notEditing
+                                          ? NoCarsText()
+                                          : CarPlatesList(
+                                              initialPlates: user.carPlates,
+                                              onChanged: (plates) {
+                                                _carPlates = plates;
+                                              },
+                                            ),
                                       _getLabel("Business Unit"),
                                       _notEditing
                                           ? _getField(
@@ -598,5 +578,129 @@ class BusinessUnitWidget extends StatelessWidget {
             ),
           ],
         ));
+  }
+}
+
+class NoCarsText extends StatelessWidget {
+  const NoCarsText({Key key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(
+        top: 12,
+        left: MediaQuery.of(context).size.width * 0.08,
+      ),
+      child: Text(
+        "No cars registered",
+        style: TextStyle(color: Theme.of(context).disabledColor),
+      ),
+    );
+  }
+}
+
+class CarPlatesList extends StatefulWidget {
+  final List<String> initialPlates;
+  final Function(List<String> plate) onChanged;
+  final bool isEditing;
+  const CarPlatesList({
+    Key key,
+    this.initialPlates,
+    @required this.onChanged,
+    this.isEditing = true,
+  }) : super(key: key);
+
+  @override
+  _CarPlatesListState createState() => _CarPlatesListState();
+}
+
+class _CarPlatesListState extends State<CarPlatesList> {
+  List<String> carPlates;
+  num numberOfCarPlates;
+  @override
+  void initState() {
+    carPlates = widget.initialPlates;
+    numberOfCarPlates = widget.initialPlates.length;
+    super.initState();
+  }
+
+  String _initialPlate(index) {
+    if (widget.initialPlates.length - 1 > index) {
+      return widget.initialPlates[index];
+    }
+    return null;
+  }
+
+  void changePlate(index, plate) {
+    if (index > carPlates.length - 1) {
+      carPlates.add(plate);
+    } else {
+      carPlates[index] = plate;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.only(top: 12, left: 24),
+          shrinkWrap: true,
+          itemCount: numberOfCarPlates,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: MediaQuery.of(context).size.width * 0.8,
+                    child: CarPlatePicker(
+                      editable: widget.isEditing,
+                      initialPlate: _initialPlate(index),
+                      onChanged: (plate) {
+                        changePlate(index, plate);
+                      },
+                    ),
+                  ),
+                  FloatingActionButton(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                    child: Icon(
+                      Icons.delete,
+                      color: Colors.grey,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        numberOfCarPlates--;
+                        carPlates.removeAt(index);
+                      });
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+        Visibility(
+          visible: numberOfCarPlates < 2,
+          child: FloatingActionButton(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            onPressed: () {
+              setState(() {
+                numberOfCarPlates++;
+              });
+            },
+            child: Icon(
+              Icons.add,
+              color: Colors.grey,
+              size: 30,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 }
