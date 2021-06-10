@@ -53,13 +53,6 @@ class User {
     this.businessUnit,
     this.pushNotificationToken,
   });
-  void addCarplates(List<dynamic> _carPlates) {
-    carPlates = new List<String>();
-    for (final carplate in _carPlates) {
-      carPlates.add(carplate.toString());
-    }
-    return;
-  }
 
   User.fromJson(Map<String, dynamic> json) {
     confirmed = json['confirmed'];
@@ -74,7 +67,7 @@ class User {
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
-    addCarplates(json['carPlates']);
+    carPlates = json['carPlates'] ?? [];
     businessUnit = json['businessUnit'];
     pushNotificationToken = json['pushNotificationToken'];
   }
