@@ -330,44 +330,11 @@ class _RegistrationState extends State<Registration> {
                                     ),
                                   ),
                                   haveCar == true
-                                      ? Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                              ListView.separated(
-                                                  separatorBuilder:
-                                                      (context, index) =>
-                                                          Divider(
-                                                            color: Colors.white,
-                                                          ),
-                                                  shrinkWrap: true,
-                                                  itemCount: carPlates.length,
-                                                  itemBuilder:
-                                                      (BuildContext context,
-                                                          int index) {
-                                                    return Container(
-                                                        width: width * 0.85,
-                                                        child: CarPlateForm(
-                                                          onChanged: (plate) {
-                                                            carPlates[index] =
-                                                                plate;
-                                                          },
-                                                        ));
-                                                  }),
-                                              SizedBox(height: height * 0.027),
-                                              addCarPlateButton(
-                                                add: () {
-                                                  setState(() {
-                                                    carPlates.add("");
-                                                  });
-                                                },
-                                                delete: () {
-                                                  setState(() {
-                                                    carPlates.removeLast();
-                                                  });
-                                                },
-                                              )
-                                            ])
+                                      ? CarPlatesList(
+                                          onChanged: (plates) {
+                                            carPlates = plates;
+                                          },
+                                        )
                                       : Container(),
                                   SizedBox(height: height * 0.027),
                                   Container(
@@ -662,69 +629,99 @@ class BusinessUnitWidget extends StatelessWidget {
   }
 }
 
-class addCarPlateButton extends StatefulWidget {
-  final Function() add;
-  final Function() delete;
-  const addCarPlateButton({Key key, @required this.add, @required this.delete})
-      : super(key: key);
+class CarPlatesList extends StatefulWidget {
+  final List<String> initialPlates;
+  final Function(List<String> plate) onChanged;
+  const CarPlatesList({
+    Key key,
+    this.initialPlates,
+    @required this.onChanged,
+  }) : super(key: key);
+
   @override
-  _addCarPlateButtonState createState() => _addCarPlateButtonState();
+  _CarPlatesListState createState() => _CarPlatesListState();
 }
 
-class _addCarPlateButtonState extends State<addCarPlateButton> {
-  bool addBool = true;
-  Color color = Color.fromRGBO(255, 255, 255, 50);
+class _CarPlatesListState extends State<CarPlatesList> {
+  List<String> carPlates = [];
+
+  void changePlate(index, plate) {
+    if (index > carPlates.length - 1) {
+      carPlates.add(plate);
+    } else {
+      carPlates[index] = plate;
+    }
+    widget.onChanged(carPlates);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
-    @override
-    void initState() {
-      super.initState();
-      setState(() {
-        addBool = true;
-      });
-    }
-
-    void _update() {
-      setState(() {
-        if (addBool == true) {
-          addBool = false;
-          color = Color.fromRGBO(255, 255, 255, 100);
-        } else {
-          addBool = true;
-          color = Color.fromRGBO(255, 255, 255, 50);
-        }
-      });
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        //border: Border.all(color: Color.fromRGBO(201, 201, 201, 100)),
-        borderRadius: BorderRadius.circular(25.0),
-        border: Border.all(
-          color: Colors.grey,
-        ),
-        color: color,
-      ),
-      child: MaterialButton(
-        //minWidth: MediaQuery.of(context).size.width,
-        padding: EdgeInsets.fromLTRB(
-            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
-        onPressed: () {
-          (addBool == true) ? widget.add() : widget.delete();
-          _update();
-        },
-        child: (addBool == true)
-            ? Icon(
-                Icons.add_box,
-                color: Colors.grey,
-              )
-            : Icon(
-                Icons.delete,
-                color: Colors.grey,
+    return Column(
+      children: [
+        ListView(
+          physics: NeverScrollableScrollPhysics(),
+          padding: const EdgeInsets.symmetric(horizontal: 4),
+          shrinkWrap: true,
+          children: carPlates.map((plate) {
+            int index = carPlates.indexOf(plate);
+            return Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CarPlatePicker(
+                      key: ObjectKey(
+                        plate, // prevents incorrect plate being deleted
+                      ),
+                      editable: true,
+                      initialPlate: plate,
+                      onChanged: (plate) {
+                        changePlate(index, plate);
+                      },
+                    ),
+                  ),
+                  Visibility(
+                    visible: carPlates.length > 1,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: InkWell(
+                        child: Icon(
+                          Icons.delete,
+                          color: Colors.grey,
+                          size: 30,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            carPlates.removeAt(index);
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
               ),
-      ),
+            );
+          }).toList(),
+        ),
+        Visibility(
+          visible: carPlates.length < 2,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: InkWell(
+              onTap: () {
+                setState(() {
+                  carPlates.add('');
+                });
+              },
+              child: Icon(
+                Icons.add,
+                color: Colors.grey,
+                size: 30,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
