@@ -465,25 +465,6 @@ class _RegistrationState extends State<Registration> {
   }
 }
 
-class CarPlateForm extends StatelessWidget {
-  final Function(String) onChanged;
-
-  const CarPlateForm({Key key, @required this.onChanged}) : super(key: key);
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        CarPlateInputTitle(),
-        SizedBox(height: 10),
-        CarPlatePicker(
-          onChanged: onChanged,
-        ),
-      ],
-    );
-  }
-}
-
 class CarPlateInputTitle extends StatelessWidget {
   CarPlateInputTitle({
     Key key,
@@ -643,7 +624,7 @@ class CarPlatesList extends StatefulWidget {
 }
 
 class _CarPlatesListState extends State<CarPlatesList> {
-  List<String> carPlates = [];
+  List<String> carPlates = [""];
 
   void changePlate(index, plate) {
     if (index > carPlates.length - 1) {
@@ -658,6 +639,7 @@ class _CarPlatesListState extends State<CarPlatesList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        CarPlateInputTitle(),
         ListView(
           physics: NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 4),
