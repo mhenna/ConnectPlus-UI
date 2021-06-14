@@ -536,17 +536,18 @@ class _EditingCarPlatesListState extends State<EditingCarPlatesList> {
               padding: const EdgeInsets.only(top: 12.0),
               child: Row(
                 children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width * 0.8,
-                    child: CarPlatePicker(
-                      key: ObjectKey(
-                        plate, // prevents incorrect plate being deleted
+                  Expanded(
+                    child: Container(
+                      child: CarPlatePicker(
+                        key: ObjectKey(
+                          plate, // prevents incorrect plate being deleted
+                        ),
+                        editable: true,
+                        initialPlate: plate,
+                        onChanged: (plate) {
+                          changePlate(index, plate);
+                        },
                       ),
-                      editable: true,
-                      initialPlate: plate,
-                      onChanged: (plate) {
-                        changePlate(index, plate);
-                      },
                     ),
                   ),
                   FloatingActionButton(
