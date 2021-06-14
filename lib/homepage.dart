@@ -46,7 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool sliderPostersLoaded = false;
   bool announcementsLoaded = false;
   List<Announcement> announcements = [];
-
+  final String INTERNAL_COMMS = 'internal comms';
   void initState() {
     events = [];
     offers = [];
@@ -197,34 +197,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void getSliderAnnouncements() {
     num numberOfShownAnnouncements = 2;
-    List<Announcement> sortedAnnouncements = announcements;
-    sortedAnnouncements.sort((a1, a2) {
-      if (a1.deadline == null) return -1;
-      if (a2.deadline == null) return 1;
-      return a2.deadline.compareTo(a1.deadline);
-    });
-
-    List<Announcement> unexpiredAnnouncements = sortedAnnouncements
-        .where(
-          (announcement) =>
-              announcement.slider == true &&
-              announcement.erg.name.toLowerCase() ==
-                  "internal comms" && //TODO store this somewhere else
-              (announcement.deadline == null ||
-                  announcement.deadline.isAfter(DateTime.now())),
-        )
+    List<Announcement> sliderAnnouncements = announcements
+        .where((announcement) =>
+            announcement.slider == true &&
+            announcement.erg.name.toLowerCase() == INTERNAL_COMMS)
         .toList();
-    unexpiredAnnouncements =
-        unexpiredAnnouncements.take(numberOfShownAnnouncements).toList();
+    sliderAnnouncements.sort((a1, a2) {
+      return a2.createdAt.compareTo(a1.createdAt);
+    });
+    sliderAnnouncements =
+        sliderAnnouncements.take(numberOfShownAnnouncements).toList();
 
-    List<CachedImageBox> posters = unexpiredAnnouncements
+    List<CachedImageBox> posters = sliderAnnouncements
         .map(
           (announcement) => CachedImageBox(
             imageurl: WebAPI.baseURL + announcement.poster.url,
           ),
         )
         .toList();
-
     sliderPosters.addAll(posters);
   }
 
@@ -237,7 +227,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> getAnnouncements() async {
-    final allAnnouncements = await WebAPI.getAnnouncements();
+    final allAnnouncements = await WebAPI.getUnexpiredAnnouncements();
     if (this.mounted) {
       announcements = allAnnouncements;
       announcementsLoaded = true;
