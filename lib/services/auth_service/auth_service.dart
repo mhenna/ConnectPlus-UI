@@ -97,6 +97,7 @@ class AuthService {
       'businessUnit': businessUnit ?? _user.businessUnit,
       'pushNotificationToken':
           pushNotificationToken ?? _user.pushNotificationToken,
+      'updatedAt': DateTime.now().toString(),
     });
     _user = _user.copyWith(
       username: username,
