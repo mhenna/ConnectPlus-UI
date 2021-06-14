@@ -67,7 +67,7 @@ class User {
     iV = json['__v'];
     role = json['role'] != null ? new Role.fromJson(json['role']) : null;
     id = json['id'];
-    carPlates = json['carPlates'] ?? [];
+    carPlates = List<String>.from(json['carPlates']) ?? [];
     businessUnit = json['businessUnit'];
     pushNotificationToken = json['pushNotificationToken'];
   }
