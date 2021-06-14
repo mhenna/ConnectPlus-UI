@@ -278,12 +278,16 @@ class MapScreenState extends State<ProfilePage>
                                       _getLabel("Car Plate"),
                                       user.carPlates.isEmpty && _notEditing
                                           ? NoCarsText()
-                                          : CarPlatesList(
-                                              initialPlates: user.carPlates,
-                                              onChanged: (plates) {
-                                                _carPlates = plates;
-                                              },
-                                            ),
+                                          : _notEditing
+                                              ? CarPlatesList(
+                                                  carPlates: user.carPlates,
+                                                )
+                                              : EditingCarPlatesList(
+                                                  initialPlates: user.carPlates,
+                                                  onChanged: (plates) {
+                                                    _carPlates = plates;
+                                                  },
+                                                ),
                                       _getLabel("Business Unit"),
                                       _notEditing
                                           ? _getField(
@@ -460,26 +464,52 @@ class NoCarsText extends StatelessWidget {
   }
 }
 
-class CarPlatesList extends StatefulWidget {
-  final List<String> initialPlates;
-  final Function(List<String> plate) onChanged;
-  final bool isEditing;
+class CarPlatesList extends StatelessWidget {
+  final List<String> carPlates;
   const CarPlatesList({
     Key key,
-    this.initialPlates,
-    @required this.onChanged,
-    this.isEditing = true,
+    @required this.carPlates,
   }) : super(key: key);
 
   @override
-  _CarPlatesListState createState() => _CarPlatesListState();
+  Widget build(BuildContext context) {
+    return ListView(
+      physics: NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+      shrinkWrap: true,
+      children: carPlates.map((plate) {
+        return Padding(
+          padding: const EdgeInsets.only(top: 12.0),
+          child: CarPlatePicker(
+            editable: false,
+            initialPlate: plate,
+            onChanged: (_) {},
+          ),
+        );
+      }).toList(),
+    );
+  }
 }
 
-class _CarPlatesListState extends State<CarPlatesList> {
+class EditingCarPlatesList extends StatefulWidget {
+  final List<String> initialPlates;
+  final Function(List<String> plate) onChanged;
+  const EditingCarPlatesList({
+    Key key,
+    this.initialPlates,
+    @required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  _EditingCarPlatesListState createState() => _EditingCarPlatesListState();
+}
+
+class _EditingCarPlatesListState extends State<EditingCarPlatesList> {
   List<String> carPlates;
   @override
   void initState() {
-    carPlates = widget.initialPlates;
+    carPlates = [];
+    carPlates.addAll(widget.initialPlates); // deep copy
     super.initState();
   }
 
@@ -489,6 +519,7 @@ class _CarPlatesListState extends State<CarPlatesList> {
     } else {
       carPlates[index] = plate;
     }
+    widget.onChanged(carPlates);
   }
 
   @override
@@ -511,7 +542,7 @@ class _CarPlatesListState extends State<CarPlatesList> {
                       key: ObjectKey(
                         plate, // prevents incorrect plate being deleted
                       ),
-                      editable: widget.isEditing,
+                      editable: true,
                       initialPlate: plate,
                       onChanged: (plate) {
                         changePlate(index, plate);
