@@ -401,145 +401,6 @@ class MapScreenState extends State<ProfilePage>
   }
 }
 
-class CarPlateForm extends StatefulWidget {
-  const CarPlateForm({
-    Key key,
-    @required this.carPlateController,
-    @required this.initialValue,
-  }) : super(key: key);
-
-  final TextEditingController carPlateController;
-  final String initialValue;
-  @override
-  _CarPlateFormState createState() => _CarPlateFormState();
-}
-
-class _CarPlateFormState extends State<CarPlateForm> {
-  String _plateLetters = "";
-  String _plateNumbers = "";
-
-  @override
-  void initState() {
-    widget.initialValue.characters.forEach((char) {
-      if (isArabicLetter(char)) {
-        _plateLetters += char;
-      } else if (isArabicNumeral(char)) {
-        _plateNumbers += char;
-      }
-    });
-    super.initState();
-  }
-
-  bool isArabicLetter(String str) =>
-      RegExp("^[\u0600-\u065F\u066A-\u06EF\u06FA-\u06FF]+\$").hasMatch(str);
-
-  bool isArabicNumeral(String str) =>
-      RegExp("^[\u0621-\u064A\u0660-\u0669]+\$").hasMatch(str);
-
-  String _validateLetters(String letters) {
-    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-      return null;
-    }
-    if (letters.isEmpty) return null;
-    if (_plateLetters.isEmpty) {
-      return "Empty field";
-    }
-
-    if (!isArabicLetter(letters)) {
-      return "Arabic letters only";
-    }
-    return null;
-  }
-
-  String _validateNumbers(String numbers) {
-    if (_plateLetters.isEmpty && _plateNumbers.isEmpty) {
-      return null;
-    }
-    if (_plateNumbers.isEmpty) {
-      return "Invalid Input";
-    }
-    if (numbers.isEmpty) return null;
-    if (!isArabicNumeral(numbers)) {
-      return "Arabic numerals only";
-    }
-    return null;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    final height = MediaQuery.of(context).size.height;
-    return Padding(
-      padding: EdgeInsets.only(
-        left: width * 0.08,
-        right: width * 0.08,
-        top: height * 0.01,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.2,
-                child: CarPlateTextField(
-                  validator: _validateNumbers,
-                  initialText: _plateNumbers,
-                  onChanged: (numbers) {
-                    _plateNumbers = numbers;
-                    widget.carPlateController.text =
-                        _plateLetters + _plateNumbers;
-                  },
-                ),
-              ),
-              SizedBox(width: 8),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.2,
-                child: CarPlateTextField(
-                  validator: _validateLetters,
-                  initialText: _plateLetters,
-                  onChanged: (letters) {
-                    _plateLetters = letters;
-                    widget.carPlateController.text =
-                        _plateLetters + _plateNumbers;
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class CarPlateTextField extends StatelessWidget {
-  final void Function(String value) onChanged;
-  final String Function(String value) validator;
-  final String initialText;
-  const CarPlateTextField({
-    Key key,
-    this.onChanged,
-    this.validator,
-    this.initialText = "",
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      onChanged: onChanged,
-      validator: validator,
-      textAlign: TextAlign.center,
-      style: TextStyle(fontSize: 20.0),
-      decoration: InputDecoration(
-        contentPadding: EdgeInsets.zero,
-        hintText: initialText,
-      ),
-    );
-  }
-}
-
 class BusinessUnitWidget extends StatelessWidget {
   final void Function(String value) businessUnitController;
   final void Function(bool value) asyncCallController;
@@ -616,19 +477,10 @@ class CarPlatesList extends StatefulWidget {
 
 class _CarPlatesListState extends State<CarPlatesList> {
   List<String> carPlates;
-  num numberOfCarPlates;
   @override
   void initState() {
     carPlates = widget.initialPlates;
-    numberOfCarPlates = widget.initialPlates.length;
     super.initState();
-  }
-
-  String _initialPlate(index) {
-    if (widget.initialPlates.length - 1 > index) {
-      return widget.initialPlates[index];
-    }
-    return null;
   }
 
   void changePlate(index, plate) {
@@ -643,12 +495,12 @@ class _CarPlatesListState extends State<CarPlatesList> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ListView.builder(
+        ListView(
           physics: NeverScrollableScrollPhysics(),
           padding: const EdgeInsets.only(top: 12, left: 24),
           shrinkWrap: true,
-          itemCount: numberOfCarPlates,
-          itemBuilder: (context, index) {
+          children: carPlates.map((plate) {
+            int index = carPlates.indexOf(plate);
             return Padding(
               padding: const EdgeInsets.only(top: 12.0),
               child: Row(
@@ -656,14 +508,18 @@ class _CarPlatesListState extends State<CarPlatesList> {
                   Container(
                     width: MediaQuery.of(context).size.width * 0.8,
                     child: CarPlatePicker(
+                      key: ObjectKey(
+                        plate, // prevents incorrect plate being deleted
+                      ),
                       editable: widget.isEditing,
-                      initialPlate: _initialPlate(index),
+                      initialPlate: plate,
                       onChanged: (plate) {
                         changePlate(index, plate);
                       },
                     ),
                   ),
                   FloatingActionButton(
+                    mini: true,
                     backgroundColor: Colors.transparent,
                     elevation: 0,
                     child: Icon(
@@ -673,7 +529,6 @@ class _CarPlatesListState extends State<CarPlatesList> {
                     ),
                     onPressed: () {
                       setState(() {
-                        numberOfCarPlates--;
                         carPlates.removeAt(index);
                       });
                     },
@@ -681,16 +536,16 @@ class _CarPlatesListState extends State<CarPlatesList> {
                 ],
               ),
             );
-          },
+          }).toList(),
         ),
         Visibility(
-          visible: numberOfCarPlates < 2,
+          visible: carPlates.length < 2,
           child: FloatingActionButton(
             backgroundColor: Colors.transparent,
             elevation: 0,
             onPressed: () {
               setState(() {
-                numberOfCarPlates++;
+                carPlates.add('');
               });
             },
             child: Icon(
