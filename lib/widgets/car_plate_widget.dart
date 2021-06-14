@@ -200,7 +200,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
       if (widget.initialLetters.length == 2) {
         if (position == 2) {
           return null;
-        } else if (position == 1) {
+        } else {
           return widget.initialLetters[position];
         }
       } else if (widget.initialLetters.length == 3) {
@@ -208,6 +208,14 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
       }
     }
     return null;
+  }
+
+  void _onChanged() {
+    String letters = "";
+    if (_char1 != null) letters += _char1;
+    if (_char2 != null) letters += _char2;
+    if (_char3 != null) letters += _char3;
+    widget.onChanged(letters);
   }
 
   @override
@@ -226,7 +234,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
           onChanged: (character) {
             _char3 = character;
             // characters are switched as arabic switched alignments
-            widget.onChanged('$_char1$_char2$_char3');
+            _onChanged();
           },
         ),
         CarPlateScrollColumn(
@@ -235,7 +243,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
           initialItem: _getInitialLetterAt(1),
           onChanged: (character) {
             _char2 = character;
-            widget.onChanged('$_char1$_char2$_char3');
+            _onChanged();
           },
         ),
         CarPlateScrollColumn(
@@ -244,7 +252,7 @@ class _CarPlateLettersState extends State<CarPlateLetters> {
           initialItem: _getInitialLetterAt(0),
           onChanged: (character) {
             _char1 = character;
-            widget.onChanged('$_char1$_char2$_char3');
+            _onChanged();
           },
         ),
         // SizedBox(
@@ -292,6 +300,15 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
     return null;
   }
 
+  void _onChanged() {
+    String nums = "";
+    if (_no1 != null) nums += _no1;
+    if (_no2 != null) nums += _no2;
+    if (_no3 != null) nums += _no3;
+    if (_no4 != null) nums += _no4;
+    widget.onChanged(nums);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -304,7 +321,7 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
           initialItem: _getInitialNumberAt(0),
           onChanged: (number) {
             _no1 = number;
-            widget.onChanged("$_no1$_no2$_no3$_no4");
+            _onChanged();
           },
         ),
         CarPlateScrollColumn(
@@ -313,7 +330,7 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
           initialItem: _getInitialNumberAt(1),
           onChanged: (number) {
             _no2 = number;
-            widget.onChanged("$_no1$_no2$_no3$_no4");
+            _onChanged();
           },
         ),
         CarPlateScrollColumn(
@@ -322,7 +339,7 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
           initialItem: _getInitialNumberAt(2),
           onChanged: (number) {
             _no3 = number;
-            widget.onChanged("$_no1$_no2$_no3$_no4");
+            _onChanged();
           },
         ),
         CarPlateScrollColumn(
@@ -331,7 +348,7 @@ class _CarPlateNumbersState extends State<CarPlateNumbers> {
           initialItem: _getInitialNumberAt(3),
           onChanged: (number) {
             _no4 = number;
-            widget.onChanged("$_no1$_no2$_no3$_no4");
+            _onChanged();
           },
         ),
       ],
@@ -429,7 +446,7 @@ class _CarPlateScrollColumnState extends State<CarPlateScrollColumn> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 28,
+      width: 36,
       height: 120,
       child: widget.editable
           ? PageView.builder(
