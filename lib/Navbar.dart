@@ -123,16 +123,17 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-          ListTile(
-            leading: Icon(Icons.car_repair),
-            title: Text('Move Your Car'),
-            onTap: () => {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MoveYourCarScreen()),
-              )
-            },
-          ),
+          // TODO: Uncomment this when re-adding the move your car function
+          // ListTile(
+          //   leading: Icon(Icons.car_repair),
+          //   title: Text('Move Your Car'),
+          //   onTap: () => {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => MoveYourCarScreen()),
+          //     )
+          //   },
+          // ),
           ListTile(
             leading: Icon(Icons.call),
             title: Text('Emergency Contacts'),
