@@ -446,7 +446,7 @@ class _CarPlateScrollColumnState extends State<CarPlateScrollColumn> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 28,
+      width: 36,
       height: 120,
       child: widget.editable
           ? PageView.builder(
