@@ -187,16 +187,18 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                   fontSize: size * 39,
                   textcolor: Utils.header)),
           Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
-              child: SizedBox(
-                  height: height * 0.25,
-                  child: ListView(
-                    controller: _scrollController,
-                    physics: ClampingScrollPhysics(),
-                    shrinkWrap: true,
-                    scrollDirection: Axis.horizontal,
-                    children: webinarsByERG(),
-                  ))),
+            padding: EdgeInsets.fromLTRB(0, 0, width * 0.02, height * 0.02),
+            child: SizedBox(
+              height: height * 0.25,
+              child: ListView(
+                controller: _scrollController,
+                physics: ClampingScrollPhysics(),
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                children: webinarsByERG(),
+              ),
+            ),
+          ),
         ],
       );
     } else {
