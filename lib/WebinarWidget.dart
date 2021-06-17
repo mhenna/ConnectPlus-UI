@@ -93,7 +93,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                       textAlign: TextAlign.center,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                        fontSize: size * 35,
+                        fontSize: 16,
                         color: Utils.header,
                       ),
                     ),

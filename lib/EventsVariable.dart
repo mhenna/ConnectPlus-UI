@@ -197,8 +197,14 @@ class Single_Event extends StatelessWidget {
                     color: Colors.white70,
                     child: ListTile(
                       title: Column(children: <Widget>[
-                        Text(event.name,
-                            style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text(
+                          event.name,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                         Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
