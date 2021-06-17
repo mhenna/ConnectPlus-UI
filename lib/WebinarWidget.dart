@@ -91,8 +91,11 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
                     child: Text(
                       ergwebinar.name,
                       textAlign: TextAlign.center,
-                      style:
-                          TextStyle(fontSize: size * 35, color: Utils.header),
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: size * 35,
+                        color: Utils.header,
+                      ),
                     ),
                   )
                 ],
