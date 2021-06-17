@@ -690,17 +690,22 @@ class _CarPlatesListState extends State<CarPlatesList> {
           child: Padding(
             padding: const EdgeInsets.only(top: 4),
             child: InkWell(
-              onTap: () {
-                setState(() {
-                  carPlates.add('');
-                });
-              },
-              child: Icon(
-                Icons.add,
-                color: Colors.grey,
-                size: 30,
-              ),
-            ),
+                onTap: () {
+                  setState(() {
+                    carPlates.add('');
+                  });
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  child: Text.rich(TextSpan(
+                      text: "+ Add another car plate",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.grey,
+                        fontFamily: "Roboto",
+                      ))),
+                )),
           ),
         ),
       ],
