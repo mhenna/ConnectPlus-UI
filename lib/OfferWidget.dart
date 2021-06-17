@@ -119,6 +119,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                               child: Text(
                                 offer.name,
                                 textAlign: TextAlign.center,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                     fontSize: size * 30, color: Colors.black87),
                               ),
