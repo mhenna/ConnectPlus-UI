@@ -572,18 +572,22 @@ class _EditingCarPlatesListState extends State<EditingCarPlatesList> {
         ),
         Visibility(
           visible: carPlates.length < 2,
-          child: FloatingActionButton(
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            onPressed: () {
+          child: InkWell(
+            onTap: () {
               setState(() {
                 carPlates.add('');
               });
             },
-            child: Icon(
-              Icons.add,
-              color: Colors.grey,
-              size: 30,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 10, bottom: 20),
+              child: Text.rich(TextSpan(
+                  text: "+ Add another car plate",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.grey,
+                    fontFamily: "Roboto",
+                  ))),
             ),
           ),
         ),
