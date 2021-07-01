@@ -316,9 +316,8 @@ class _RegistrationState extends State<Registration> {
                                   ),
                                   Container(
                                     width: width * 0.85,
-                                    child: BusinessUnitWidget(
-                                      businessUnitController:
-                                          businessUnitController,
+                                    child: BusinessUnit(
+                                      passValue: businessUnitController,
                                       asyncCallController: _asyncCallController,
                                     ),
                                   ),
@@ -564,48 +563,6 @@ class _State extends State<CarPlateRadioButton> {
           )
         ],
       ),
-    );
-  }
-}
-
-class BusinessUnitWidget extends StatelessWidget {
-  final void Function(String value) businessUnitController;
-  final void Function(bool value) asyncCallController;
-  const BusinessUnitWidget({
-    Key key,
-    @required this.businessUnitController,
-    @required this.asyncCallController,
-  }) : super(key: key);
-
-  void onChange(String val) {
-    businessUnitController(val);
-  }
-
-  void onLoaded(bool val) {
-    asyncCallController(val);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
-    return Column(
-      children: [
-        SizedBox(height: 20.0),
-        Container(
-          width: width * 0.85,
-          child: Text(
-            'Business Unit',
-            style: TextStyle(fontSize: 20.0),
-          ),
-        ),
-        Container(
-          width: width * 0.85,
-          child: BusinessUnit(
-            passValue: onChange,
-            asyncCallController: onLoaded,
-          ),
-        ),
-      ],
     );
   }
 }
