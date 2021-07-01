@@ -43,32 +43,48 @@ class _BusinessUnit extends State<BusinessUnit> {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
     return loaded
-        ? DropdownButton<String>(
-            isExpanded: true,
-            value: dropdownValue,
-            icon: const Icon(Icons.arrow_downward),
-            iconSize: 24,
-            elevation: 16,
-            style: const TextStyle(
-              color: Utils.header,
-            ),
-            underline: Container(
-              height: 2,
-              color: Utils.header,
-            ),
-            onChanged: (String newValue) {
-              setState(() {
-                dropdownValue = newValue;
-                widget.passValue(dropdownValue);
-              });
-            },
-            items: businessUnits.map<DropdownMenuItem<String>>((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
-            }).toList(),
+        ? Column(
+            children: [
+              SizedBox(height: 20.0),
+              Container(
+                width: width * 0.85,
+                child: Text(
+                  'Business Unit',
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              ),
+              Container(
+                  width: width * 0.85,
+                  child: DropdownButton<String>(
+                    isExpanded: true,
+                    value: dropdownValue,
+                    icon: const Icon(Icons.arrow_downward),
+                    iconSize: 24,
+                    elevation: 16,
+                    style: const TextStyle(
+                      color: Utils.header,
+                    ),
+                    underline: Container(
+                      height: 2,
+                      color: Utils.header,
+                    ),
+                    onChanged: (String newValue) {
+                      setState(() {
+                        dropdownValue = newValue;
+                        widget.passValue(dropdownValue);
+                      });
+                    },
+                    items: businessUnits
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  )),
+            ],
           )
         : Container();
   }
