@@ -7,6 +7,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:connect_plus/BusinessUnit.dart';
 import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/homepage.dart';
 
 class MissingInformation extends StatefulWidget {
   MissingInformation({Key key, this.user}) : super(key: key);
@@ -27,14 +28,15 @@ class _MissingInformationState extends State<MissingInformation> {
   }
 
   void _asyncCallController(bool value) {
-    print(value);
     setState(() {
       asyncCall = value;
     });
   }
 
   void businessUnitController(String value) {
-    businessUnit = value;
+    setState(() {
+      businessUnit = value;
+    });
   }
 
   void _displayCarPlate(bool _haveCar) {
@@ -91,6 +93,16 @@ class _MissingInformationState extends State<MissingInformation> {
                               },
                             )
                           : Container(),
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(width * 0.05,
+                            height * 0.02, width * 0.05, height * 0.03),
+                        child: SaveButton(
+                          carPlates: carPlates,
+                          businessUnit: businessUnit,
+                          asyncCallController: _asyncCallController,
+                          haveCar: haveCar,
+                        ),
+                      )
                     ]))))));
   }
 }
@@ -297,6 +309,77 @@ class _CarPlatesListState extends State<CarPlatesList> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class SaveButton extends StatefulWidget {
+  SaveButton(
+      {Key key,
+      this.carPlates,
+      this.businessUnit,
+      this.asyncCallController,
+      this.haveCar})
+      : super(key: key);
+  final String businessUnit;
+  final List<String> carPlates;
+  final Function asyncCallController;
+  final bool haveCar;
+
+  @override
+  _SaveButtonState createState() => _SaveButtonState();
+}
+
+class _SaveButtonState extends State<SaveButton> {
+  @override
+  Widget build(BuildContext context) {
+    TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    var size = MediaQuery.of(context).size.aspectRatio;
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        gradient: LinearGradient(
+          colors: [
+            Utils.secondaryColor,
+            Utils.primaryColor,
+          ],
+          begin: Alignment.topRight,
+          end: Alignment.bottomLeft,
+        ),
+      ),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(
+            width * 0.02, height * 0.023, width * 0.02, height * 0.023),
+        onPressed: () async {
+          widget.asyncCallController(true);
+          List<String> nullCarPlates;
+          if (widget.haveCar == false) {
+            List<String> nullCarPlates = new List<String>();
+            nullCarPlates.add(null);
+          }
+          print("HAVECAR?" + widget.haveCar.toString());
+          await sl<AuthService>().updateProfile(
+            carPlates: widget.haveCar ? widget.carPlates : nullCarPlates,
+            businessUnit:
+                widget.businessUnit == "" ? null : widget.businessUnit,
+          );
+          widget.asyncCallController(false);
+          Navigator.of(context).pop();
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage()),
+          );
+        },
+        child: Text(
+          "Save & Continue",
+          textAlign: TextAlign.center,
+          style: style.copyWith(
+              color: Colors.white, fontWeight: FontWeight.normal),
+        ),
+      ),
     );
   }
 }
