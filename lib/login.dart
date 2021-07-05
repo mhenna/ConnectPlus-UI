@@ -1,5 +1,6 @@
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
+import 'package:connect_plus/models/user.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
@@ -12,6 +13,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/ResetPassword.dart';
+import 'package:connect_plus/missingInformation.dart';
 
 class Login extends StatefulWidget {
   Login({Key key, this.title}) : super(key: key);
@@ -137,10 +139,25 @@ class _LoginState extends State<Login> {
               password: pwController.text,
             );
             if (state == AuthState.Loggedin) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage()),
-              );
+              final User user = await sl<AuthService>().getUser();
+
+              if (user.businessUnit == "") {
+                setState(() {
+                  asyncCall = false;
+                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => MissingInformation(
+                            user: user,
+                          )),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => MyHomePage()),
+                );
+              }
             } else {
               setState(() {
                 asyncCall = false;
@@ -311,4 +328,9 @@ class _LoginState extends State<Login> {
       },
     );
   }
+}
+
+bool checkMissingInfo(User user) {
+  if (user.businessUnit != null) return false;
+  return true;
 }
