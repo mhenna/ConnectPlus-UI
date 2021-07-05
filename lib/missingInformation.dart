@@ -360,14 +360,13 @@ class _SaveButtonState extends State<SaveButton> {
             List<String> nullCarPlates = new List<String>();
             nullCarPlates.add(null);
           }
-          print("HAVECAR?" + widget.haveCar.toString());
           await sl<AuthService>().updateProfile(
             carPlates: widget.haveCar ? widget.carPlates : nullCarPlates,
             businessUnit:
                 widget.businessUnit == "" ? null : widget.businessUnit,
           );
           widget.asyncCallController(false);
-          Navigator.of(context).pop();
+
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => MyHomePage()),
