@@ -242,7 +242,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
         // Link Button
         ClickableButton(
             link: event.link,
-            text: 'registeration link',
+            text: 'registration link',
             launchURL: _launchURL),
       ],
     );
