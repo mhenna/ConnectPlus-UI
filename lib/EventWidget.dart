@@ -236,38 +236,14 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           color: Colors.transparent,
           height: 10,
         ),
-        // trivia button
-        event.trivia == null
-            ? Container()
-            : Center(
-                child: RaisedButton(
-                  onPressed: () => _launchURL(event.trivia ?? ''),
-                  color: Utils.iconColor,
-                  textColor: Colors.white,
-                  padding: const EdgeInsets.all(0.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      side: BorderSide(color: Utils.iconColor)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      gradient: LinearGradient(
-                        colors: [
-                          Utils.secondaryColor,
-                          Utils.primaryColor,
-                        ],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
-                    child: Text(
-                      'Trivia Link',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ),
-              ),
+        // Trivia Button
+        ClickableButton(
+            link: event.trivia, text: 'trivia link', launchURL: _launchURL),
+        // Link Button
+        ClickableButton(
+            link: event.link,
+            text: 'registration link',
+            launchURL: _launchURL),
       ],
     );
   }
@@ -336,5 +312,47 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           ),
         ),
       );
+  }
+}
+
+class ClickableButton extends StatelessWidget {
+  const ClickableButton({Key key, this.link, this.text, this.launchURL})
+      : super(key: key);
+  final String link;
+  final String text;
+  final void Function(String) launchURL;
+  @override
+  Widget build(BuildContext context) {
+    return link == ''
+        ? Container()
+        : Center(
+            child: RaisedButton(
+              onPressed: () => launchURL(link ?? ''),
+              color: Utils.iconColor,
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(color: Utils.iconColor)),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                child: Text(
+                  this.text,
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+          );
   }
 }

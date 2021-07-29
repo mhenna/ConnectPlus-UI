@@ -23,6 +23,7 @@ class Event extends Occurrence {
   final String _id;
   final String _trivia;
   final bool _slider;
+  final String _link;
   @override
   DateTime get date => this._createdAt;
 
@@ -50,26 +51,28 @@ class Event extends Occurrence {
   String get trivia => this._trivia;
   String get id => this._id;
   ERG get erg => this._erg;
+  String get link => this._link;
 
-  Event({
-    @required String sId,
-    @required String status,
-    @required String name,
-    @required String venue,
-    @required DateTime startDate,
-    @required DateTime endDate,
-    @required DateTime createdAt,
-    @required DateTime updatedAt,
-    @required int iV,
-    @required String onBehalfOf,
-    @required AdminUser createdBy,
-    @required ImageFile poster,
-    @required AdminUser updatedBy,
-    @required ERG erg,
-    @required String id,
-    @required String trivia,
-    @required bool slider,
-  })  : _sId = sId,
+  Event(
+      {@required String sId,
+      @required String status,
+      @required String name,
+      @required String venue,
+      @required DateTime startDate,
+      @required DateTime endDate,
+      @required DateTime createdAt,
+      @required DateTime updatedAt,
+      @required int iV,
+      @required String onBehalfOf,
+      @required AdminUser createdBy,
+      @required ImageFile poster,
+      @required AdminUser updatedBy,
+      @required ERG erg,
+      @required String id,
+      @required String trivia,
+      @required bool slider,
+      String link})
+      : _sId = sId,
         _status = status,
         _name = name,
         _venue = venue,
@@ -85,7 +88,8 @@ class Event extends Occurrence {
         _erg = erg,
         _id = id,
         _trivia = trivia,
-        _slider = slider;
+        _slider = slider,
+        _link = link;
 
   factory Event.fromJson(Map<String, dynamic> json) {
     return Event(
@@ -119,6 +123,7 @@ class Event extends Occurrence {
       updatedBy: json['updated_by'] != null
           ? AdminUser.fromJson(json['updated_by'])
           : null,
+      link: json['link'],
     );
   }
 
@@ -151,6 +156,8 @@ class Event extends Occurrence {
     data['trivia'] = this._trivia;
     data['id'] = this._id;
     data['slider'] = this._slider;
+    data['link'] = this._link;
+
     return data;
   }
 }
