@@ -270,11 +270,11 @@ class _OffersState extends State<Offers> {
                   if (elem == 0) {
                     return Column(children: <Widget>[
                       SizedBox(
-                        height: height * 0.308,
+                        height: width * 2 / 3,
                         width: width,
                         child: Carousel(
                           images: recentOffers,
-                          boxFit: BoxFit.cover,
+                          boxFit: BoxFit.fill,
                           dotSize: 4.0,
                           dotSpacing: 15.0,
                           dotColor: Colors.grey,

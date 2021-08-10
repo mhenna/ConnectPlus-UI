@@ -55,7 +55,7 @@ class _OfferVariables extends State<OfferVariables>
         Padding(
           padding: EdgeInsets.only(left: 6, right: 6),
           child: Container(
-            height: height * 0.27,
+            height: height * 0.3,
             child: _mostRecentOfferLogo(),
           ),
         ),
@@ -87,7 +87,7 @@ class _OfferVariables extends State<OfferVariables>
           padding: EdgeInsets.only(right: 10),
           child: SizedBox(
             height: height,
-            width: width * 0.60,
+            width: 0.97 * 0.23 * height * 3 / 2,
             child: Single_Offer(offer: offer),
           ),
         ));

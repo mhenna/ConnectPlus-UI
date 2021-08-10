@@ -329,7 +329,7 @@ class _MyHomePageState extends State<MyHomePage> {
       if (sliderPosters.isNotEmpty) {
         list.add(
           SizedBox(
-            height: height * 0.308,
+            height: width * 2 / 3,
             child: DecoratedBox(
               decoration: BoxDecoration(color: Utils.background),
               child: Carousel(
@@ -357,7 +357,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         list.add(Container(
           width: width * 0.97,
-          height: height * 0.50,
+          height: height * 0.55,
           child: EventsVariables(events: events, webinars: webinars),
         ));
         list.add(
@@ -371,7 +371,7 @@ class _MyHomePageState extends State<MyHomePage> {
         );
         list.add(Container(
             width: width * 0.97,
-            height: height * 0.50,
+            height: height * 0.55,
             child: AnnouncementVariables(
               announcements: announcements,
             )));
@@ -386,7 +386,7 @@ class _MyHomePageState extends State<MyHomePage> {
             //gridview
             Container(
           width: width * 0.97,
-          height: height * 0.50,
+          height: height * 0.55,
           child: OfferVariables(
             offers: offers,
           ),

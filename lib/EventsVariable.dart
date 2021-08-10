@@ -108,7 +108,7 @@ class _EventsVariablesState extends State<EventsVariables>
       children: <Widget>[
         Padding(
             padding: EdgeInsets.only(left: 6, right: 6),
-            child: Container(height: height * 0.27, child: mostRecent())),
+            child: Container(height: height * 0.3, child: mostRecent())),
         Expanded(
             child: Padding(
                 padding: EdgeInsets.only(left: 6, right: 7, top: 5),
@@ -144,7 +144,7 @@ class _EventsVariablesState extends State<EventsVariables>
               ),
               child: SizedBox(
                 height: height,
-                width: width * 0.60,
+                width: 0.97 * 0.23 * height * 3 / 2,
                 child: Single_Event(event: event),
               ),
             )));
