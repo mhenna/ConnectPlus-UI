@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connect_plus/models/user.dart' as user_model;
+import 'package:cloud_functions/cloud_functions.dart';
 
 class AuthService {
   final FirebaseAuth _fbAuth = FirebaseAuth.instance;
@@ -34,7 +35,7 @@ class AuthService {
         password: password,
       );
       final User fbUser = cred.user;
-      await fbUser.sendEmailVerification();
+
       if (fbUser != null) {
         await _fs.collection('users').doc(cred.user.uid).set({
           'username': username,
@@ -48,6 +49,10 @@ class AuthService {
           'businessUnit': businessUnit,
           'pushNotificationToken': pushNotificationToken,
         });
+        String response = await sendVerificationEmail();
+        if (response != "") {
+          return false;
+        }
         return true;
       }
       return false;
@@ -121,7 +126,6 @@ class AuthService {
       await _fbAuth.sendPasswordResetEmail(email: email);
       return null;
     } catch (e) {
-      print(e.toString());
       return e.toString();
     }
   }
@@ -138,7 +142,7 @@ class AuthService {
       email: email,
       password: password,
     );
-    return await userCred.user.sendEmailVerification();
+    return await sendVerificationEmail();
   }
 
   Future<void> updatePushNotificationToken(String pnToken) async {
@@ -147,6 +151,20 @@ class AuthService {
         .collection('users')
         .doc(userUid)
         .update({'pushNotificationToken': pnToken});
+  }
+
+  Future<String> sendVerificationEmail() async {
+    final FirebaseFunctions _fbFunctions = FirebaseFunctions.instance;
+    try {
+      final HttpsCallable callable =
+          _fbFunctions.httpsCallable('sendVerificationEmail');
+      final response = await callable.call();
+      final String err = response.data['error'];
+
+      return err;
+    } catch (e) {
+      return e;
+    }
   }
 }
 
