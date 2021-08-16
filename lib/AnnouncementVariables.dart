@@ -42,8 +42,8 @@ class _AnnouncementVariables extends State<AnnouncementVariables>
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(left: 6, right: 6),
-          child: Container(
-              height: height * 0.27, child: _mostRecentAnnouncement()),
+          child:
+              Container(height: height * 0.3, child: _mostRecentAnnouncement()),
         ),
         Expanded(
           child: Padding(
@@ -77,7 +77,7 @@ class _AnnouncementVariables extends State<AnnouncementVariables>
         padding: EdgeInsets.only(right: 10),
         child: SizedBox(
           height: height,
-          width: width * 0.60,
+          width: 0.97 * 0.23 * height * 3 / 2,
           child: Single_Announcement(announcement),
         ),
       );
