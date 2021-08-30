@@ -23,7 +23,6 @@ class Offer extends Occurrence {
   final String _location;
   final Attachment _attachment;
   final String _id;
-  final bool _slider;
   final ERG _erg;
 
   @override
@@ -35,7 +34,7 @@ class Offer extends Occurrence {
   @override
   ImageFile get poster => _logo;
   @override
-  bool get slider => _slider;
+  bool get slider => false;
   @override
   ERG get erg => _erg;
 
@@ -71,7 +70,6 @@ class Offer extends Occurrence {
     @required String location,
     @required Attachment attachment,
     @required String id,
-    @required bool slider,
     @required ERG erg,
   })  : _sId = sId,
         _name = name,
@@ -89,7 +87,6 @@ class Offer extends Occurrence {
         _location = location,
         _attachment = attachment,
         _id = id,
-        _slider = slider,
         _erg = erg;
 
   factory Offer.fromJson(Map<String, dynamic> json) {
@@ -124,7 +121,6 @@ class Offer extends Occurrence {
           ? new Attachment.fromJson(json['attachment'])
           : null,
       id: json['id'],
-      slider: json['slider'] ?? false,
       erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
     );
   }
