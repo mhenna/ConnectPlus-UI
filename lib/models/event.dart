@@ -123,7 +123,7 @@ class Event extends Occurrence {
       updatedBy: json['updated_by'] != null
           ? AdminUser.fromJson(json['updated_by'])
           : null,
-      link: json['link'],
+      link: json['registrationLink'] ?? json['link'] ?? null,
     );
   }
 
@@ -156,7 +156,7 @@ class Event extends Occurrence {
     data['trivia'] = this._trivia;
     data['id'] = this._id;
     data['slider'] = this._slider;
-    data['link'] = this._link;
+    data['registrationLink'] = this._link;
 
     return data;
   }

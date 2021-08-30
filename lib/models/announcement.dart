@@ -105,7 +105,9 @@ class Announcement extends Occurrence {
       slider: json['slider'] ?? false,
       trivia:
           json['trivia'] == "" ? null : json['trivia'], // will auto set to null
-      link: json['link'] == "" ? null : json['link'], // will auto set to null
+      link: json['registrationLink'] ??
+          json['link'] ??
+          null, // will auto set to null
       erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
     );
   }
@@ -134,7 +136,7 @@ class Announcement extends Occurrence {
     }
     data['trivia'] = this._trivia;
     data['id'] = this._id;
-    data['link'] = this._link;
+    data['registrationLink'] = this._link;
 
     return data;
   }
