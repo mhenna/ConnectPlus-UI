@@ -104,6 +104,15 @@ class PushNotificationsService {
           ));
         } else
           Get.to(Events());
+      } else if (view == 'announcements') {
+        if (notificationData['announcement'] != null) {
+          announcement = await WebAPI.getAnnouncementByName(
+              notificationData['announcement']);
+          Get.to(AnnouncementWidget(
+            announcement: announcement,
+          ));
+        } else
+          Get.to(Events());
       }
     }
   }
