@@ -21,6 +21,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:io';
 import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:get/get.dart';
+import 'package:flutter/material.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 class PushNotificationsService {
   final FirebaseMessaging _fcm = FirebaseMessaging();
@@ -34,9 +36,23 @@ class PushNotificationsService {
 
     _fcm.configure(
       onMessage: (Map<String, dynamic> message) async {
-        Get.snackbar(message, message, snackPosition: SnackPosition.TOP);
         print("onMessage: $message");
-        serializeAndNavigate(message);
+        showOverlayNotification((context) {
+          return Card(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            child: SafeArea(
+              child: ListTile(
+                title: Text(message['notification']['title']),
+                subtitle: Text(message['notification']['body']),
+                trailing: IconButton(
+                    icon: Icon(Icons.expand_more_rounded),
+                    onPressed: () {
+                      serializeAndNavigate(message);
+                    }),
+              ),
+            ),
+          );
+        }, duration: Duration(milliseconds: 6000));
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
