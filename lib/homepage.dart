@@ -156,16 +156,6 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     });
 
-    offers.forEach((offer) {
-      if (offer.slider) {
-        ERG erg = offer.erg;
-        if (erg != null && ergItems.containsKey(erg)) {
-          ergItems[erg].add(offer);
-        } else {
-          ergItems[erg] = [offer];
-        }
-      }
-    });
     activities.forEach((activity) {
       if (activity.slider) {
         ERG erg = activity.erg;
