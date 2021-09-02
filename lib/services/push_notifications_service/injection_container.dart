@@ -3,5 +3,7 @@ import 'package:get_it/get_it.dart';
 
 void init(GetIt sl) {
   sl.registerLazySingleton<PushNotificationsService>(
-      () => PushNotificationsService());
+          () => PushNotificationsService()..initialize()
+  );
+
 }

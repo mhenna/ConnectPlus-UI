@@ -372,7 +372,16 @@ class WebAPI {
 
     return webinar;
   }
+  static Future<Announcement> getAnnouncementByName(String name) async {
+    final announcementURL = "$_announcementURL?name=$name";
+    final response = await get(announcementURL);
 
+    // TODO: Add this logic to a seperate transformer service
+    final announcementRaw = json.decode(response.body);
+    final Announcement announcement = Announcement.fromJson(announcementRaw[0]);
+
+    return announcement;
+  }
   static Future<List<Webinar>> getWebinarsByERG(ERG erg) async {
     final ergId = erg.id;
     final ergURL = "$_webinarsURL?erg_eq=$ergId";

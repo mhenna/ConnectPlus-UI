@@ -11,6 +11,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:connect_plus/injection_container.dart' as di;
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/models/user.dart';
+import 'package:overlay_support/overlay_support.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -33,7 +34,8 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GetMaterialApp(
+    return OverlaySupport(
+        child: GetMaterialApp(
       title: 'Connect+',
       debugShowCheckedModeBanner: false,
       navigatorKey: NavigationService.navigationKey,
@@ -44,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: Splash(),
-    );
+    ));
   }
 }
 
