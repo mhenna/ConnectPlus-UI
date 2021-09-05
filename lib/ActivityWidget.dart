@@ -219,7 +219,6 @@ class _ActivityState extends State<ActivityWidget>
     text += "\n\nTime: " + time;
     text += "\n\nRecurrence: " + activity.recurrence;
     text += "\n\nDay(s): " + activity.days;
-
     if (activity.onBehalfOf != null) {
       text += "\n\nOn behalf of: " + activity.onBehalfOf;
     }
@@ -246,7 +245,7 @@ class _ActivityState extends State<ActivityWidget>
               activity.zoomID,
               style: TextStyle(fontSize: size * 30, color: Colors.blue),
             ),
-            onTap: _launchURL,
+            onTap: _launchZoomLink,
           )
         ]),
         SelectableText(
@@ -257,6 +256,10 @@ class _ActivityState extends State<ActivityWidget>
             fontSize: size * 35,
           ),
         ),
+        ClickableButton(
+            link: activity.registrationLink,
+            text: 'Register',
+            launchURL: _launchURL),
       ],
     );
   }
@@ -319,12 +322,63 @@ class _ActivityState extends State<ActivityWidget>
     }
   }
 
-  _launchURL() async {
+  _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
+
+  _launchZoomLink() async {
     var url = activity.zoomID;
     if (await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
     }
+  }
+}
+
+class ClickableButton extends StatelessWidget {
+  const ClickableButton({Key key, this.link, this.text, this.launchURL})
+      : super(key: key);
+  final String link;
+  final String text;
+  final void Function(String) launchURL;
+
+  @override
+  Widget build(BuildContext context) {
+    return link == ''
+        ? Container()
+        : Center(
+            child: RaisedButton(
+              onPressed: () => launchURL(link ?? ''),
+              color: Utils.iconColor,
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(color: Utils.iconColor)),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                child: Text(
+                  this.text,
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+          );
   }
 }
