@@ -26,6 +26,7 @@ class Activity extends Occurrence {
   final ERG _erg;
   final List<ActivityDate> _activityDates;
   final bool _slider;
+  final String _registrationLink;
 
   @override
   String get name => _name;
@@ -51,29 +52,31 @@ class Activity extends Occurrence {
   String get id => _id;
   ERG get erg => _erg;
   List<ActivityDate> get activityDates => _activityDates;
+  String get registrationLink => _registrationLink;
 
-  Activity({
-    @required String recurrence,
-    @required ImageFile poster,
-    @required String sId,
-    @required String name,
-    @required String onBehalfOf,
-    @required DateTime startDate,
-    @required DateTime endDate,
-    @required String zoomID,
-    @required String venue,
-    @required String days,
-    @required DateTime createdAt,
-    @required DateTime updatedAt,
-    @required int iV,
-    @required this.recurrenceDates,
-    @required AdminUser createdBy,
-    @required AdminUser updatedBy,
-    @required String id,
-    @required ERG erg,
-    @required List<ActivityDate> activityDates,
-    @required bool slider,
-  })  : _recurrence = recurrence,
+  Activity(
+      {@required String recurrence,
+      @required ImageFile poster,
+      @required String sId,
+      @required String name,
+      @required String onBehalfOf,
+      @required DateTime startDate,
+      @required DateTime endDate,
+      @required String zoomID,
+      @required String venue,
+      @required String days,
+      @required DateTime createdAt,
+      @required DateTime updatedAt,
+      @required int iV,
+      @required this.recurrenceDates,
+      @required AdminUser createdBy,
+      @required AdminUser updatedBy,
+      @required String id,
+      @required ERG erg,
+      @required List<ActivityDate> activityDates,
+      @required bool slider,
+      String registrationLink})
+      : _recurrence = recurrence,
         _poster = poster,
         _sId = sId,
         _name = name,
@@ -91,48 +94,49 @@ class Activity extends Occurrence {
         _id = id,
         _erg = erg,
         _activityDates = activityDates,
-        _slider = slider;
+        _slider = slider,
+        _registrationLink = registrationLink;
 
   factory Activity.fromJson(Map<String, dynamic> json) {
     return Activity(
-      recurrence: json['recurrence'],
-      poster:
-          json['poster'] != null ? ImageFile.fromJson(json['poster']) : null,
-      sId: json['_id'],
-      name: json['name'],
-      onBehalfOf: json['onBehalfOf'],
-      zoomID: json['zoomID'],
-      days: json['days'],
-      recurrenceDates: json['recurrenceDates'] != null
-          ? json['recurrenceDates'].cast<DateTime>()
-          : null,
-      endDate: json['endDate'] != null
-          ? DateTime.parse((json['endDate'])).toLocal()
-          : null,
-      startDate: json['startDate'] != null
-          ? DateTime.parse((json['startDate'])).toLocal()
-          : null,
-      createdAt: json['createdAt'] != null
-          ? DateTime.parse((json['createdAt']))
-          : null,
-      updatedAt: json['updatedAt'] != null
-          ? DateTime.parse((json['updatedAt']))
-          : null,
-      venue: json['venue'],
-      iV: json['__v'],
-      createdBy: json['created_by'] != null
-          ? new AdminUser.fromJson(json['created_by'])
-          : null,
-      updatedBy: json['updated_by'] != null
-          ? new AdminUser.fromJson(json['updated_by'])
-          : null,
-      erg: json['erg'] != null ? new ERG.fromJson(json['erg']) : null,
-      activityDates: List<Map<String, dynamic>>.from(json['activity_dates'])
-          .map((activityDateJson) => ActivityDate.fromJson(activityDateJson))
-          .toList(),
-      id: json['id'],
-      slider: json['slider'] ?? false,
-    );
+        recurrence: json['recurrence'],
+        poster:
+            json['poster'] != null ? ImageFile.fromJson(json['poster']) : null,
+        sId: json['_id'],
+        name: json['name'],
+        onBehalfOf: json['onBehalfOf'],
+        zoomID: json['zoomID'],
+        days: json['days'],
+        recurrenceDates: json['recurrenceDates'] != null
+            ? json['recurrenceDates'].cast<DateTime>()
+            : null,
+        endDate: json['endDate'] != null
+            ? DateTime.parse((json['endDate'])).toLocal()
+            : null,
+        startDate: json['startDate'] != null
+            ? DateTime.parse((json['startDate'])).toLocal()
+            : null,
+        createdAt: json['createdAt'] != null
+            ? DateTime.parse((json['createdAt']))
+            : null,
+        updatedAt: json['updatedAt'] != null
+            ? DateTime.parse((json['updatedAt']))
+            : null,
+        venue: json['venue'],
+        iV: json['__v'],
+        createdBy: json['created_by'] != null
+            ? new AdminUser.fromJson(json['created_by'])
+            : null,
+        updatedBy: json['updated_by'] != null
+            ? new AdminUser.fromJson(json['updated_by'])
+            : null,
+        erg: json['erg'] != null ? new ERG.fromJson(json['erg']) : null,
+        activityDates: List<Map<String, dynamic>>.from(json['activity_dates'])
+            .map((activityDateJson) => ActivityDate.fromJson(activityDateJson))
+            .toList(),
+        id: json['id'],
+        slider: json['slider'] ?? false,
+        registrationLink: json['registrationLink']);
   }
 
   Map<String, dynamic> toJson() {
@@ -169,6 +173,7 @@ class Activity extends Occurrence {
           this._activityDates.map((v) => v.toJson()).toList();
     }
     data['id'] = this._id;
+    data['registrationLink'] = this._registrationLink;
     return data;
   }
 }
