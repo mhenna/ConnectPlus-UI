@@ -24,6 +24,7 @@ class Offer extends Occurrence {
   final Attachment _attachment;
   final String _id;
   final ERG _erg;
+  final String _link;
 
   @override
   String get sId => _sId;
@@ -37,7 +38,6 @@ class Offer extends Occurrence {
   bool get slider => false;
   @override
   ERG get erg => _erg;
-
   Category get category => _category;
   String get details => _details;
   String get discount => _discount;
@@ -52,7 +52,7 @@ class Offer extends Occurrence {
   String get location => _location;
   Attachment get attachment => _attachment;
   String get id => _id;
-
+  String get link => _link;
   Offer({
     @required String sId,
     @required String name,
@@ -71,6 +71,7 @@ class Offer extends Occurrence {
     @required Attachment attachment,
     @required String id,
     @required ERG erg,
+    String link,
   })  : _sId = sId,
         _name = name,
         _category = category,
@@ -87,7 +88,8 @@ class Offer extends Occurrence {
         _location = location,
         _attachment = attachment,
         _id = id,
-        _erg = erg;
+        _erg = erg,
+        _link = link;
 
   factory Offer.fromJson(Map<String, dynamic> json) {
     return Offer(
@@ -122,6 +124,7 @@ class Offer extends Occurrence {
           : null,
       id: json['id'],
       erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
+      link: json['link'],
     );
   }
 
@@ -156,7 +159,7 @@ class Offer extends Occurrence {
       data['erg'] = this._erg.toJson();
     }
     data['id'] = this._id;
-
+    data['link'] = this._link;
     return data;
   }
 }

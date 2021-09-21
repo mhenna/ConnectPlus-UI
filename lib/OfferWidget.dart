@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:localstorage/localstorage.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'widgets/Utils.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
 
@@ -318,6 +319,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
           DateFormat.yMMMMd("en_US").format(widget.offer.expiration) +
           "\n";
     }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
@@ -335,8 +337,21 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
             fontSize: size * 30,
           ),
         ),
+        ClickableButton(
+            link: widget.offer.link,
+            text: 'More Details',
+            launchURL: _launchURL)
       ],
     );
+  }
+
+  _launchURL(String url) async {
+    print(url);
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
   }
 
   @override
@@ -394,5 +409,48 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
           ),
         ),
       );
+  }
+}
+
+class ClickableButton extends StatelessWidget {
+  const ClickableButton({Key key, this.link, this.text, this.launchURL})
+      : super(key: key);
+  final String link;
+  final String text;
+  final void Function(String) launchURL;
+
+  @override
+  Widget build(BuildContext context) {
+    return link == '' || link == null
+        ? Container()
+        : Center(
+            child: RaisedButton(
+              onPressed: () => launchURL(link ?? ''),
+              color: Utils.iconColor,
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                  side: BorderSide(color: Utils.iconColor)),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30.0),
+                  gradient: LinearGradient(
+                    colors: [
+                      Utils.secondaryColor,
+                      Utils.primaryColor,
+                    ],
+                    begin: Alignment.topRight,
+                    end: Alignment.bottomLeft,
+                  ),
+                ),
+                padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+                child: Text(
+                  this.text,
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
+          );
   }
 }
