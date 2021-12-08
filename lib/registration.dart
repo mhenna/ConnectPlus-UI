@@ -102,7 +102,7 @@ class _RegistrationState extends State<Registration> {
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
               width * 0.05, height * 0.025, width * 0.02, height * 0.02),
-          hintText: "Email ( @dell / @dellteams ).com",
+          hintText: "Email ( @dell / @dellteam ).com",
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
       validator: (value) {
@@ -113,7 +113,7 @@ class _RegistrationState extends State<Registration> {
             RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dell.com")
                 .hasMatch(value.toString());
         bool emailValid2 =
-            RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dellteams.com")
+            RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@dellteam.com")
                 .hasMatch(value.toString());
         if (!emailValid && !emailValid2) {
           return "Please enter a valid email";
