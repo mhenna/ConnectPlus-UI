@@ -117,7 +117,7 @@ class _ResetPasswordState extends State<ResetPassword> {
       decoration: InputDecoration(
           contentPadding: EdgeInsets.fromLTRB(
               width * 0.05, height * 0.025, width * 0.02, height * 0.02),
-          hintText: "Email ( @dell / @dellteams )",
+          hintText: "Email ( @dell / @dellteam )",
           hintStyle: TextStyle(fontSize: 16),
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
