@@ -237,13 +237,17 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
           height: 10,
         ),
         // Trivia Button
-        ClickableButton(
-            link: event.trivia, text: 'trivia link', launchURL: _launchURL),
+        event.trivia == null || event.trivia == ""
+            ? Container()
+            : ClickableButton(
+                link: event.trivia, text: 'trivia link', launchURL: _launchURL),
         // Link Button
-        ClickableButton(
-            link: event.link,
-            text: 'registration link',
-            launchURL: _launchURL),
+        event.link == null || event.link == ""
+            ? Container()
+            : ClickableButton(
+                link: event.link,
+                text: 'registration link',
+                launchURL: _launchURL),
       ],
     );
   }
