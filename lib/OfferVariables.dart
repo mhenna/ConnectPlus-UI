@@ -81,14 +81,15 @@ class _OfferVariables extends State<OfferVariables>
     var height = MediaQuery.of(context).size.height;
     bool first = true;
 
-    for (var offer in offers) {
+    final LIST_SIZE = 6;
+    for (var i = 0; i < LIST_SIZE && i < offers.length; i++) {
       if (!first) {
         list.add(Padding(
           padding: EdgeInsets.only(right: 10),
           child: SizedBox(
             height: height,
             width: 0.97 * 0.23 * height * 3 / 2,
-            child: Single_Offer(offer: offer),
+            child: Single_Offer(offer: offers[i]),
           ),
         ));
       }

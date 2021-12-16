@@ -72,13 +72,14 @@ class _AnnouncementVariables extends State<AnnouncementVariables>
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     bool first = true;
-    for (var announcement in announcements) {
+    final LIST_SIZE = 6;
+    for (var i = 0; i < LIST_SIZE && i < announcements.length; i++) {
       Widget child = Padding(
         padding: EdgeInsets.only(right: 10),
         child: SizedBox(
           height: height,
           width: 0.97 * 0.23 * height * 3 / 2,
-          child: Single_Announcement(announcement),
+          child: Single_Announcement(announcements[i]),
         ),
       );
       if (!first) {
