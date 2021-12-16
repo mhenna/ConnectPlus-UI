@@ -1,24 +1,19 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:connect_plus/WebinarWidget.dart';
-import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
 import 'package:connect_plus/models/webinar.dart';
 import 'package:connect_plus/services/web_api.dart';
-import 'package:connect_plus/utils/map_indexed.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:filter_list/filter_list.dart';
 import 'package:flutter/material.dart';
 import 'package:connect_plus/EventWidget.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
-import 'package:localstorage/localstorage.dart';
-import 'dart:math';
-import 'package:connect_plus/widgets/CachedImageBox.dart';
 
 class Events extends StatefulWidget {
   Events({
     Key key,
   }) : super(key: key);
-  static final _random = new Random();
 
   @override
   MyEventsPageState createState() => MyEventsPageState();
@@ -43,7 +38,6 @@ class MyEventsPageState extends State<Events>
   bool eventsLoaded = false;
 
   List<dynamic> _all;
-  final LocalStorage localStorage = new LocalStorage("Connect+");
   List<String> selectedCountList = [];
   List<String> ergsList;
   List<dynamic> _filteredData;
@@ -55,6 +49,11 @@ class MyEventsPageState extends State<Events>
     super.initState();
     getEvents();
     getERGS();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   Future<void> _refreshData() async {
@@ -76,7 +75,6 @@ class MyEventsPageState extends State<Events>
         events = allEvents;
         if (events.length != 0) {
           emptyEvents = false;
-          randIndex = Events._random.nextInt(events.length);
         }
       });
       getWebinars();
@@ -116,6 +114,9 @@ class MyEventsPageState extends State<Events>
     searchDataEvents = this.events;
     searchDataWebinars = this.webinars;
     searchAll = this._all;
+    webinars.clear();
+    events.clear();
+    _all.clear();
   }
 
   void getERGS() async {
@@ -137,30 +138,26 @@ class MyEventsPageState extends State<Events>
     setState(() {});
   }
 
-  Widget featuredImage() {
-    try {
-      final featuredEvent = events[randIndex];
-      final imageURL = WebAPI.baseURL + featuredEvent.poster.url;
-      return FittedBox(
-        fit: BoxFit.fill,
-        child: CachedImageBox(imageurl: imageURL),
-      );
-    } catch (Exception) {
-      return Scaffold(
-        body: ImageRotate(),
-      );
-    }
-  }
-
   Widget urlToImage(String imageUrl) {
+    ImageCache _imageCache = PaintingBinding.instance.imageCache;
+    
+    if (_imageCache.currentSize >= 55 << 20 ||
+        (_imageCache.currentSize + _imageCache.liveImageCount) >= 20) {
+      _imageCache.clear();
+      _imageCache.clearLiveImages();
+    }
+    
     return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width *
             0.50, // otherwise the logo will be tiny
         child: FittedBox(
-          fit: BoxFit.fill,
-          child: CachedImageBox(imageurl: imageUrl),
-        ));
+            fit: BoxFit.fill,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              memCacheWidth: (MediaQuery.of(context).size.width * 1).toInt(),
+              memCacheHeight: (MediaQuery.of(context).size.width * 0.5).toInt(),
+            )));
   }
 
   Widget search() {
@@ -236,6 +233,64 @@ class MyEventsPageState extends State<Events>
     });
   }
 
+  List<Widget> getContent() {
+    var width = MediaQuery.of(context).size.width;
+    List<Widget> list = [];
+    for (final event in _filteredData) {
+      list.add(Center(
+          child: SizedBox(
+        width: width * 0.8,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Text(
+              event.name.toString(),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 23,
+                  color: Colors.black87,
+                  fontWeight: FontWeight.w500),
+            ),
+            SizedBox(
+              height: 5,
+            ),
+            Card(
+                elevation: 2.0,
+                clipBehavior: Clip.antiAlias,
+                margin: EdgeInsets.all(12.0),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(10.0))),
+                child: InkWell(
+                  child: urlToImage(WebAPI.baseURL + event.poster.url),
+                  onTap: () {
+                    if (event.runtimeType == Event) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => EventWidget(event: event),
+                        ),
+                      );
+                    } else {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => WebinarWidget(webinar: event),
+                        ),
+                      );
+                    }
+                  },
+                )),
+            SizedBox(
+              height: 30,
+            )
+          ],
+        ),
+      )));
+    }
+    return list;
+  }
+
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
@@ -246,10 +301,7 @@ class MyEventsPageState extends State<Events>
         return Scaffold(
           body: ImageRotate(),
         );
-      else if (events.isEmpty &&
-          eventsLoaded &&
-          webinarsLoaded &&
-          webinars.isEmpty)
+      else if (_filteredData.isEmpty && eventsLoaded && webinarsLoaded)
         return RefreshIndicator(
             onRefresh: _refreshData,
             child: Scaffold(
@@ -316,65 +368,12 @@ class MyEventsPageState extends State<Events>
                       SizedBox(
                         height: 10,
                       ),
-                      ListView(
-                        shrinkWrap: true,
-                        physics: ScrollPhysics(),
-                        children: mapIndexed(_filteredData, (index, event) {
-                          return Center(
-                              child: SizedBox(
-                            width: width * 0.8,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Text(
-                                  event.name.toString(),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                      fontSize: 23,
-                                      color: Colors.black87,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                SizedBox(
-                                  height: 5,
-                                ),
-                                Card(
-                                    elevation: 7.0,
-                                    clipBehavior: Clip.antiAlias,
-                                    margin: EdgeInsets.all(12.0),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0))),
-                                    child: InkWell(
-                                      child: urlToImage(
-                                          WebAPI.baseURL + event.poster.url),
-                                      onTap: () {
-                                        if (event.runtimeType == Event) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  EventWidget(event: event),
-                                            ),
-                                          );
-                                        } else {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  WebinarWidget(webinar: event),
-                                            ),
-                                          );
-                                        }
-                                      },
-                                    )),
-                                SizedBox(
-                                  height: 30,
-                                )
-                              ],
-                            ),
-                          ));
-                        }).toList(),
+                      Container(
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: getContent(),
+                          ),
+                        ),
                       ),
                     ]))))));
     } catch (err) {
