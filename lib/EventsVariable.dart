@@ -129,7 +129,8 @@ class _EventsVariablesState extends State<EventsVariables>
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
 
-    for (var event in _all) {
+    final LIST_SIZE = 6;
+    for (var i = 0; i < LIST_SIZE && i < _all.length; i++) {
       if (!first) {
         list.add(Padding(
             padding: EdgeInsets.only(right: 10),
@@ -145,7 +146,7 @@ class _EventsVariablesState extends State<EventsVariables>
               child: SizedBox(
                 height: height,
                 width: 0.97 * 0.23 * height * 3 / 2,
-                child: Single_Event(event: event),
+                child: Single_Event(event: _all[i]),
               ),
             )));
       }
