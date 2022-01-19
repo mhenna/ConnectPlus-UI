@@ -23,7 +23,7 @@ import 'package:time_machine/time_machine.dart';
 import 'package:connect_plus/models/announcement.dart';
 
 class WebAPI {
-  static final String baseURL = "http://18.221.173.220:1337";
+  static final String baseURL = "http://18.188.100.150:1337";
   static final String _registerURL = '/auth/local/register';
   static final String _loginURL = '/auth/local';
   static final String _checkUserURL = '/users/me';
@@ -372,6 +372,7 @@ class WebAPI {
 
     return webinar;
   }
+
   static Future<Announcement> getAnnouncementByName(String name) async {
     final announcementURL = "$_announcementURL?name=$name";
     final response = await get(announcementURL);
@@ -382,6 +383,7 @@ class WebAPI {
 
     return announcement;
   }
+
   static Future<List<Webinar>> getWebinarsByERG(ERG erg) async {
     final ergId = erg.id;
     final ergURL = "$_webinarsURL?erg_eq=$ergId";

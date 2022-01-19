@@ -14,7 +14,9 @@ import 'package:flutter/services.dart';
 versionCheck(context) async {
   //Get Current installed version of app
   final PackageInfo info = await PackageInfo.fromPlatform();
-  double currentVersion = double.parse(info.version);
+  List<String> currentVersionList = info.version.split(".");
+  double currentVersion = double.parse(currentVersionList[0]) +
+      (double.parse(currentVersionList[1]) / 10.0);
   //Get Latest version info from firebase config
   final RemoteConfig remoteConfig = await RemoteConfig.instance;
 

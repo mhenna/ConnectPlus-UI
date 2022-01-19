@@ -106,7 +106,17 @@ class MyEventsPageState extends State<Events>
   }
 
   sortData() {
-    _all.sort((b, a) => a.startDate.compareTo(b.startDate));
+    _all.sort((b, a) {
+      DateTime n = a.startDate;
+      DateTime m = b.startDate;
+      return n.compareTo(m);
+    });
+    _filteredData.sort((b, a) {
+      DateTime n = a.startDate;
+      DateTime m = b.startDate;
+      return n.compareTo(m);
+    });
+
     webinarsLoaded = true;
   }
 
@@ -140,13 +150,13 @@ class MyEventsPageState extends State<Events>
 
   Widget urlToImage(String imageUrl) {
     ImageCache _imageCache = PaintingBinding.instance.imageCache;
-    
+
     if (_imageCache.currentSize >= 55 << 20 ||
         (_imageCache.currentSize + _imageCache.liveImageCount) >= 20) {
       _imageCache.clear();
       _imageCache.clearLiveImages();
     }
-    
+
     return SizedBox(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width *
