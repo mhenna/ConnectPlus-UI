@@ -20,6 +20,7 @@ class Announcement extends Occurrence {
   final bool _slider;
   final String _link;
   final ERG _erg;
+  final String _attachment;
 
   @override
   String get sId => _sId;
@@ -45,6 +46,8 @@ class Announcement extends Occurrence {
   String get trivia => _trivia;
   String get link => _link;
 
+  String get attachment => _attachment;
+
   Announcement({
     @required String sId,
     @required String name,
@@ -61,6 +64,7 @@ class Announcement extends Occurrence {
     @required String trivia,
     @required String link,
     @required ERG erg,
+    String attachment,
   })  : _sId = sId,
         _name = name,
         _createdAt = createdAt,
@@ -75,7 +79,8 @@ class Announcement extends Occurrence {
         _slider = slider,
         _trivia = trivia,
         _link = link,
-        _erg = erg;
+        _erg = erg,
+        _attachment = attachment;
 
   factory Announcement.fromJson(Map<String, dynamic> json) {
     return Announcement(
@@ -109,6 +114,7 @@ class Announcement extends Occurrence {
           json['link'] ??
           null, // will auto set to null
       erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
+      attachment: json['attachment'] != null ? json['attachment']['url'] : null,
     );
   }
 
@@ -137,6 +143,9 @@ class Announcement extends Occurrence {
     data['trivia'] = this._trivia;
     data['id'] = this._id;
     data['registrationLink'] = this._link;
+    if (this._attachment != null) {
+      data['attachment'] = this._attachment;
+    }
 
     return data;
   }
