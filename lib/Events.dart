@@ -395,9 +395,11 @@ class MyEventsPageState extends State<Events>
 
   List<dynamic> getEventsSuggestions(String pattern) {
     if (pattern == "") return null;
-    final filter = searchAll
+    print(pattern);
+    print(_all.length);
+    final filter = _filteredData
         .where(
-          (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
+          (entry) => entry.name.toLowerCase().contains(pattern.toLowerCase()),
         )
         .toList();
     return filter;

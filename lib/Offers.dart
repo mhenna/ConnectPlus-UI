@@ -437,7 +437,7 @@ class _OffersState extends State<Offers> {
     if (pattern == "") return null;
     final filter = searchData
         .where(
-          (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
+          (entry) => entry.name.toLowerCase().contains(pattern.toLowerCase()),
         )
         .toList();
     return filter;
