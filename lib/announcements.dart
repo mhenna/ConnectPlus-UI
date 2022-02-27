@@ -81,7 +81,7 @@ class _AnnouncementsState extends State<Announcements> {
                             filter(a) &&
                             a.name
                                 .toLowerCase()
-                                .startsWith(pattern.toLowerCase()),
+                                .contains(pattern.toLowerCase()),
                       )
                       .take(5); // suggests only 5 results
                 },

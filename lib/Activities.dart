@@ -328,7 +328,7 @@ class MyActivitiesPageState extends State<Activities>
     if (pattern == "") return null;
     final filter = searchActivities
         .where(
-          (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
+          (entry) => entry.name.toLowerCase().contains(pattern.toLowerCase()),
         )
         .toList();
     return filter;
