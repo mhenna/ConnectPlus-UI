@@ -23,6 +23,7 @@ import 'package:no_context_navigation/no_context_navigation.dart';
 import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:connect_plus/models/user.dart';
 
 class PushNotificationsService {
   final FirebaseMessaging _fcm = FirebaseMessaging();
@@ -133,20 +134,27 @@ class PushNotificationsService {
     }
   }
 
-  Future<NotificationResponse> sendNotificationToCarOwner({
+  Future<List<dynamic>> sendNotificationToCarOwner({
     @required String carPlate,
   }) async {
+    User blocker;
     try {
       final HttpsCallable callable =
           _fbFunctions.httpsCallable('alertCarOwner');
       final response = await callable.call({'carPlate': carPlate});
       final bool carFound = response.data['carFound'] == true;
       final bool sentSuccessfully = response.data['sent'] == true;
-      if (sentSuccessfully) return NotificationResponse.Success;
-      if (!carFound) return NotificationResponse.CarNotFound;
-      return NotificationResponse.GenericError;
+
+      if (sentSuccessfully) {
+        Map<String, dynamic> userData =
+            Map<String, dynamic>.from(response.data['blocker']);
+        blocker = User.fromJson(userData);
+        return [NotificationResponse.Success, blocker];
+      }
+      if (!carFound) return [NotificationResponse.CarNotFound, blocker];
+      return [NotificationResponse.GenericError, blocker];
     } catch (e) {
-      return NotificationResponse.GenericError;
+      return [NotificationResponse.GenericError, blocker];
     }
   }
 }
