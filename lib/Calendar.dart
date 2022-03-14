@@ -12,6 +12,7 @@ import 'package:localstorage/localstorage.dart';
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/EventWidget.dart';
 import 'package:intl/intl.dart';
+
 class Calendar extends StatefulWidget {
   @override
   _CalendarState createState() => _CalendarState();
@@ -43,15 +44,14 @@ class _CalendarState extends State<Calendar> {
     var events = await WebAPI.getEvents();
     if (this.mounted) {
       for (var event in events) {
-        var date = DateTime.parse(DateFormat('yyyy-MM-dd').format(event.startDate));
+        var date =
+            DateTime.parse(DateFormat('yyyy-MM-dd').format(event.startDate));
         if (_all[date] != null)
           _all[date].add(event);
         else
           _all[date] = [event];
       }
-      setState(() {
-      });
-      
+      setState(() {});
     }
   }
 
@@ -78,25 +78,23 @@ class _CalendarState extends State<Calendar> {
     var webinars = await WebAPI.getWebinars();
     if (this.mounted) {
       for (var webinar in webinars) {
-        var date = DateTime.parse(DateFormat('yyyy-MM-dd').format(webinar.startDate));
+        var date =
+            DateTime.parse(DateFormat('yyyy-MM-dd').format(webinar.startDate));
         if (_all[date] != null)
           _all[date].add(webinar);
         else
           _all[date] = [webinar];
       }
-      setState(() {
-      });
+      setState(() {});
     }
   }
-
-
-
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    if (_events.isEmpty && _webinars.isEmpty && _activities.isEmpty) {
+
+    if (_all.isEmpty) {
       return Scaffold(
         body: ImageRotate(),
       );
