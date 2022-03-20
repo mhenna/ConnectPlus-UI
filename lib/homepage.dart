@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool highlightsLoaded = false;
   bool sliderPostersLoaded = false;
   bool announcementsLoaded = false;
+  DateTime YESTERDAY_DATE = new DateTime.now().subtract(Duration(days: 1));
   List<Announcement> announcements = [];
   final String INTERNAL_COMMS = 'internal comms';
   void initState() {
@@ -134,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add events to erg owner
     events.forEach((event) {
-      if (event.slider) {
+      if (event.slider && event.endDate.isAfter(YESTERDAY_DATE)) {
         ERG erg = event.erg;
         if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(event);
@@ -146,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add webinars to erg owner
     webinars.forEach((webinar) {
-      if (webinar.slider) {
+      if (webinar.slider && webinar.startDate.isAfter(YESTERDAY_DATE)) {
         ERG erg = webinar.erg;
         if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(webinar);
@@ -190,7 +191,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Announcement> sliderAnnouncements = announcements
         .where((announcement) =>
             announcement.slider == true &&
-            announcement.erg.name.toLowerCase() == INTERNAL_COMMS)
+            announcement.erg.name.toLowerCase() == INTERNAL_COMMS &&
+            announcement.deadline.isAfter(YESTERDAY_DATE))
         .toList();
     sliderAnnouncements.sort((a1, a2) {
       return a2.createdAt.compareTo(a1.createdAt);
