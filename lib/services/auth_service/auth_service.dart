@@ -14,6 +14,7 @@ class AuthService {
     if (fbUser != null) {
       final userDoc = await _fs.collection('users').doc(fbUser.uid).get();
       _user = user_model.User.fromJson(userDoc.data());
+      _user.setEmailVerified(fbUser.emailVerified);
       return _user;
     }
     return null;
