@@ -345,43 +345,71 @@ class _MyHomePageState extends State<MyHomePage> {
           title('Recent Events & Webinars'),
           //gridview
         );
-        list.add(Container(
-          width: width * 0.97,
-          height: height * 0.55,
-          child: EventsVariables(events: events, webinars: webinars),
-        ));
-        list.add(
-          seeMore('Events'),
-        );
+        if (events.length + webinars.length >= 2) {
+          list.add(Container(
+            width: width * 0.97,
+            height: height * 0.55,
+            child: EventsVariables(events: events, webinars: webinars),
+          ));
+          list.add(
+            seeMore('Events'),
+          );
+        } else {
+          list.add(Container(
+            width: width * 0.97,
+            height: height * 0.3,
+            child: EventsVariables(events: events, webinars: webinars),
+          ));
+        }
       }
       if (announcements.isNotEmpty) {
         list.add(
           title('Recent Announcements'),
           //gridview
         );
-        list.add(Container(
+
+        if (announcements.length >= 2) {
+          list.add(Container(
+              width: width * 0.97,
+              height: height * 0.55,
+              child: AnnouncementVariables(
+                announcements: announcements,
+              )));
+          list.add(seeMore('Announcements'));
+        } else
+          list.add(Container(
             width: width * 0.97,
-            height: height * 0.55,
+            height: height * 0.3,
             child: AnnouncementVariables(
               announcements: announcements,
-            )));
-        list.add(
-          seeMore('Announcements'),
-        );
+            ),
+          ));
       }
       if (offers.isNotEmpty) {
         list.add(title('Recent Offers'));
-        list.add(
 
-            //gridview
-            Container(
-          width: width * 0.97,
-          height: height * 0.55,
-          child: OfferVariables(
-            offers: offers,
-          ),
-        ));
-        list.add(seeMore('Offers'));
+        if (offers.length >= 2) {
+          list.add(
+              //gridview
+              Container(
+            width: width * 0.97,
+            height: height * 0.55,
+            child: OfferVariables(
+              offers: offers,
+            ),
+          ));
+          list.add(seeMore('Offers'));
+        } else {
+          list.add(
+              //gridview
+              Container(
+            width: width * 0.97,
+            height: height * 0.3,
+            child: OfferVariables(
+              offers: offers,
+            ),
+          ));
+        }
       } else if (offers.isEmpty &&
           events.isEmpty &&
           webinars.isEmpty &&
@@ -396,7 +424,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ));
       list.add(Center(
           child: Text(
-        "Copyright © 2020. Cairo Automation Team - The Co-partner \n project . All rights reserved.",
+        "Copyright © 2022. Cairo Automation Team - The Co-partner \n project . All rights reserved.",
         textAlign: TextAlign.center,
       )));
       list.add(SizedBox(
