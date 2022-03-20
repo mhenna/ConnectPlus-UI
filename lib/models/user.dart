@@ -35,7 +35,7 @@ class User {
   List<String> carPlates;
   String businessUnit;
   String pushNotificationToken;
-
+  bool isEmailVerified;
   User({
     this.confirmed,
     this.blocked,
@@ -70,6 +70,7 @@ class User {
     carPlates = List<String>.from(json['carPlates'] ?? []);
     businessUnit = json['businessUnit'] ?? "";
     pushNotificationToken = json['pushNotificationToken'];
+    isEmailVerified = false;
   }
 
   Map<String, dynamic> toJson() {
@@ -129,6 +130,10 @@ class User {
       pushNotificationToken:
           pushNotificationToken ?? this.pushNotificationToken,
     );
+  }
+
+  void setEmailVerified(bool isEmailVerified) {
+    this.isEmailVerified = isEmailVerified;
   }
 }
 
