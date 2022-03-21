@@ -64,7 +64,9 @@ class _SplashState extends State<Splash> {
       navigateAfterSeconds: FutureBuilder<User>(
           future: authService.getUser(),
           builder: (context, snapshot) {
-            if (!snapshot.hasData) {
+            if ((!snapshot.hasData) ||
+                (snapshot.data.businessUnit == "") ||
+                !snapshot.data.isEmailVerified) {
               versionCheck(context);
               return Login(
                 title: "login",
