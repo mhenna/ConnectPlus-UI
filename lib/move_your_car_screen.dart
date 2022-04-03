@@ -90,7 +90,7 @@ class _MoveYourCarScreenState extends State<MoveYourCarScreen> {
         return CupertinoAlertDialog(
           title: Text("Not Found"),
           content: Text(
-              "This car is not registered for dell employees, we have notified the facilities"),
+              "Unfortunately this car is not registered for dell employees"),
           actions: [
             FlatButton(
               child: Text("Close"),
