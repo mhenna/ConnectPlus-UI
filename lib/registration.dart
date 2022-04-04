@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/BusinessUnit.dart';
+import 'package:connect_plus/widgets/terms_and_conditions_popup.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -41,6 +42,8 @@ class _RegistrationState extends State<Registration> {
   final _formKey = GlobalKey<FormState>();
   String businessUnit = "";
   UserCredential userCredentials;
+  bool _agreedToTermsConditions = false;
+  bool _termsConditionsError = false;
   void initState() {
     carPlates.add("");
     super.initState();
@@ -70,6 +73,15 @@ class _RegistrationState extends State<Registration> {
     print(value);
     setState(() {
       asyncCall = value;
+    });
+  }
+
+  void _setAgreedToTermsConditions(bool newValue) {
+    setState(() {
+      _agreedToTermsConditions = newValue;
+      if (newValue == true) {
+        _termsConditionsError = false;
+      }
     });
   }
 
@@ -217,7 +229,12 @@ class _RegistrationState extends State<Registration> {
         padding: EdgeInsets.fromLTRB(
             width * 0.02, height * 0.023, width * 0.02, height * 0.023),
         onPressed: () async {
-          if (_formKey.currentState.validate()) {
+          setState(() {
+            _termsConditionsError = !_agreedToTermsConditions;
+          });
+
+          if (_formKey.currentState.validate() &&
+              _agreedToTermsConditions == true) {
             FocusScope.of(context).unfocus();
             setState(() {
               asyncCall = true;
@@ -335,6 +352,54 @@ class _RegistrationState extends State<Registration> {
                                           },
                                         )
                                       : Container(),
+                                  SizedBox(height: height * 0.027),
+                                  Row(children: <Widget>[
+                                    Checkbox(
+                                      value: _agreedToTermsConditions,
+                                      onChanged: _setAgreedToTermsConditions,
+                                    ),
+                                    GestureDetector(
+                                        onTap: () =>
+                                            _setAgreedToTermsConditions(
+                                                !_agreedToTermsConditions),
+                                        child: Text.rich(TextSpan(
+                                            text: 'I agree to the',
+                                            style: TextStyle(
+                                              fontSize: size * 24,
+                                              color: Colors.black,
+                                              fontFamily: "Roboto",
+                                            )))),
+                                    TextButton(
+                                        style: TextButton.styleFrom(
+                                          padding: EdgeInsets.zero,
+                                        ),
+                                        onPressed: () {
+                                          showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return TermsAndConditionsPopup(
+                                                    context);
+                                              });
+                                        },
+                                        child: Text.rich(TextSpan(
+                                            text: ' Terms and conditions',
+                                            style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: size * 24,
+                                              color: Utils.header,
+                                              fontFamily: "Roboto",
+                                            )))),
+                                  ]),
+                                  _termsConditionsError
+                                      ? Text.rich(TextSpan(
+                                          text:
+                                              'Please check check terms and conditions',
+                                          style: TextStyle(
+                                            fontSize: size * 20,
+                                            color: Colors.red,
+                                            fontFamily: "Roboto",
+                                          )))
+                                      : SizedBox(),
                                   SizedBox(height: height * 0.027),
                                   Container(
                                     width: width * 0.85,
