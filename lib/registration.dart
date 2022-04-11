@@ -393,7 +393,7 @@ class _RegistrationState extends State<Registration> {
                                   _termsConditionsError
                                       ? Text.rich(TextSpan(
                                           text:
-                                              'Please check check terms and conditions',
+                                              'Please check terms and conditions',
                                           style: TextStyle(
                                             fontSize: size * 20,
                                             color: Colors.red,
