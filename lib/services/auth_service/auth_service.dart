@@ -52,14 +52,27 @@ class AuthService {
         });
         String response = await sendVerificationEmail();
         if (response != "") {
+          logRegistrationError(typedEmail: email, error: response);
           return false;
         }
         return true;
       }
       return false;
     } catch (e) {
+      logRegistrationError(typedEmail: email, error: e.toString());
       return false;
     }
+  }
+  Future<void> logRegistrationError({
+    @required String typedEmail,
+    @required String error
+  }) async {
+    await _fs.collection('registration-error-logs').add({
+      'typedEmail':typedEmail,
+       'error':error,
+      'timestamp':DateTime.now().toString()
+    }
+    );
   }
 
   Future<AuthState> login({
