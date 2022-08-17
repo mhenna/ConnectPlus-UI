@@ -8,6 +8,8 @@ import 'package:intl/intl.dart';
 import 'widgets/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
+import 'package:add_2_calendar/add_2_calendar.dart' as add2calendar;
+import 'package:connect_plus/widgets/app_button.dart';
 
 class EventWidget extends StatefulWidget {
   EventWidget({Key key, @required this.event}) : super(key: key);
@@ -159,7 +161,15 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
       );
     }
   }
-
+  void _addEventToCalendar(){
+    final add2calendar.Event calendarEvent = add2calendar.Event(
+        title: event.name,
+        startDate: event.startDate,
+        endDate: event.endDate,
+        location: event.venue
+    );
+    add2calendar.Add2Calendar.addEvent2Cal(calendarEvent);
+  }
   Widget _detailWidget() {
     var width = MediaQuery.of(context).size.width;
 
@@ -248,6 +258,14 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
                 link: event.link,
                 text: 'registration link',
                 launchURL: _launchURL),
+        SizedBox(height: 5),
+        Center(
+          child:AppButton(
+            title: 'Add to Calendar',
+            onPress: _addEventToCalendar,
+          )
+        )
+
       ],
     );
   }

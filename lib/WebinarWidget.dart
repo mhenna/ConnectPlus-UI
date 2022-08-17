@@ -9,6 +9,8 @@ import 'package:intl/intl.dart';
 import 'widgets/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
+import 'package:connect_plus/widgets/app_button.dart';
+import 'package:add_2_calendar/add_2_calendar.dart' as add2calendar;
 
 class WebinarWidget extends StatefulWidget {
   WebinarWidget({Key key, @required this.webinar}) : super(key: key);
@@ -260,6 +262,15 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
       },
     );
   }
+  void _addWebinarToCalendar(){
+    DateTime endDate=webinar.startDate.add(Duration(hours:webinar.duration.toInt()));
+    final add2calendar.Event event = add2calendar.Event(
+      title: webinar.name,
+      startDate: webinar.startDate,
+      endDate: endDate
+    );
+    add2calendar.Add2Calendar.addEvent2Cal(event);
+  }
 
   Widget _description() {
     var size = MediaQuery.of(context).size.aspectRatio;
@@ -289,33 +300,17 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
         ),
         SizedBox(height: 30),
         Center(
-          child: RaisedButton(
-            onPressed: () => _launchURL(webinar.url ?? ''),
-            color: Utils.iconColor,
-            textColor: Colors.white,
-            padding: const EdgeInsets.all(0.0),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18),
-                side: BorderSide(color: Utils.iconColor)),
-            child: Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(30.0),
-                gradient: LinearGradient(
-                  colors: [
-                    Utils.secondaryColor,
-                    Utils.primaryColor,
-                  ],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                ),
-              ),
-              padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
-              child: Text(
-                'Webinar Link',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-          ),
+          child: AppButton(
+              onPress: ()=> _launchURL(webinar.url ?? ''),
+              title: 'Webinar Link'
+          )
+        ),
+        SizedBox(height: 15),
+        Center(
+          child: AppButton(
+              onPress: ()=> _addWebinarToCalendar(),
+              title: 'Add to Calendar'
+          )
         ),
         Divider(
           color: Colors.transparent,
@@ -325,33 +320,10 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
         webinar.trivia == null
             ? Container()
             : Center(
-                child: RaisedButton(
-                  onPressed: () => _launchURL(webinar.trivia ?? ''),
-                  color: Utils.iconColor,
-                  textColor: Colors.white,
-                  padding: const EdgeInsets.all(0.0),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(18),
-                      side: BorderSide(color: Utils.iconColor)),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30.0),
-                      gradient: LinearGradient(
-                        colors: [
-                          Utils.secondaryColor,
-                          Utils.primaryColor,
-                        ],
-                        begin: Alignment.topRight,
-                        end: Alignment.bottomLeft,
-                      ),
-                    ),
-                    padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
-                    child: Text(
-                      'Trivia Link',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ),
-                ),
+                child:AppButton(
+                    onPress: ()=>  _launchURL(webinar.trivia ?? ''),
+                    title: 'Trivia Link'
+                )
               ),
       ],
     );
