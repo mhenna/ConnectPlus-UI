@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connect_plus/models/user.dart' as user_model;
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:connect_plus/models/registration_status.dart';
 
 class AuthService {
   final FirebaseAuth _fbAuth = FirebaseAuth.instance;
@@ -21,7 +22,7 @@ class AuthService {
   }
 
   /// Registration
-  Future<bool> register({
+  Future<RegistrationStatus> register({
     @required String email,
     @required String password,
     @required String username,
@@ -53,26 +54,25 @@ class AuthService {
         String response = await sendVerificationEmail();
         if (response != "") {
           logRegistrationError(typedEmail: email, error: response);
-          return false;
+          return RegistrationStatus(success: false, error: response);
         }
-        return true;
+        return RegistrationStatus(success: true);
       }
-      return false;
+      return RegistrationStatus(success: false, error: "Unknown error");
     } catch (e) {
-      logRegistrationError(typedEmail: email, error: e.toString());
-      return false;
+      String error = e.toString();
+      logRegistrationError(typedEmail: email, error: error);
+      return RegistrationStatus(success: false, error: error);
     }
   }
-  Future<void> logRegistrationError({
-    @required String typedEmail,
-    @required String error
-  }) async {
+
+  Future<void> logRegistrationError(
+      {@required String typedEmail, @required String error}) async {
     await _fs.collection('registration-error-logs').add({
-      'typedEmail':typedEmail,
-       'error':error,
-      'timestamp':DateTime.now().toString()
-    }
-    );
+      'typedEmail': typedEmail,
+      'error': error,
+      'timestamp': DateTime.now().toString()
+    });
   }
 
   Future<AuthState> login({
