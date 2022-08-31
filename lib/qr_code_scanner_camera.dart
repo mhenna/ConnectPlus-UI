@@ -1,10 +1,11 @@
 import 'dart:io' show Platform;
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:connect_plus/services/firestore_services.dart';
 
 class QrCodeScannerCamera extends StatefulWidget {
   const QrCodeScannerCamera({Key key, @required this.eventId, @required this.eventName}) : super(key: key);
@@ -22,7 +23,6 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Set<String> scannedQrCodes={};
-  final FirebaseFirestore _fs = FirebaseFirestore.instance;
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -36,6 +36,7 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
 
   @override
   Widget build(BuildContext context) {
+    final _scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
@@ -59,85 +60,6 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
       body: Column(
         children: <Widget>[
           Expanded(flex: 4, child: _buildQrView(context)),
-          Expanded(
-            flex: 1,
-            child: FittedBox(
-              fit: BoxFit.contain,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  if (qrCode != null)
-                    Text(
-                        'Data: $qrCode')
-                  else
-                    Text('Scan a code'),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.toggleFlash();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getFlashStatus(),
-                              builder: (context, snapshot) {
-                                return Text('Flash: ${snapshot.data}');
-                              },
-                            )),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              await controller?.flipCamera();
-                              setState(() {});
-                            },
-                            child: FutureBuilder(
-                              future: controller?.getCameraInfo(),
-                              builder: (context, snapshot) {
-                                if (snapshot.data != null) {
-                                  return Text(
-                                      'Camera facing ${describeEnum(snapshot.data)}');
-                                } else {
-                                  return Text('loading');
-                                }
-                              },
-                            )),
-                      )
-                    ],
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await controller?.pauseCamera();
-                          },
-                          child: Text('pause', style: TextStyle(fontSize: 20)),
-                        ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.all(8),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await controller?.resumeCamera();
-                          },
-                          child: Text('resume', style: TextStyle(fontSize: 20)),
-                        ),
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          )
         ],
       ),
     );
@@ -162,6 +84,34 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
           cutOutSize: scanArea),
     );
   }
+  void _showMessage(String message){
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+
+  Future<void> _addEventRegistration(String uid) async {
+    FirestoreServices fsServices=FirestoreServices();
+    bool userExists=await fsServices.checkIfUserExists(uid);
+    if(!userExists){
+      _showMessage("Invalid QR Code!");
+      return;
+    }
+    String username=await fsServices.getUsername(uid);
+    bool userAlreadyRegistered=await fsServices.checkIfUserRegistered(uid,eventId);
+    if(userAlreadyRegistered){
+      _showMessage('$username was already added to the $eventName event');
+      return;
+    }
+    fsServices.addUserEventRegistration(uid,eventId);
+    _showMessage('$username has been added successfully to the $eventName event');
+  }
 
   void _onQRViewCreated(QRViewController controller) {
     setState(() {
@@ -170,20 +120,11 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
     controller.scannedDataStream.listen((scanData) {
       setState(() {
         qrCode=scanData.code;
-        if(!scannedQrCodes.contains(qrCode)){
-          _fs.collection('event-registrations').add({
-            'uid':qrCode,
-            'eventId':eventId,
-            'registrationTime':DateTime.now().toString()
-          });
-          print('User:${scanData.code} was added successfully to $eventName');
-          scannedQrCodes.add(scanData.code);
-        }
-        else{
-          print('QR Code already added!');
-        }
       });
-
+      if(!scannedQrCodes.contains(qrCode)){
+        _addEventRegistration(qrCode);
+        scannedQrCodes.add(scanData.code);
+      }
     });
   }
 

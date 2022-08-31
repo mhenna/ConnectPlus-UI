@@ -184,14 +184,14 @@ class _EventState extends State<QrCodeScannerEventWidget>
           height: 10,
         ),
         // Trivia Button
-        if (event.endDate.isAfter(DateTime.now()))
+        //if (event.endDate.isAfter(DateTime.now()))
           ClickableButton(
             text: 'Scan QR Codes',
             onClick: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => QrCodeScannerCamera(eventId: event.id, eventName: event.name,),
+                  builder: (context) => QrCodeScannerCamera(eventId: event.sId, eventName: event.name,),
                 ),
               );
             },
@@ -203,7 +203,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => QrCodeScannerCamera(eventId: event.id,eventName:event.name),
+                builder: (context) => QrCodeScannerCamera(eventId: event.sId,eventName:event.name),
               ),
             );
           },
