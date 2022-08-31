@@ -1,6 +1,8 @@
+
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/models/erg.dart';
 import 'package:connect_plus/models/event.dart';
+import 'package:connect_plus/qr_code_scanner_camera.dart';
 import 'package:connect_plus/services/web_api.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +22,8 @@ class QrCodeScannerEventWidget extends StatefulWidget {
   }
 }
 
-class _EventState extends State<QrCodeScannerEventWidget> with TickerProviderStateMixin {
+class _EventState extends State<QrCodeScannerEventWidget>
+    with TickerProviderStateMixin {
   final Event event;
 
   List<Event> ergEvents;
@@ -65,7 +68,6 @@ class _EventState extends State<QrCodeScannerEventWidget> with TickerProviderSta
               imageurl: imageURL,
             )));
   }
-
 
   Widget _eventPoster() {
     return Stack(
@@ -182,13 +184,30 @@ class _EventState extends State<QrCodeScannerEventWidget> with TickerProviderSta
           height: 10,
         ),
         // Trivia Button
-        if(event.endDate.isAfter(DateTime.now()))
+        if (event.endDate.isAfter(DateTime.now()))
           ClickableButton(
-            link: event.trivia, text: 'Scan QR Codes', launchURL: _launchURL),
-     ClickableButton(
-            link: event.link,
-            text: 'Get Event Report',
-            launchURL: _launchURL),
+            text: 'Scan QR Codes',
+            onClick: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => QrCodeScannerCamera(eventId: event.id, eventName: event.name,),
+                ),
+              );
+            },
+          ),
+        ClickableButton(
+          text: 'Get Event Report',
+          onClick: () {
+            print("Navigating");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => QrCodeScannerCamera(eventId: event.id,eventName:event.name),
+              ),
+            );
+          },
+        ),
       ],
     );
   }
@@ -261,18 +280,15 @@ class _EventState extends State<QrCodeScannerEventWidget> with TickerProviderSta
 }
 
 class ClickableButton extends StatelessWidget {
-  const ClickableButton({Key key, this.link, this.text, this.launchURL})
-      : super(key: key);
-  final String link;
+  const ClickableButton({Key key, this.text, this.onClick}) : super(key: key);
+  final Function onClick;
   final String text;
-  final void Function(String) launchURL;
+
   @override
   Widget build(BuildContext context) {
-    return link == ''
-        ? Container()
-        : Center(
+    return Center(
       child: RaisedButton(
-        onPressed: () => launchURL(link ?? ''),
+        onPressed: onClick,
         color: Utils.iconColor,
         textColor: Colors.white,
         padding: const EdgeInsets.all(0.0),
