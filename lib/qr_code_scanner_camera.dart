@@ -103,15 +103,14 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
       return;
     }
     String username=await fsServices.getUsername(uid);
-    bool userAlreadyRegistered=await fsServices.checkIfUserRegistered(uid,eventId);
+    bool userAlreadyRegistered=await fsServices.checkIfUserRegistered(uid:uid,eventId: eventId);
     if(userAlreadyRegistered){
       _showMessage('$username was already added to the $eventName event');
       return;
     }
-    fsServices.addUserEventRegistration(uid,eventId);
+    fsServices.addUserEventRegistration(uid:uid,eventId: eventId);
     _showMessage('$username has been added successfully to the $eventName event');
   }
-
   void _onQRViewCreated(QRViewController controller) {
     setState(() {
       this.controller = controller;

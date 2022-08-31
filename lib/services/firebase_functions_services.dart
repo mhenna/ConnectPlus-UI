@@ -7,8 +7,8 @@ class FirebaseFunctionsServices {
   final FirestoreServices _fs = FirestoreServices();
 
   Future<bool> sendEventReportByMail(
-      String email, String eventId, String eventName) async {
-    bool emailExists = await _fs.checkIfEmailExists(email);
+  {String email, String eventId, String eventName}) async {
+    bool emailExists = await _fs.checkIfEmailExists(email: email);
     if (!emailExists) return false;
     final HttpsCallable callable =
         _fbFunctions.httpsCallable('sendEventReportByMail');

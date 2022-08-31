@@ -209,7 +209,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
                       text: 'Confirm',
                       onClick: () async {
                         FirebaseFunctionsServices _fbFunctions=FirebaseFunctionsServices();
-                        bool success=await _fbFunctions.sendEventReportByMail(emailController.text, event.sId, event.name);
+                        bool success=await _fbFunctions.sendEventReportByMail(email:emailController.text,eventId:event.sId,eventName:event.name);
                         if(success)
                           {
                             Navigator.pop(context);
