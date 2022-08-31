@@ -36,7 +36,6 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
 
   @override
   Widget build(BuildContext context) {
-    final _scaffoldKey = GlobalKey<ScaffoldState>();
     return Scaffold(
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by

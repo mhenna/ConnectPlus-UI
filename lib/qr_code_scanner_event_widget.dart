@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 import 'widgets/Utils.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
+import 'package:connect_plus/services/firebase_functions_services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class QrCodeScannerEventWidget extends StatefulWidget {
   QrCodeScannerEventWidget({Key key, @required this.event}) : super(key: key);
@@ -31,6 +33,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
 
   AnimationController controller;
   Animation<double> animation;
+  final emailController = TextEditingController();
 
   _EventState(this.event);
 
@@ -152,6 +155,76 @@ class _EventState extends State<QrCodeScannerEventWidget>
       },
     );
   }
+  void _showMessage(String message){
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 7,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0
+    );
+  }
+  void _showEmailInputPopUp(){
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
+    showDialog(
+        context: context,
+        builder: (BuildContext
+        context) =>
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius:
+                  BorderRadius.all(Radius.circular(32))),
+              title: Text(
+                  "Send Event Report To:"),
+              content:
+              Container(
+                width:width*0.8,
+                height:height*0.3,
+                alignment: Alignment.center,
+                child:
+                Column(
+                  mainAxisSize:
+                  MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 25),
+                      child: TextField(
+                        controller: emailController,
+                        obscureText: false,
+                        style: style,
+                        decoration: InputDecoration(
+                            contentPadding: EdgeInsets.fromLTRB(
+                                width * 0.05, height * 0.025, width * 0.02, height * 0.02),
+                            hintText: "Email",
+                            border:
+                            OutlineInputBorder(borderRadius: BorderRadius.circular(15.0))),
+                      )
+                    ),
+                    ClickableButton(
+                      text: 'Confirm',
+                      onClick: () async {
+                        FirebaseFunctionsServices _fbFunctions=FirebaseFunctionsServices();
+                        bool success=await _fbFunctions.sendEventReportByMail(emailController.text, event.sId, event.name);
+                        if(success)
+                          {
+                            Navigator.pop(context);
+                            _showMessage('${event.name} event report will be sent to your email at ${emailController.text} shortly');
+                          }
+                        else{
+                          _showMessage('Failed to send email, Please enter a valid email address');
+                        }
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ));
+  }
 
   Widget _description() {
     String time = DateFormat.Hm('en_US').format(event.startDate);
@@ -199,13 +272,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
         ClickableButton(
           text: 'Get Event Report',
           onClick: () {
-            print("Navigating");
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QrCodeScannerCamera(eventId: event.sId,eventName:event.name),
-              ),
-            );
+            _showEmailInputPopUp();
           },
         ),
       ],

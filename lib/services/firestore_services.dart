@@ -15,6 +15,19 @@ class FirestoreServices {
     return exists;
   }
 
+  Future<bool> checkIfEmailExists(String email) async {
+    try {
+      var snapshots = await _fs
+          .collection('users')
+          .where('email', isEqualTo: email.trim())
+          .get();
+      if (snapshots.docs.length >= 1) return true;
+    } catch (e) {
+      return false;
+    }
+    return false;
+  }
+
   Future<String> getUsername(String uid) async {
     var collectionRef = _fs.collection('users');
     var doc = await collectionRef.doc(uid).get();
@@ -22,12 +35,16 @@ class FirestoreServices {
   }
 
   Future<bool> checkIfUserRegistered(String uid, String eventId) async {
-    var snapshots = await _fs
-        .collection('event-registrations')
-        .where('uid', isEqualTo: uid)
-        .where('eventId', isEqualTo: eventId)
-        .get();
-    if (snapshots.docs.length >= 1) return true;
+    try {
+      var snapshots = await _fs
+          .collection('event-registrations')
+          .where('uid', isEqualTo: uid)
+          .where('eventId', isEqualTo: eventId)
+          .get();
+      if (snapshots.docs.length >= 1) return true;
+    } catch (e) {
+      return false;
+    }
     return false;
   }
 
