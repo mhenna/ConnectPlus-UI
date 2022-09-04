@@ -21,7 +21,7 @@ class FirestoreServices {
     try {
       var snapshots = await _fs
           .collection('users')
-          .where('email', isEqualTo: email.trim())
+          .where('email', isEqualTo: email.trim().toLowerCase())
           .get();
       if (snapshots.docs.length >= 1) return true;
     } catch (e) {

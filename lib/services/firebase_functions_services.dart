@@ -13,7 +13,7 @@ class FirebaseFunctionsServices {
     final HttpsCallable callable =
         _fbFunctions.httpsCallable('sendEventReportByMail');
     try {
-      await callable
+      callable
           .call({'email': email, 'eventName': eventName, 'eventId': eventId});
     } catch (e) {
       return false;
