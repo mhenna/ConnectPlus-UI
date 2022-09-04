@@ -17,6 +17,8 @@ versionCheck(context) async {
   List<String> currentVersionList = info.version.split(".");
   double currentVersion = double.parse(currentVersionList[0]) +
       (double.parse(currentVersionList[1]) / 10.0);
+  print('CURRENT VERSION: ${currentVersion}');
+
   //Get Latest version info from firebase config
   final RemoteConfig remoteConfig = await RemoteConfig.instance;
 
@@ -28,6 +30,7 @@ versionCheck(context) async {
     if (Platform.isIOS) device = "ios";
     String query = "force_update_current_version_" + device;
     double newVersion = double.parse(remoteConfig.getString(query));
+    print('NEW VERSION: ${newVersion}');
     if (newVersion > currentVersion) {
       _showVersionDialog(context);
     }

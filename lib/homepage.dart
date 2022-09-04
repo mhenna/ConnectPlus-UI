@@ -45,6 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
   bool highlightsLoaded = false;
   bool sliderPostersLoaded = false;
   bool announcementsLoaded = false;
+  DateTime YESTERDAY_DATE = new DateTime.now().subtract(Duration(days: 1));
   List<Announcement> announcements = [];
   final String INTERNAL_COMMS = 'internal comms';
   void initState() {
@@ -134,7 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add events to erg owner
     events.forEach((event) {
-      if (event.slider) {
+      if (event.slider && event.endDate.isAfter(YESTERDAY_DATE)) {
         ERG erg = event.erg;
         if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(event);
@@ -146,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     // add webinars to erg owner
     webinars.forEach((webinar) {
-      if (webinar.slider) {
+      if (webinar.slider && webinar.startDate.isAfter(YESTERDAY_DATE)) {
         ERG erg = webinar.erg;
         if (erg != null && ergItems.containsKey(erg)) {
           ergItems[erg].add(webinar);
@@ -190,7 +191,8 @@ class _MyHomePageState extends State<MyHomePage> {
     List<Announcement> sliderAnnouncements = announcements
         .where((announcement) =>
             announcement.slider == true &&
-            announcement.erg.name.toLowerCase() == INTERNAL_COMMS)
+            announcement.erg.name.toLowerCase() == INTERNAL_COMMS &&
+            announcement.deadline.isAfter(YESTERDAY_DATE))
         .toList();
     sliderAnnouncements.sort((a1, a2) {
       return a2.createdAt.compareTo(a1.createdAt);
@@ -345,43 +347,71 @@ class _MyHomePageState extends State<MyHomePage> {
           title('Recent Events & Webinars'),
           //gridview
         );
-        list.add(Container(
-          width: width * 0.97,
-          height: height * 0.55,
-          child: EventsVariables(events: events, webinars: webinars),
-        ));
-        list.add(
-          seeMore('Events'),
-        );
+        if (events.length + webinars.length >= 2) {
+          list.add(Container(
+            width: width * 0.97,
+            height: height * 0.55,
+            child: EventsVariables(events: events, webinars: webinars),
+          ));
+          list.add(
+            seeMore('Events'),
+          );
+        } else {
+          list.add(Container(
+            width: width * 0.97,
+            height: height * 0.3,
+            child: EventsVariables(events: events, webinars: webinars),
+          ));
+        }
       }
       if (announcements.isNotEmpty) {
         list.add(
           title('Recent Announcements'),
           //gridview
         );
-        list.add(Container(
+
+        if (announcements.length >= 2) {
+          list.add(Container(
+              width: width * 0.97,
+              height: height * 0.55,
+              child: AnnouncementVariables(
+                announcements: announcements,
+              )));
+          list.add(seeMore('Announcements'));
+        } else
+          list.add(Container(
             width: width * 0.97,
-            height: height * 0.55,
+            height: height * 0.3,
             child: AnnouncementVariables(
               announcements: announcements,
-            )));
-        list.add(
-          seeMore('Announcements'),
-        );
+            ),
+          ));
       }
       if (offers.isNotEmpty) {
         list.add(title('Recent Offers'));
-        list.add(
 
-            //gridview
-            Container(
-          width: width * 0.97,
-          height: height * 0.55,
-          child: OfferVariables(
-            offers: offers,
-          ),
-        ));
-        list.add(seeMore('Offers'));
+        if (offers.length >= 2) {
+          list.add(
+              //gridview
+              Container(
+            width: width * 0.97,
+            height: height * 0.55,
+            child: OfferVariables(
+              offers: offers,
+            ),
+          ));
+          list.add(seeMore('Offers'));
+        } else {
+          list.add(
+              //gridview
+              Container(
+            width: width * 0.97,
+            height: height * 0.3,
+            child: OfferVariables(
+              offers: offers,
+            ),
+          ));
+        }
       } else if (offers.isEmpty &&
           events.isEmpty &&
           webinars.isEmpty &&
@@ -396,7 +426,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ));
       list.add(Center(
           child: Text(
-        "Copyright © 2020. Cairo Automation Team - The Co-partner \n project . All rights reserved.",
+        "Copyright © 2022. Cairo Automation Team - The Co-partner \n project . All rights reserved.",
         textAlign: TextAlign.center,
       )));
       list.add(SizedBox(

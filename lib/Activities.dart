@@ -17,7 +17,6 @@ class Activities extends StatefulWidget {
     Key key,
   }) : super(key: key);
   static final _rand = new Random();
-
   @override
   MyActivitiesPageState createState() => MyActivitiesPageState();
 }
@@ -53,7 +52,8 @@ class MyActivitiesPageState extends State<Activities>
         if (activities.length != 0) {
           emptyActivities = false;
         }
-        randIndex = Activities._rand.nextInt(activities.length);
+
+        randIndex = Activities._rand.nextInt(max(1, activities.length));
       });
       activitiesLoaded = true;
     }
@@ -190,7 +190,7 @@ class MyActivitiesPageState extends State<Activities>
                 appBar: AppBar(
                   // Here we take the value from the MyHomePage object that was created by
                   // the App.build method, and use it to set our appbar title.
-                  title: Text("Events & Webinars"),
+                  title: Text("Activities"),
                   centerTitle: true,
                   bottom: PreferredSize(
                     child: search(),
@@ -328,7 +328,7 @@ class MyActivitiesPageState extends State<Activities>
     if (pattern == "") return null;
     final filter = searchActivities
         .where(
-          (entry) => entry.name.toLowerCase().startsWith(pattern.toLowerCase()),
+          (entry) => entry.name.toLowerCase().contains(pattern.toLowerCase()),
         )
         .toList();
     return filter;

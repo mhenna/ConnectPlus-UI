@@ -6,19 +6,26 @@ import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/models/announcement.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:connect_plus/widgets/pdf_viewer_from_url.dart';
 
-class AnnouncementWidget extends StatelessWidget {
+class AnnouncementWidget extends StatefulWidget {
   final Announcement announcement;
 
   const AnnouncementWidget({Key key, @required this.announcement})
       : super(key: key);
+
+  @override
+  _AnnouncementWidgetState createState() => _AnnouncementWidgetState();
+}
+
+class _AnnouncementWidgetState extends State<AnnouncementWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         elevation: 0,
-        title: Text(announcement.name),
+        title: Text(widget.announcement.name),
         centerTitle: true,
         backgroundColor: Colors.transparent,
       ),
@@ -40,11 +47,11 @@ class AnnouncementWidget extends StatelessWidget {
           children: [
             Align(
               alignment: Alignment.topCenter,
-              child: AnnouncementImage(announcement: announcement),
+              child: AnnouncementImage(announcement: widget.announcement),
             ),
             Align(
               alignment: Alignment.bottomCenter,
-              child: InfoSheet(announcement: announcement),
+              child: InfoSheet(announcement: widget.announcement),
             ),
           ],
         ),
@@ -71,7 +78,7 @@ class AnnouncementImage extends StatelessWidget {
   }
 }
 
-class InfoSheet extends StatelessWidget {
+class InfoSheet extends StatefulWidget {
   const InfoSheet({
     Key key,
     @required this.announcement,
@@ -79,6 +86,11 @@ class InfoSheet extends StatelessWidget {
 
   final Announcement announcement;
 
+  @override
+  _InfoSheetState createState() => _InfoSheetState();
+}
+
+class _InfoSheetState extends State<InfoSheet> {
   TextStyle _style(BuildContext context) => TextStyle(
         color: Colors.black87,
         fontWeight: FontWeight.w500,
@@ -86,7 +98,7 @@ class InfoSheet extends StatelessWidget {
       );
 
   Future<void> _goTo(String url) async {
-    if (await canLaunch(url)) {
+    if (!await canLaunch(url)) {
       await launch(url);
     } else {
       throw 'Could not launch $url';
@@ -94,8 +106,9 @@ class InfoSheet extends StatelessWidget {
   }
 
   String _deadlineDate() {
-    if (announcement.deadline != null) {
-      final date = DateFormat.yMMMMd('en_US').format(announcement.deadline);
+    if (widget.announcement.deadline != null) {
+      final date =
+          DateFormat.yMMMMd('en_US').format(widget.announcement.deadline);
       return "Date: $date";
     } else {
       return "";
@@ -130,15 +143,15 @@ class InfoSheet extends StatelessWidget {
                   "Description",
                   style: _style(context),
                 ),
-                SelectableText(announcement.description),
+                SelectableText(widget.announcement.description),
                 Divider(color: Colors.transparent, height: 10),
                 SelectableText(
-                  'On Behalf of: ${announcement.onBehalfOf}',
+                  'On Behalf of: ${widget.announcement.onBehalfOf}',
                   style: _style(context),
                 ),
                 Divider(color: Colors.transparent, height: 10),
                 Visibility(
-                  visible: announcement.deadline != null,
+                  visible: widget.announcement.deadline != null,
                   child: SelectableText(
                     _deadlineDate(),
                     style: _style(context),
@@ -148,12 +161,18 @@ class InfoSheet extends StatelessWidget {
 
                 // trivia button
                 TriviaButton(
-                  announcement: announcement,
-                  onPressed: () => _goTo(announcement.trivia),
+                  announcement: widget.announcement,
+                  onPressed: () => _goTo(widget.announcement.trivia),
                 ),
                 LinkButton(
-                  announcement: announcement,
-                  onPressed: () => _goTo(announcement.link),
+                  announcement: widget.announcement,
+                  onPressed: () => _goTo(widget.announcement.link),
+                ),
+
+                AttachmentButton(
+                  announcement: widget.announcement,
+                  onPressed: () =>
+                      _launchAttachment(widget.announcement.attachment),
                 ),
               ],
             ),
@@ -161,6 +180,21 @@ class InfoSheet extends StatelessWidget {
         },
       ),
     );
+  }
+
+  _launchAttachment(String url) async {
+    String pathPDF = WebAPI.baseURL + url;
+    print(pathPDF);
+    if (url != null)
+      Navigator.push(
+        context,
+        MaterialPageRoute<dynamic>(
+          builder: (_) => PDFViewerCachedFromUrl(
+            url: pathPDF,
+            title: widget.announcement.name,
+          ),
+        ),
+      );
   }
 }
 
@@ -214,7 +248,7 @@ class LinkButton extends StatelessWidget {
             ),
             padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
             child: Text(
-              'Details',
+              'Registration Link',
               style: TextStyle(fontSize: 18),
             ),
           ),
@@ -262,6 +296,52 @@ class TriviaButton extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
             child: Text(
               'Trivia Link',
+              style: TextStyle(fontSize: 18),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class AttachmentButton extends StatelessWidget {
+  const AttachmentButton({
+    Key key,
+    @required this.announcement,
+    @required this.onPressed,
+  }) : super(key: key);
+
+  final Announcement announcement;
+  final void Function() onPressed;
+  @override
+  Widget build(BuildContext context) {
+    return Visibility(
+      visible: announcement.attachment != null,
+      child: Center(
+        child: RaisedButton(
+          onPressed: onPressed,
+          color: Utils.iconColor,
+          textColor: Colors.white,
+          padding: const EdgeInsets.all(0.0),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+              side: BorderSide(color: Utils.iconColor)),
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30.0),
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+              ),
+            ),
+            padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
+            child: Text(
+              'More Details',
               style: TextStyle(fontSize: 18),
             ),
           ),

@@ -48,6 +48,7 @@ ios/Flutter/.last_build_id
 .env
 google-services.json
 launch.json
-android/key.properties
+android/app/key.properties
+android/app/key.jks
 node_modules
 node_modules

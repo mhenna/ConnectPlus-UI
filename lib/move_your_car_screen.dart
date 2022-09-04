@@ -6,6 +6,7 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/car_plate_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:connect_plus/models/user.dart';
 
 class MoveYourCarScreen extends StatefulWidget {
   @override
@@ -17,12 +18,15 @@ class _MoveYourCarScreenState extends State<MoveYourCarScreen> {
 
   Future<void> _sendNotification() async {
     _showLoading();
-    final NotificationResponse response = await sl<PushNotificationsService>()
+    final List<dynamic> response = await sl<PushNotificationsService>()
         .sendNotificationToCarOwner(carPlate: _carPlate);
     Navigator.pop(context);
-    if (response == NotificationResponse.Success) {
-      _showSuccess();
-    } else if (response == NotificationResponse.CarNotFound) {
+    final NotificationResponse notificationResponse = response[0];
+    final User blocker = response[1];
+
+    if (notificationResponse == NotificationResponse.Success) {
+      _showSuccess(blocker);
+    } else if (notificationResponse == NotificationResponse.CarNotFound) {
       _showCarNotFound();
     } else {
       _showFailed();
@@ -38,14 +42,14 @@ class _MoveYourCarScreenState extends State<MoveYourCarScreen> {
     );
   }
 
-  Future<void> _showSuccess() {
+  Future<void> _showSuccess(User blocker) {
     return showDialog(
       context: context,
       builder: (context) {
         return CupertinoAlertDialog(
           title: Text("Notification Sent"),
-          content:
-              Text("The owner of this vehicle has been notified successfuly"),
+          content: Text(
+              "${blocker.username} from ${blocker.businessUnit} BU has been notified successfuly"),
           actions: [
             FlatButton(
               child: Text("Close"),
@@ -85,7 +89,8 @@ class _MoveYourCarScreenState extends State<MoveYourCarScreen> {
       builder: (context) {
         return CupertinoAlertDialog(
           title: Text("Not Found"),
-          content: Text("This car is not registered for dell employees"),
+          content: Text(
+              "Unfortunately this car is not registered for dell employees"),
           actions: [
             FlatButton(
               child: Text("Close"),
