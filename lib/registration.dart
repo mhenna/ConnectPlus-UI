@@ -14,6 +14,7 @@ import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/BusinessUnit.dart';
 import 'package:connect_plus/widgets/terms_and_conditions_popup.dart';
+import 'package:connect_plus/models/registration_status.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -83,6 +84,13 @@ class _RegistrationState extends State<Registration> {
         _termsConditionsError = false;
       }
     });
+  }
+  String _tokenizeRegistrationError(String error)
+  {
+    if (error.contains("] ")){
+      return error.split("] ")[1];
+    }
+    else return error;
   }
 
   @override
@@ -240,7 +248,7 @@ class _RegistrationState extends State<Registration> {
               asyncCall = true;
             });
             final pnToken = await sl<PushNotificationsService>().token;
-            bool registered = await sl<AuthService>().register(
+            RegistrationStatus registered = await sl<AuthService>().register(
               email: emController.text,
               password: pwController.text,
               username: fnController.text,
@@ -249,7 +257,7 @@ class _RegistrationState extends State<Registration> {
               businessUnit: businessUnit,
               pushNotificationToken: pnToken,
             );
-            if (registered) {
+            if (registered.success) {
               await successDialog();
               Navigator.push(
                 context,
@@ -257,7 +265,8 @@ class _RegistrationState extends State<Registration> {
               );
             } else {
               //TODO: change dialog logic
-              _showDialog('Could not register');
+              String error=_tokenizeRegistrationError(registered.error);
+              _showDialog(error);
             }
             setState(() {
               asyncCall = false;
@@ -474,38 +483,13 @@ class _RegistrationState extends State<Registration> {
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        if (err == '400') {
-          return CupertinoAlertDialog(
-            title: new Text(
-              "Oops!",
-              textAlign: TextAlign.center,
-            ),
-            content: new Text('Full Name/Email Address is Already Taken!'),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text(
-                  "Close",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        } else {
           return CupertinoAlertDialog(
             title: new Text(
               "Oops!",
               textAlign: TextAlign.center,
             ),
             content: new Text(
-                'Connection timed out! Please check your internet connection and try again.'),
+                err),
             actions: <Widget>[
               // usually buttons at the bottom of the dialog
               new FlatButton(
@@ -523,7 +507,6 @@ class _RegistrationState extends State<Registration> {
               ),
             ],
           );
-        }
       },
     );
   }
