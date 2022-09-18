@@ -54,5 +54,9 @@
     <true/>
     <key>NSCameraUsageDescription</key>
     <string>This app needs camera access to scan QR codes for on-site event registrations at Dell Technologies COE</string>
+	<key>NSCalendarsUsageDescription</key>
+    <string>At Dell Technologies COE, we host events regularly for employees. In order to enhance the user experience, we added the ability for the user to add any event to their system calendar. </string>
+    <key>NSContactsUsageDescription</key>
+    <string>At Dell Technologies COE, we host events regularly for employees. In order to enhance the user experience, we added the ability for the user to add any event to their system calendar.</string>
 </dict>
 </plist>
