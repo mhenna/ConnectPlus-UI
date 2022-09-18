@@ -9,12 +9,22 @@ class AuthService {
   final FirebaseAuth _fbAuth = FirebaseAuth.instance;
   final FirebaseFirestore _fs = FirebaseFirestore.instance;
   user_model.User _user;
+  Future<String> getCustomClaim(fbUser) async{
+    final idTokenResult=await fbUser.getIdTokenResult(true);
+    final claims = idTokenResult.claims;
+    if(claims['qrCodeScanner']==true)
+      return 'qrCodeScanner';
+    else return '';
+  }
 
   Future<user_model.User> getUser() async {
     final fbUser = _fbAuth.currentUser;
     if (fbUser != null) {
       final userDoc = await _fs.collection('users').doc(fbUser.uid).get();
-      _user = user_model.User.fromJson(userDoc.data());
+      final userData=userDoc.data();
+      userData['customClaim']=await getCustomClaim(fbUser);
+      _user = user_model.User.fromJson(userData);
+      print("claims: ${_user.customClaim}");
       _user.setEmailVerified(fbUser.emailVerified);
       return _user;
     }

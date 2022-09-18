@@ -411,7 +411,18 @@ class WebAPI {
         events.add(Event.fromJson(eventJson));
     }
     events.sort((b, a) => a.startDate.compareTo(b.startDate));
+    return events;
+  }
 
+  static Future<List<Event>> getAllEvents() async {
+    final response = await get(_eventsURL);
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawEvents = json.decode(response.body);
+    final List<Event> events = [];
+    for (final eventJson in rawEvents) {
+        events.add(Event.fromJson(eventJson));
+    }
+    events.sort((b, a) => a.startDate.compareTo(b.startDate));
     return events;
   }
 

@@ -1,3 +1,4 @@
+import 'package:connect_plus/qr_code_scanner_home_screen.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/models/user.dart';
@@ -153,6 +154,13 @@ class _LoginState extends State<Login> {
                           )),
                 );
               } else {
+                if(user.customClaim=='qrCodeScanner'){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => QrCodeScannerHomeScreen()),
+                  );
+                }
+                else
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePage()),

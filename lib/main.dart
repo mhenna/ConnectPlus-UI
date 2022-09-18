@@ -12,6 +12,7 @@ import 'package:connect_plus/injection_container.dart' as di;
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/models/user.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:connect_plus/qr_code_scanner_home_screen.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -72,7 +73,9 @@ class _SplashState extends State<Splash> {
                 title: "login",
               );
             } else {
-              return MyHomePage();
+              if(snapshot.data.customClaim=='qrCodeScanner')
+                return QrCodeScannerHomeScreen();
+              else return MyHomePage();
             }
           }),
       imageBackground: AssetImage('assets/splash.png'),
