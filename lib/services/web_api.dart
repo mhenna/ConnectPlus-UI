@@ -451,6 +451,21 @@ class WebAPI {
     return events;
   }
 
+
+  static Future<List<Event>> getEventsByERGs(List<String> ergIds) async {
+    final List<Event> events = [];
+    for (String ergId in ergIds){
+      final ergURL = "$_eventsURL?erg_eq=$ergId";
+      final response = await get(ergURL);
+      final rawEvents = json.decode(response.body);
+      for (final eventJson in rawEvents) {
+          events.add(Event.fromJson(eventJson));
+      }
+    }
+    events.sort((b, a) => a.startDate.compareTo(b.startDate));
+    return events;
+  }
+
   static Future<List<Event>> getRecentEvents() async {
     final recentURL = "$_eventsURL?_limit=5";
     final response = await get(recentURL);

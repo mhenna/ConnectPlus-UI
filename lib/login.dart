@@ -157,7 +157,7 @@ class _LoginState extends State<Login> {
                 if(user.customClaim=='qrCodeScanner'){
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => QrCodeScannerHomeScreen()),
+                    MaterialPageRoute(builder: (context) => QrCodeScannerHomeScreen(scannerErgs: user.scannerErgs,)),
                   );
                 }
                 else
