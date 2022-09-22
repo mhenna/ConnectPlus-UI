@@ -13,6 +13,7 @@ import 'package:connect_plus/homepage.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/Calendar.dart';
+import 'package:connect_plus/WireMagazines.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:localstorage/localstorage.dart';
 
@@ -90,6 +91,16 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Events()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.book),
+            title: Text('The Wire'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => WireMagazines()),
               )
             },
           ),
