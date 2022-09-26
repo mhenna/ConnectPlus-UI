@@ -95,7 +95,7 @@ class NavDrawerState extends State<NavDrawer>
             },
           ),
           ListTile(
-            leading: Icon(Icons.book),
+            leading: Icon(Icons.menu_book_outlined),
             title: Text('The Wire'),
             onTap: () => {
               Navigator.push(
