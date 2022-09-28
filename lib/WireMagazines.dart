@@ -42,20 +42,17 @@ class _WireMagazinesState extends State<WireMagazines> {
             child: Stack(
               alignment: Alignment.centerRight,
               children: [
-                Align(
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height,
-                      child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: wireMagazines.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            return WireMagazineCard(
-                              wireMagazine: wireMagazines[index],
-                            );
-                          })),
-                ),
+                SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: wireMagazines.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return WireMagazineCard(
+                            wireMagazine: wireMagazines[index],
+                          );
+                        })),
                 Icon(
                   Icons.arrow_right_outlined,
                   size: 35,
