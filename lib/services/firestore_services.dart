@@ -3,7 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreServices {
   final FirebaseFirestore _fs = FirebaseFirestore.instance;
-  final String _uid= FirebaseAuth.instance.currentUser.uid;
+  final String _uid = FirebaseAuth.instance.currentUser.uid;
 
   Future<bool> checkIfUserExists(String uid) async {
     bool exists;
@@ -36,6 +36,12 @@ class FirestoreServices {
     return doc.data()['username'];
   }
 
+  Future<String> getCurrentUserEmail() async {
+    var collectionRef = _fs.collection('users');
+    var doc = await collectionRef.doc(_uid).get();
+    return doc.data()['email'];
+  }
+
   Future<bool> checkIfUserRegistered({String uid, String eventId}) async {
     try {
       var snapshots = await _fs
@@ -55,7 +61,7 @@ class FirestoreServices {
       'uid': uid,
       'eventId': eventId,
       'registrationTime': DateTime.now().toString(),
-      'registeredBy':_uid
+      'registeredBy': _uid
     });
   }
 }

@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/services/firebase_functions_services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:connect_plus/services/firestore_services.dart';
 
 class QrCodeScannerEventWidget extends StatefulWidget {
   QrCodeScannerEventWidget({Key key, @required this.event}) : super(key: key);
@@ -34,6 +35,9 @@ class _EventState extends State<QrCodeScannerEventWidget>
   AnimationController controller;
   Animation<double> animation;
   final emailController = TextEditingController();
+  Future<String> defaultEmailFuture;
+  String defaultEmail;
+  FirestoreServices _fs=FirestoreServices();
 
   _EventState(this.event);
 
@@ -45,8 +49,10 @@ class _EventState extends State<QrCodeScannerEventWidget>
     animation = Tween<double>(begin: 0, end: 1).animate(
         CurvedAnimation(parent: controller, curve: Curves.easeInToLinear));
     controller.forward();
+    setDefaultEmail();
     getERGEvents();
   }
+
 
   @override
   void dispose() {
@@ -61,6 +67,9 @@ class _EventState extends State<QrCodeScannerEventWidget>
         ergEvents = events.where((ev) => ev.id != event.id).toList();
         loading = false;
       });
+  }
+  Future<void> setDefaultEmail() async {
+    defaultEmailFuture= _fs.getCurrentUserEmail();
   }
 
   Widget urlToImage(String imageURL) {
@@ -166,7 +175,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
         fontSize: 16.0
     );
   }
-  void _showEmailInputPopUp(){
+  void _showEmailInputPopUp(String defaultEmail){
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     TextStyle style = TextStyle(fontFamily: 'Arial', fontSize: 20.0);
@@ -194,7 +203,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
                     Padding(
                       padding: const EdgeInsets.only(bottom: 25),
                       child: TextField(
-                        controller: emailController,
+                        controller: emailController..text = defaultEmail,
                         obscureText: false,
                         style: style,
                         decoration: InputDecoration(
@@ -271,8 +280,9 @@ class _EventState extends State<QrCodeScannerEventWidget>
           ),
         ClickableButton(
           text: 'Get Event Report',
-          onClick: () {
-            _showEmailInputPopUp();
+          onClick: () async {
+            defaultEmail=await defaultEmailFuture;
+            _showEmailInputPopUp(defaultEmail);
           },
         ),
       ],

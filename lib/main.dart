@@ -74,7 +74,7 @@ class _SplashState extends State<Splash> {
               );
             } else {
               if(snapshot.data.customClaim=='qrCodeScanner')
-                return QrCodeScannerHomeScreen();
+                return QrCodeScannerHomeScreen(scannerErgs: snapshot.data.scannerErgs,);
               else return MyHomePage();
             }
           }),

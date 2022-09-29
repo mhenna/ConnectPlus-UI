@@ -16,18 +16,18 @@ import 'injection_container.dart';
 import 'login.dart';
 
 class QrCodeScannerHomeScreen extends StatefulWidget {
-  QrCodeScannerHomeScreen({
-    Key key,
-  }) : super(key: key);
-
+  QrCodeScannerHomeScreen({Key key, @required this.scannerErgs}) : super(key: key);
+  final List<String> scannerErgs;
   @override
-  _QrCodeScannerHomeScreenState createState() => _QrCodeScannerHomeScreenState();
+  _QrCodeScannerHomeScreenState createState() => _QrCodeScannerHomeScreenState(this.scannerErgs);
 }
 
 class _QrCodeScannerHomeScreenState extends State<QrCodeScannerHomeScreen>
 {
 
 //  String token;
+  final List<String> scannerErgs;
+  _QrCodeScannerHomeScreenState(this.scannerErgs);
   List<Event> events = [];
   List<Event> searchDataEvents = [];
   List<dynamic> searchAll;
@@ -66,7 +66,7 @@ class _QrCodeScannerHomeScreenState extends State<QrCodeScannerHomeScreen>
   }
 
   void getEvents() async {
-    final allEvents = await WebAPI.getAllEvents();
+    final allEvents = await WebAPI.getEventsByERGs(scannerErgs);
     if (this.mounted) {
       eventsLoaded = true;
 

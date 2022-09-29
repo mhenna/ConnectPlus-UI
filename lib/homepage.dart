@@ -240,7 +240,7 @@ class _MyHomePageState extends State<MyHomePage> {
               borderRadius:
               BorderRadius.all(Radius.circular(32))),
           title: Text(
-              "This is your QR Code:"),
+              "My QR Code:"),
           content:
           Container(
             width:width*0.8,
