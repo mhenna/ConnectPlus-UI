@@ -16,6 +16,7 @@ import 'package:connect_plus/models/profile.dart';
 import 'package:connect_plus/models/register_request_params.dart';
 import 'package:connect_plus/models/user.dart';
 import 'package:connect_plus/models/webinar.dart';
+import 'package:connect_plus/models/wire_magazine.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:rrule/rrule.dart';
@@ -36,6 +37,7 @@ class WebAPI {
   static final String _eventHighlightsURL = "/event-highlights";
   static final String _announcementURL = "/announcements";
   static final String _businessUnitURL = "/business-units";
+  static final String _wireMagazineURL = "/wire-magazines";
   // TODO: remove this to a separate service
   static User currentUser;
   static String currentToken;
@@ -86,7 +88,6 @@ class WebAPI {
       requestURL,
       headers: headers,
     );
-
     // TODO: Implement better error handling approach
     if (response.statusCode != 200) {
       throw response;
@@ -539,5 +540,17 @@ class WebAPI {
     }
     print(BUs);
     return BUs;
+  }
+  static Future<List<WireMagazine>> getWireMagazines() async {
+    final response = await get(_wireMagazineURL);
+
+    // TODO: Add this logic to a seperate transformer service
+    final List<dynamic> rawWireMagazines = json.decode(response.body);
+    final List<WireMagazine> wireMagazines = [];
+    for (final wireMagazineJson in rawWireMagazines) {
+      wireMagazines.add(WireMagazine.fromJson(wireMagazineJson));
+    }
+    wireMagazines.sort((b, a) => a.edition.compareTo(b.edition));
+    return wireMagazines;
   }
 }
