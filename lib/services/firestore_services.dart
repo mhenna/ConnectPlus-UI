@@ -42,6 +42,10 @@ class FirestoreServices {
     return doc.data()['email'];
   }
 
+  Future<void> addGender(String gender) async {
+    await _fs.collection('users').doc(_uid).update({"gender":gender});
+  }
+
   Future<bool> checkIfUserRegistered({String uid, String eventId}) async {
     try {
       var snapshots = await _fs

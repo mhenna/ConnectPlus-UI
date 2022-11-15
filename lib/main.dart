@@ -6,6 +6,7 @@ import 'package:splashscreen/splashscreen.dart';
 import 'package:connect_plus/login.dart';
 import 'package:connect_plus/homepage.dart';
 import 'package:no_context_navigation/no_context_navigation.dart';
+import 'gender_select_screen.dart';
 import 'routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:connect_plus/injection_container.dart' as di;
@@ -75,7 +76,11 @@ class _SplashState extends State<Splash> {
             } else {
               if(snapshot.data.customClaim=='qrCodeScanner')
                 return QrCodeScannerHomeScreen(scannerErgs: snapshot.data.scannerErgs,);
-              else return MyHomePage();
+              else {
+                if(snapshot.data.gender==null || snapshot.data.gender=="")
+                  return GenderSelectScreen();
+                else return MyHomePage();
+              }
             }
           }),
       imageBackground: AssetImage('assets/splash.png'),

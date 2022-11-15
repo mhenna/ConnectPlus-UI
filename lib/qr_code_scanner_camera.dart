@@ -23,6 +23,7 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
   QRViewController controller;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   Set<String> scannedQrCodes={};
+  FirestoreServices fsServices=FirestoreServices();
   // In order to get hot reload to work we need to pause the camera if the platform
   // is android, or resume the camera if the platform is iOS.
   @override
@@ -96,7 +97,6 @@ class _QrCodeScannerCameraState extends State<QrCodeScannerCamera> {
   }
 
   Future<void> _addEventRegistration(String uid) async {
-    FirestoreServices fsServices=FirestoreServices();
     bool userExists=await fsServices.checkIfUserExists(uid);
     if(!userExists){
       _showMessage("Invalid QR Code!");

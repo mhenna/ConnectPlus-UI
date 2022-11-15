@@ -25,6 +25,7 @@ class AuthService {
       userData['customClaim']=await getCustomClaim(fbUser);
       _user = user_model.User.fromJson(userData);
       print("claims: ${_user.customClaim}");
+      print("gender: ${_user.gender}");
       _user.setEmailVerified(fbUser.emailVerified);
       return _user;
     }
@@ -38,6 +39,7 @@ class AuthService {
     @required String username,
     @required String phoneNumber,
     @required String pushNotificationToken,
+    @required String gender,
     List<String> carPlates,
     String businessUnit,
   }) async {
@@ -60,6 +62,7 @@ class AuthService {
           'id': cred.user.uid,
           'businessUnit': businessUnit,
           'pushNotificationToken': pushNotificationToken,
+          'gender':gender
         });
         String response = await sendVerificationEmail();
         if (response != "") {
