@@ -31,7 +31,7 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-
+  String genderSelectedVal='Male';
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -60,9 +60,12 @@ class _RegistrationState extends State<Registration> {
     super.dispose();
   }
 
-  void _displayCarPlate(bool _haveCar) {
+  void _displayRadioOption(dynamic _option) {
     setState(() {
-      haveCar = _haveCar;
+      if(_option is bool)
+      haveCar = _option;
+      else
+      genderSelectedVal = _option;
     });
   }
 
@@ -248,14 +251,16 @@ class _RegistrationState extends State<Registration> {
               asyncCall = true;
             });
             final pnToken = await sl<PushNotificationsService>().token;
+            print("REGISTERING WITH GENDER:$genderSelectedVal, CAR:$haveCar");
             RegistrationStatus registered = await sl<AuthService>().register(
-              email: emController.text,
+              email: emController.text.toLowerCase(),
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlates: haveCar ? carPlates : null,
               businessUnit: businessUnit,
               pushNotificationToken: pnToken,
+              gender: genderSelectedVal
             );
             if (registered.success) {
               await successDialog();
@@ -350,8 +355,8 @@ class _RegistrationState extends State<Registration> {
                                   SizedBox(height: 20.0),
                                   Container(
                                     width: width * 0.85,
-                                    child: CarPlateRadioButton(
-                                      displayCarPlate: _displayCarPlate,
+                                    child: RadioButtonRow(
+                                      displayRadioOption: _displayRadioOption,
                                     ),
                                   ),
                                   haveCar == true
@@ -549,11 +554,11 @@ class CarPlateInputTitle extends StatelessWidget {
   }
 }
 
-class CarPlateRadioButton extends StatefulWidget {
-  final void Function(bool value) displayCarPlate;
-  CarPlateRadioButton({
+class RadioButtonRow extends StatefulWidget {
+  final void Function(dynamic value) displayRadioOption;
+  RadioButtonRow({
     Key key,
-    this.displayCarPlate,
+    this.displayRadioOption,
   }) : super(key: key);
   @override
   _State createState() => _State();
@@ -565,7 +570,7 @@ class QuestionsOptions {
   QuestionsOptions({this.name, this.index});
 }
 
-class _State extends State<CarPlateRadioButton> {
+class _State extends State<RadioButtonRow> {
   String radioItem = 'Yes';
   int id = 1;
   List<QuestionsOptions> optionsList = [
@@ -578,39 +583,57 @@ class _State extends State<CarPlateRadioButton> {
       name: "No",
     ),
   ];
-
+  String genderSelectedVal='Male';
+  List<String> genderOptions=["Male","Female"];
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
+            "Gender",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          Row(
+            children: genderOptions
+                .map((data) => Expanded(
+                child: RadioListTile(
+                  title: Text("$data"),
+                  groupValue: genderSelectedVal,
+                  value: data,
+                  onChanged: (val) {
+                    widget.displayRadioOption(data);
+                    setState(() {
+                      genderSelectedVal = data;
+                    });
+                  },
+                )))
+                .toList(),
+          ),
+          Text(
             "Have a car ?",
             style: TextStyle(fontSize: 20.0),
           ),
-          Column(
-            children: <Widget>[
-              Row(
-                children: optionsList
-                    .map((data) => Expanded(
-                            child: RadioListTile(
-                          title: Text("${data.name}"),
-                          groupValue: id,
-                          value: data.index,
-                          onChanged: (val) {
-                            widget.displayCarPlate(data.index == 1);
-                            setState(() {
-                              radioItem = data.name;
-                              id = data.index;
-                            });
-                          },
-                        )))
-                    .toList(),
-              )
-            ],
-          )
+          Row(
+            children: optionsList
+                .map((data) => Expanded(
+                        child: RadioListTile(
+                      title: Text("${data.name}"),
+                      groupValue: id,
+                      value: data.index,
+                      onChanged: (val) {
+                        widget.displayRadioOption(data.index == 1);
+                        setState(() {
+                          radioItem = data.name;
+                          id = data.index;
+                        });
+                      },
+                    )))
+                .toList(),
+          ),
         ],
       ),
+
     );
   }
 }

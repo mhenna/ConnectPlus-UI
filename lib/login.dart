@@ -16,6 +16,8 @@ import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/ResetPassword.dart';
 import 'package:connect_plus/missingInformation.dart';
 
+import 'gender_select_screen.dart';
+
 class Login extends StatefulWidget {
   Login({Key key, this.title}) : super(key: key);
   final String title;
@@ -161,10 +163,18 @@ class _LoginState extends State<Login> {
                   );
                 }
                 else
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                );
+                  {
+                    if(user.gender==null || user.gender==""){
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GenderSelectScreen()),
+                    );
+                  }
+                    else Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                    );
+                  }
               }
             } else {
               setState(() {
