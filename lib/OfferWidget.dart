@@ -170,7 +170,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
           ),
           InkWell(
             child: Text(
-              "More Details",
+              "Offer Attachment",
               style: TextStyle(
                 color: Colors.blue,
                 fontSize: 16.0,
@@ -339,7 +339,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         ),
         ClickableButton(
             link: widget.offer.link,
-            text: 'More Details',
+            text: 'Offer Link',
             launchURL: _launchURL)
       ],
     );
