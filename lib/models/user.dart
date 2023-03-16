@@ -38,6 +38,7 @@ class User {
   bool isEmailVerified;
   String customClaim="";
   String gender;
+  int bookSwapPoints;
   List<String> scannerErgs=[];  // this attribute exists for qr code scanners, so that they can access their own list of events
   User({
     this.confirmed,
@@ -57,7 +58,8 @@ class User {
     this.pushNotificationToken,
     this.customClaim,
     this.scannerErgs,
-    this.gender
+    this.gender,
+    this.bookSwapPoints
   });
 
   User.fromJson(Map<String, dynamic> json) {
@@ -80,6 +82,7 @@ class User {
     customClaim = json['customClaim']?? "";
     gender = json['gender']?? "";
     scannerErgs = List<String>.from(json['ergs'] ?? []);
+    bookSwapPoints = json['bookSwapPoints']??0;
   }
 
   Map<String, dynamic> toJson() {
@@ -104,6 +107,7 @@ class User {
     data['customClaim']=this.customClaim;
     data['ergs']=this.scannerErgs;
     data['gender']=this.gender;
+    data['bookSwapPoints']=this.bookSwapPoints;
     return data;
   }
 
