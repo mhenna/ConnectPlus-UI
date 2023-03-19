@@ -17,6 +17,7 @@ class BookPost {
   String borrowerFullName;
   String borrowerEmail;
   String borrowerBU;
+  String postId;
 
   // Constructor
   BookPost({
@@ -35,49 +36,71 @@ class BookPost {
     @required this.borrowerEmail,
     @required this.borrowerFullName,
     @required this.borrowerBU,
+    this.postId,
   });
 
   // Deserialize JSON data into BookPost object
   factory BookPost.fromJson(Map<String, dynamic> json) {
     return BookPost(
-      postedAt: DateTime.parse(json['postedAt']),
-      postedByFullName: json['postedByFullName'],
-      postedByEmail: json['postedByEmail'],
-      postedById: json['postedById'],
-      postedByBU: json['postedByBU'],
-      bookName: json['bookName'],
-      bookPagesRange: json['bookPagesRange'],
-      bookCategory: json['bookCategory'],
-      bookDescription: json['bookDescription'],
-      postStatus: bookPostStatusValues.entries
-          .firstWhere((entry) => entry.value == json['postStatus'])
-          .key,
-      bookCoverUrl: json['bookCoverUrl'],
-      borrowerId:json['borrowerId'],
-      borrowerEmail: json['borrowerEmail'],
-      borrowerFullName: json['borrowerFullName'],
-      borrowerBU: json['borrowerBU']
-    );
+        postedAt: DateTime.parse(json['postedAt']),
+        postedByFullName: json['postedByFullName'],
+        postedByEmail: json['postedByEmail'],
+        postedById: json['postedById'],
+        postedByBU: json['postedByBU'],
+        bookName: json['bookName'],
+        bookPagesRange: json['bookPagesRange'],
+        bookCategory: json['bookCategory'],
+        bookDescription: json['bookDescription'],
+        postStatus: bookPostStatusValues.entries
+            .firstWhere((entry) => entry.value == json['postStatus'])
+            .key,
+        bookCoverUrl: json['bookCoverUrl'],
+        borrowerId: json['borrowerId'],
+        borrowerEmail: json['borrowerEmail'],
+        borrowerFullName: json['borrowerFullName'],
+        borrowerBU: json['borrowerBU'],
+        postId: json['postId']);
   }
 
   // Serialize BookPost object into JSON data
   Map<String, dynamic> toJson() {
-    return {
-      'postedAt': postedAt.toIso8601String(),
-      'postedByFullName': postedByFullName,
-      'postedByEmail': postedByEmail,
-      'postedById': postedById,
-      'postedByBU': postedByBU,
-      'bookName': bookName,
-      'bookPagesRange': bookPagesRange,
-      'bookCategory': bookCategory,
-      'bookDescription': bookDescription,
-      'postStatus': bookPostStatusValues[postStatus],
-      'bookCoverUrl': bookCoverUrl,
-      'borrowerId': borrowerId,
-      'borrowerFullName': borrowerFullName,
-      'borrowerEmail': borrowerEmail,
-      'borrowerBU': borrowerBU
-    };
+    if (postId != null)
+      return {
+        'postedAt': postedAt.toIso8601String(),
+        'postedByFullName': postedByFullName,
+        'postedByEmail': postedByEmail,
+        'postedById': postedById,
+        'postedByBU': postedByBU,
+        'bookName': bookName,
+        'bookPagesRange': bookPagesRange,
+        'bookCategory': bookCategory,
+        'bookDescription': bookDescription,
+        'postStatus': bookPostStatusValues[postStatus],
+        'bookCoverUrl': bookCoverUrl,
+        'borrowerId': borrowerId,
+        'borrowerFullName': borrowerFullName,
+        'borrowerEmail': borrowerEmail,
+        'borrowerBU': borrowerBU,
+        'postId': postId
+      };
+    else {
+      return {
+        'postedAt': postedAt.toIso8601String(),
+        'postedByFullName': postedByFullName,
+        'postedByEmail': postedByEmail,
+        'postedById': postedById,
+        'postedByBU': postedByBU,
+        'bookName': bookName,
+        'bookPagesRange': bookPagesRange,
+        'bookCategory': bookCategory,
+        'bookDescription': bookDescription,
+        'postStatus': bookPostStatusValues[postStatus],
+        'bookCoverUrl': bookCoverUrl,
+        'borrowerId': borrowerId,
+        'borrowerFullName': borrowerFullName,
+        'borrowerEmail': borrowerEmail,
+        'borrowerBU': borrowerBU,
+      };
+    }
   }
 }

@@ -13,7 +13,9 @@ class BookSwapServices {
             isEqualTo: bookPostStatusValues[BookPostStatus.approvedByAdmin])
         .orderBy("postedAt", descending: true)
         .get();
-    return snapshot.docs.map((doc) => BookPost.fromJson(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => BookPost.fromJson({...doc.data(), 'postId': doc.id}))
+        .toList();
   }
 
   Future<List<BookPost>> getPendingAdminApprovalPosts() async {
@@ -24,7 +26,9 @@ class BookSwapServices {
                 bookPostStatusValues[BookPostStatus.pendingAdminApproval])
         .orderBy("postedAt", descending: true)
         .get();
-    return snapshot.docs.map((doc) => BookPost.fromJson(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => BookPost.fromJson({...doc.data(), 'postId': doc.id}))
+        .toList();
   }
 
   Future<List<BookPost>> getUserPosts({String userId}) async {
@@ -33,7 +37,9 @@ class BookSwapServices {
         .where('postedById', isEqualTo: userId)
         .orderBy("postedAt", descending: true)
         .get();
-    return snapshot.docs.map((doc) => BookPost.fromJson(doc.data())).toList();
+    return snapshot.docs
+        .map((doc) => BookPost.fromJson({...doc.data(), 'postId': doc.id}))
+        .toList();
   }
 
   Future<List<BookRequest>> getBookRequests({String postId}) async {
@@ -46,7 +52,8 @@ class BookSwapServices {
         .orderBy('requestedAt', descending: true)
         .get();
     return snapshot.docs
-        .map((doc) => BookRequest.fromJson(doc.data()))
+        .map(
+            (doc) => BookRequest.fromJson({...doc.data(), 'requestId': doc.id}))
         .toList();
   }
 
@@ -57,7 +64,8 @@ class BookSwapServices {
         .orderBy('requestedAt', descending: true)
         .get();
     return snapshot.docs
-        .map((doc) => BookRequest.fromJson(doc.data()))
+        .map(
+            (doc) => BookRequest.fromJson({...doc.data(), 'requestId': doc.id}))
         .toList();
   }
 
