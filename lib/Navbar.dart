@@ -14,6 +14,7 @@ import 'package:connect_plus/login.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/Calendar.dart';
 import 'package:connect_plus/WireMagazines.dart';
+import 'package:connect_plus/BookSwapsHome.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:localstorage/localstorage.dart';
 
@@ -81,6 +82,16 @@ class NavDrawerState extends State<NavDrawer>
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => Offers()),
+              )
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.library_books),
+            title: Text('Book Swaps'),
+            onTap: () => {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => BookSwapsHome()),
               )
             },
           ),

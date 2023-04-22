@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect_plus/utils/enums.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class BookPost {
-  DateTime postedAt;
+  String postedAt;
   String postedByFullName;
   String postedByEmail;
   String postedById;
@@ -21,7 +23,7 @@ class BookPost {
 
   // Constructor
   BookPost({
-    @required this.postedAt,
+    this.postedAt,
     @required this.postedByFullName,
     @required this.postedByEmail,
     @required this.postedById,
@@ -42,7 +44,7 @@ class BookPost {
   // Deserialize JSON data into BookPost object
   factory BookPost.fromJson(Map<String, dynamic> json) {
     return BookPost(
-        postedAt: DateTime.parse(json['postedAt']),
+        postedAt: DateFormat('dd MMMM yyyy, hh:mm a').format(json['postedAt'].toDate()),
         postedByFullName: json['postedByFullName'],
         postedByEmail: json['postedByEmail'],
         postedById: json['postedById'],
@@ -66,7 +68,7 @@ class BookPost {
   Map<String, dynamic> toJson() {
     if (postId != null)
       return {
-        'postedAt': postedAt.toIso8601String(),
+        'postedAt': Timestamp.fromDate(DateTime.now()),
         'postedByFullName': postedByFullName,
         'postedByEmail': postedByEmail,
         'postedById': postedById,
@@ -85,7 +87,7 @@ class BookPost {
       };
     else {
       return {
-        'postedAt': postedAt.toIso8601String(),
+        'postedAt': Timestamp.fromDate(DateTime.now()),
         'postedByFullName': postedByFullName,
         'postedByEmail': postedByEmail,
         'postedById': postedById,

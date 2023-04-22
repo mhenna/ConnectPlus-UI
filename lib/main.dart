@@ -1,3 +1,4 @@
+import 'package:connect_plus/BookSwapsAdminHome.dart';
 import 'package:connect_plus/widgets/version_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -75,7 +76,9 @@ class _SplashState extends State<Splash> {
               );
             } else {
               if(snapshot.data.customClaim=='qrCodeScanner')
-                return QrCodeScannerHomeScreen(scannerErgs: snapshot.data.scannerErgs,);
+                return QrCodeScannerHomeScreen(scannerErgs: snapshot.data.scannerErgs);
+              else if(snapshot.data.customClaim=='bookSwapsAdmin')
+                return BookSwapsAdminHome();
               else {
                 if(snapshot.data.gender==null || snapshot.data.gender=="")
                   return GenderSelectScreen();

@@ -6,16 +6,25 @@ import 'package:connect_plus/utils/enums.dart';
 class BookSwapServices {
   FirebaseFirestore _fs = FirebaseFirestore.instance;
 
-  Future<List<BookPost>> getAvailablePosts() async {
+  Future<List<BookPost>> getAvailablePosts({currentUserId}) async {
     QuerySnapshot snapshot = await _fs
         .collection('book-posts')
         .where('postStatus',
             isEqualTo: bookPostStatusValues[BookPostStatus.approvedByAdmin])
         .orderBy("postedAt", descending: true)
         .get();
-    return snapshot.docs
+    List<BookRequest> currentUserRequests= await getUserRequests(userId: currentUserId);
+    Set<String> requestedBookIds=currentUserRequests.map((request) =>request.postId).toSet();
+    List<BookPost> allPosts= snapshot.docs
         .map((doc) => BookPost.fromJson({...doc.data(), 'postId': doc.id}))
         .toList();
+    List<BookPost> availablePosts=[];
+    for(BookPost post in allPosts)
+      {
+       if(!requestedBookIds.contains(post.postId) && post.postedById!=currentUserId)
+         availablePosts.add(post);
+      }
+    return availablePosts;
   }
 
   Future<List<BookPost>> getPendingAdminApprovalPosts() async {
@@ -73,11 +82,20 @@ class BookSwapServices {
     await _fs.collection('book-posts').add(post.toJson());
   }
 
+
+  Future<void> deleteBookPost({String postId}) async {
+    await _fs.collection('book-posts').doc(postId).delete();
+  }
+
+  Future<void> deleteBookRequest({String requestId}) async {
+    await _fs.collection('book-posts').doc(requestId).delete();
+  }
+
   Future<void> addBookRequest({BookRequest request}) async {
     await _fs.collection('book-requests').add(request.toJson());
   }
 
-  Future<void> updatePostStatus({String postId, String status}) async {
+  Future<void> updatePostStatus({String postId, BookPostStatus status}) async {
     DocumentReference ref = _fs.collection('book-posts').doc(postId);
 
     Map<String, dynamic> data = {
@@ -94,7 +112,6 @@ class BookSwapServices {
     Map<String, dynamic> data = {
       'requestStatus': bookRequestStatusValues[status],
     };
-
     await ref.update(data);
   }
 

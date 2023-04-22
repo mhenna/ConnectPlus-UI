@@ -6,6 +6,7 @@ enum BookPostStatus {
   handedOver,
   returned
 }
+
 final Map<BookPostStatus, String> bookPostStatusValues = {
   BookPostStatus.pendingAdminApproval: 'Pending Admin Approval',
   BookPostStatus.approvedByAdmin: 'Approved by Admin',
@@ -14,13 +15,15 @@ final Map<BookPostStatus, String> bookPostStatusValues = {
   BookPostStatus.handedOver: 'Handed Over to User',
   BookPostStatus.returned: 'Returned by User',
 };
-enum BookRequestStatus{
+
+enum BookRequestStatus {
   pendingUserApproval,
   rejectedByUser,
   acceptedByUser,
   received,
   returned
 }
+
 final Map<BookRequestStatus, String> bookRequestStatusValues = {
   BookRequestStatus.pendingUserApproval: 'Pending User Approval',
   BookRequestStatus.rejectedByUser: 'Rejected by User',

@@ -16,6 +16,7 @@ import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/ResetPassword.dart';
 import 'package:connect_plus/missingInformation.dart';
 
+import 'BookSwapsAdminHome.dart';
 import 'gender_select_screen.dart';
 
 class Login extends StatefulWidget {
@@ -162,6 +163,8 @@ class _LoginState extends State<Login> {
                     MaterialPageRoute(builder: (context) => QrCodeScannerHomeScreen(scannerErgs: user.scannerErgs,)),
                   );
                 }
+                else if(user.customClaim=='bookSwapsAdmin')
+                  return BookSwapsAdminHome();
                 else
                   {
                     if(user.gender==null || user.gender==""){

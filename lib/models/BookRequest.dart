@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connect_plus/utils/enums.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class BookRequest {
-  DateTime requestedAt;
+  String requestedAt;
   String requestedByFullName;
   String requestedByEmail;
   String requestedById;
@@ -17,11 +19,11 @@ class BookRequest {
   String postedByFullName;
   String postedById;
   String bookCoverUrl;
-  DateTime requestDuration;
+  String requestDuration;
   String requestId;
 
   BookRequest(
-      {@required this.requestedAt,
+      {this.requestedAt,
       @required this.requestedByFullName,
       @required this.requestedByEmail,
       @required this.requestedById,
@@ -41,7 +43,7 @@ class BookRequest {
 
   factory BookRequest.fromJson(Map<String, dynamic> json) {
     return BookRequest(
-        requestedAt: DateTime.parse(json['requestedAt']),
+        requestedAt: DateFormat('dd MMMM yyyy, hh:mm a').format(json['requestedAt'].toDate()),
         requestedByFullName: json['requestedByFullName'],
         requestedByEmail: json['requestedByEmail'],
         requestedById: json['requestedById'],
@@ -65,7 +67,7 @@ class BookRequest {
   Map<String, dynamic> toJson() {
     if (requestId != null)
       return {
-        'requestedAt': requestedAt.toIso8601String(),
+        'requestedAt': Timestamp.fromDate(DateTime.now()),
         'requestedByFullName': requestedByFullName,
         'requestedByEmail': requestedByEmail,
         'requestedById': requestedById,
@@ -80,12 +82,12 @@ class BookRequest {
         'postedByFullName': postedByFullName,
         'postedById': postedById,
         'bookCoverUrl': bookCoverUrl,
-        'requestDuration': requestDuration.toIso8601String(),
+        'requestDuration': requestDuration,
         'requestId': requestId
       };
     else {
       return {
-        'requestedAt': requestedAt.toIso8601String(),
+        'requestedAt': Timestamp.fromDate(DateTime.now()),
         'requestedByFullName': requestedByFullName,
         'requestedByEmail': requestedByEmail,
         'requestedById': requestedById,
@@ -100,7 +102,7 @@ class BookRequest {
         'postedByFullName': postedByFullName,
         'postedById': postedById,
         'bookCoverUrl': bookCoverUrl,
-        'requestDuration': requestDuration.toIso8601String(),
+        'requestDuration': requestDuration,
       };
     }
   }
