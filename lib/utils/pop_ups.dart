@@ -57,7 +57,7 @@ Future<void> showConfirmationPopUp(
         );
       },
     );
-    Navigator.pop(context);
+    //Navigator.pop(context);
   }
 }
 
@@ -94,5 +94,5 @@ Future<void> showAfterLoadingPopUp(
       );
     },
   );
-  Navigator.pop(context);
+  //Navigator.pop(context);
 }

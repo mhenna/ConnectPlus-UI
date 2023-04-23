@@ -6,17 +6,17 @@ import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/material.dart';
 import 'BookPostInfoScreen.dart';
-import 'PostBookScreen.dart';
+import 'BookSwapsPostBook.dart';
 import 'models/BookPost.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:connect_plus/injection_container.dart';
 
-class BookSwapsHome extends StatefulWidget {
+class BookSwapsAvailablePosts extends StatefulWidget {
   @override
-  _BookSwapsHomeState createState() => _BookSwapsHomeState();
+  _BookSwapsAvailablePostsState createState() => _BookSwapsAvailablePostsState();
 }
 
-class _BookSwapsHomeState extends State<BookSwapsHome> {
+class _BookSwapsAvailablePostsState extends State<BookSwapsAvailablePosts> {
   List<BookPost> _bookPosts;
   User currentUser;
 
@@ -53,22 +53,6 @@ class _BookSwapsHomeState extends State<BookSwapsHome> {
       );
     } else {
       return Scaffold(
-        appBar: AppBar(
-          title: Text('Available Book Posts'),
-          backgroundColor: Utils.header,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Utils.secondaryColor,
-                  Utils.primaryColor,
-                ],
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-              ),
-            ),
-          ),
-        ),
         body: _bookPosts.isEmpty
             ? Center(child: Text('No Available Posts'))
             : GridView.count(
@@ -88,7 +72,7 @@ class _BookSwapsHomeState extends State<BookSwapsHome> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => PostBookScreen(
+                builder: (context) => BookSwapsPostBook(
                   currentUser: currentUser,
                 ),
               ),

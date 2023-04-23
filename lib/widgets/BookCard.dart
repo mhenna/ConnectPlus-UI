@@ -40,7 +40,7 @@ class BookCard extends StatelessWidget {
           ),
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 4.0, vertical: 15.0),
+            const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15.0),
             child: Column(
               children: [
                 Expanded(
@@ -62,13 +62,18 @@ class BookCard extends StatelessWidget {
                 SizedBox(height: 8.0),
                 Text(
                   bookName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
+
                   ),
                 ),
                 SizedBox(height: 8.0),
                 Text(
                   bookInfoText,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

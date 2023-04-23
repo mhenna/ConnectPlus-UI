@@ -1,84 +1,59 @@
+import 'package:connect_plus/BookSwapsMain.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
 import 'package:connect_plus/utils/enums.dart';
+import 'package:connect_plus/utils/lists.dart';
 import 'package:connect_plus/utils/pop_ups.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'BookSwapsAdminHome.dart';
-import 'BookSwapsHome.dart';
+import 'BookSwapsAvailablePosts.dart';
 import 'models/BookPost.dart';
 import 'models/BookRequest.dart';
 import 'models/user.dart';
 
-class BookPostInfoScreen extends StatelessWidget {
+class BookPostInfoScreen extends StatefulWidget {
   final BookPost bookPost;
   final User currentUser;
-  final BookSwapServices _bookSwapServices = new BookSwapServices();
 
   BookPostInfoScreen(
       {Key key, @required this.bookPost, @required this.currentUser})
       : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    _requestBook() {
-      showConfirmationPopUp(
-          context: context,
-          message: "Are you sure you want to request this book?",
-          successMessage:
-              "Book Requested Successfully. You will receive an email notification once ${bookPost.postedByFullName} accepts your request.",
-          successMessageTitle: "Book Requested Successfully",
-          onConfirmed: () async {
-            await _bookSwapServices.addBookRequest(
-                request: BookRequest(
-                    postId: bookPost.postId,
-                    bookName: bookPost.bookName,
-                    requestedById: currentUser.id,
-                    bookCategory: bookPost.bookCategory,
-                    requestDuration: "3 Weeks",
-                    bookDescription: bookPost.bookDescription,
-                    bookPagesRange: bookPost.bookPagesRange,
-                    postedById: bookPost.postedById,
-                    requestStatus: BookRequestStatus.pendingUserApproval,
-                    requestedByFullName: currentUser.username,
-                    requestedByBU: currentUser.businessUnit,
-                    requestedByEmail: currentUser.email,
-                    bookCoverUrl: bookPost.bookCoverUrl,
-                    postedByFullName: bookPost.postedByFullName,
-                    postedByEmail: bookPost.postedByEmail));
-          },
-          afterSuccess: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => BookSwapsHome()),
-            );
-          });
-    }
+  _BookPostInfoScreenState createState() => _BookPostInfoScreenState();
+}
 
-    _deletePost(){
+class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
+  final BookSwapServices _bookSwapServices = new BookSwapServices();
+  String _requestDuration = bookRentDurations[0]; // default value
+
+  @override
+  Widget build(BuildContext context) {
+    _deletePost() {
       showConfirmationPopUp(
           context: context,
-          message:
-          "Are you sure you want to delete this post?",
-          successMessage: "${bookPost.bookName} Deleted Successfully.",
+          message: "Are you sure you want to delete this post?",
+          successMessage: "${widget.bookPost.bookName} Deleted Successfully.",
           successMessageTitle: "Post Deleted Successfully",
           onConfirmed: () async {
             await _bookSwapServices.deleteBookPost(
-                postId: bookPost.postId);
+                postId: widget.bookPost.postId);
           },
           afterSuccess: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => BookSwapsHome()),
+              MaterialPageRoute(
+                  builder: (context) => BookSwapsMain(selectedIndex: 1)),
             );
           });
     }
 
-    _viewRequests(){
+    _viewRequests() {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => BookSwapsHome()),
+        MaterialPageRoute(builder: (context) => BookSwapsAvailablePosts()),
       );
     }
 
@@ -86,12 +61,12 @@ class BookPostInfoScreen extends StatelessWidget {
       showConfirmationPopUp(
           context: context,
           message:
-              "Are you sure you approve ${bookPost.postedByFullName}'s book?",
-          successMessage: "${bookPost.bookName} Approved Successfully.",
+              "Are you sure you approve ${widget.bookPost.postedByFullName}'s book?",
+          successMessage: "${widget.bookPost.bookName} Approved Successfully.",
           successMessageTitle: "Book Approved Successfully",
           onConfirmed: () async {
             await _bookSwapServices.updatePostStatus(
-                postId: bookPost.postId,
+                postId: widget.bookPost.postId,
                 status: BookPostStatus.approvedByAdmin);
           },
           afterSuccess: () {
@@ -107,11 +82,11 @@ class BookPostInfoScreen extends StatelessWidget {
           successMessageTitle: "Book Rejected Successfully",
           context: context,
           message:
-              "Are you sure you reject ${bookPost.postedByFullName}'s book?",
-          successMessage: "${bookPost.bookName} Rejected Successfully.",
+              "Are you sure you reject ${widget.bookPost.postedByFullName}'s book?",
+          successMessage: "${widget.bookPost.bookName} Rejected Successfully.",
           onConfirmed: () async {
             await _bookSwapServices.updatePostStatus(
-                postId: bookPost.postId,
+                postId: widget.bookPost.postId,
                 status: BookPostStatus.approvedByAdmin);
           },
           afterSuccess: () {
@@ -122,9 +97,87 @@ class BookPostInfoScreen extends StatelessWidget {
           });
     }
 
+    _requestBook() async {
+      await showAfterLoadingPopUp(
+          context: context,
+          successMessage:
+              "Book Requested Successfully. You will receive an email notification once ${widget.bookPost.postedByFullName} accepts your request.",
+          successMessageTitle: "Book Requested Successfully",
+          loadingFunction: () async {
+            await _bookSwapServices.addBookRequest(
+                request: BookRequest(
+                    postId: widget.bookPost.postId,
+                    bookName: widget.bookPost.bookName,
+                    requestedById: widget.currentUser.id,
+                    bookCategory: widget.bookPost.bookCategory,
+                    requestDuration: _requestDuration,
+                    bookDescription: widget.bookPost.bookDescription,
+                    bookPagesRange: widget.bookPost.bookPagesRange,
+                    postedById: widget.bookPost.postedById,
+                    requestStatus: BookRequestStatus.pendingUserApproval,
+                    requestedByFullName: widget.currentUser.username,
+                    requestedByBU: widget.currentUser.businessUnit,
+                    requestedByEmail: widget.currentUser.email,
+                    bookCoverUrl: widget.bookPost.bookCoverUrl,
+                    postedByFullName: widget.bookPost.postedByFullName,
+                    postedByEmail: widget.bookPost.postedByEmail));
+          },
+          afterSuccess: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BookSwapsMain(selectedIndex: 2)),
+            );
+          });
+    }
+
+    _askForDuration() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Preferred Rental Duration:'),
+            content: DropdownButtonFormField<String>(
+              value: _requestDuration,
+              icon: Icon(Icons.arrow_drop_down),
+              onSaved: (String newValue) {
+                setState(() {
+                  _requestDuration = newValue;
+                });
+              },
+              onChanged: (String newValue) {
+                setState(() {
+                  _requestDuration = newValue;
+                });
+              },
+              items: bookRentDurations
+                  .map<DropdownMenuItem<String>>((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Confirm'),
+                onPressed: _requestBook,
+              ),
+            ],
+          );
+        },
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Book Information'),
+        title: Text('Book Post Information'),
         backgroundColor: Utils.header,
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -146,13 +199,13 @@ class BookPostInfoScreen extends StatelessWidget {
           children: [
             Center(
               child: Image.network(
-                bookPost.bookCoverUrl,
+                widget.bookPost.bookCoverUrl,
                 fit: BoxFit.cover,
                 height: 300.0,
               ),
             ),
             SizedBox(height: 25.0),
-            if (bookPost.postedById == currentUser.id)
+            if (widget.bookPost.postedById == widget.currentUser.id)
               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
                   'Book Status:',
@@ -163,7 +216,7 @@ class BookPostInfoScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  bookPostStatusValues[bookPost.postStatus],
+                  bookPostStatusValues[widget.bookPost.postStatus],
                   style: TextStyle(fontSize: 16.0),
                 ),
                 SizedBox(height: 16.0),
@@ -177,7 +230,7 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              bookPost.bookName,
+              widget.bookPost.bookName,
               style: TextStyle(fontSize: 16.0),
             ),
             SizedBox(height: 16.0),
@@ -190,7 +243,7 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              bookPost.bookPagesRange,
+              widget.bookPost.bookPagesRange,
               style: TextStyle(fontSize: 16.0),
             ),
             SizedBox(height: 16.0),
@@ -203,7 +256,7 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              bookPost.bookCategory,
+              widget.bookPost.bookCategory,
               style: TextStyle(fontSize: 16.0),
             ),
             SizedBox(height: 16.0),
@@ -216,7 +269,7 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              bookPost.bookDescription,
+              widget.bookPost.bookDescription,
               style: TextStyle(fontSize: 16.0),
             ),
             SizedBox(height: 16.0),
@@ -229,10 +282,10 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              '${bookPost.postedByFullName} (${bookPost.postedByBU} BU)',
+              '${widget.bookPost.postedByFullName} (${widget.bookPost.postedByBU} BU)',
               style: TextStyle(fontSize: 16.0),
             ),
-            SizedBox(height: 16.0),
+            SizedBox(height: 8.0),
             Text(
               'Posted At:',
               style: TextStyle(
@@ -242,10 +295,10 @@ class BookPostInfoScreen extends StatelessWidget {
             ),
             SizedBox(height: 8.0),
             Text(
-              bookPost.postedAt,
+              widget.bookPost.postedAt,
               style: TextStyle(fontSize: 16.0),
             ),
-            if (currentUser.customClaim == "bookSwapsAdmin")
+            if (widget.currentUser.customClaim == "bookSwapsAdmin")
               Padding(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 30.0, vertical: 15),
@@ -257,23 +310,23 @@ class BookPostInfoScreen extends StatelessWidget {
                   ],
                 ),
               )
-            else if (bookPost.postedById == currentUser.id)
+            else if (widget.bookPost.postedById == widget.currentUser.id)
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 15),
+                padding: const EdgeInsets.symmetric(vertical: 15),
                 child: Center(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      if (bookPost.postStatus != BookPostStatus.rejectedByAdmin &&
-                          bookPost.postStatus !=
+                      if (widget.bookPost.postStatus !=
+                              BookPostStatus.rejectedByAdmin &&
+                          widget.bookPost.postStatus !=
                               BookPostStatus.pendingAdminApproval)
                         AppButton(
-                            title: "View Requests",
-                            onPress: _viewRequests),
-                      SizedBox(height: 10,),
-                      AppButton(
-                          title: "Delete Post", onPress: _deletePost)
+                            title: "View Requests", onPress: _viewRequests),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      AppButton(title: "Delete Post", onPress: _deletePost)
                     ],
                   ),
                 ),
@@ -282,7 +335,8 @@ class BookPostInfoScreen extends StatelessWidget {
               Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Center(
-                    child: AppButton(title: "Request", onPress: _requestBook),
+                    child:
+                        AppButton(title: "Request", onPress: _askForDuration),
                   ))
           ],
         ),

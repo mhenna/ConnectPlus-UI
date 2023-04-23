@@ -1,4 +1,6 @@
 import 'package:connect_plus/Activities.dart';
+import 'package:connect_plus/BookSwapsMain.dart';
+import 'package:connect_plus/BookSwapsMyRequests.dart';
 import 'package:connect_plus/aboutus.dart';
 import 'package:connect_plus/announcements.dart';
 import 'package:connect_plus/events.dart';
@@ -14,9 +16,11 @@ import 'package:connect_plus/login.dart';
 import 'package:connect_plus/Offers.dart';
 import 'package:connect_plus/Calendar.dart';
 import 'package:connect_plus/WireMagazines.dart';
-import 'package:connect_plus/BookSwapsHome.dart';
+import 'package:connect_plus/BookSwapsAvailablePosts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:localstorage/localstorage.dart';
+
+import 'BookSwapsMyPosts.dart';
 
 class NavDrawer extends StatefulWidget {
   NavDrawer({Key key, this.title}) : super(key: key);
@@ -91,7 +95,7 @@ class NavDrawerState extends State<NavDrawer>
             onTap: () => {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => BookSwapsHome()),
+                MaterialPageRoute(builder: (context) => BookSwapsMain()),
               )
             },
           ),

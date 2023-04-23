@@ -1,0 +1,97 @@
+import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/widgets/Utils.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+import 'BookSwapsAvailablePosts.dart';
+import 'BookSwapsMyPosts.dart';
+import 'BookSwapsMyRequests.dart';
+
+import 'package:flutter/material.dart';
+
+class BookSwapsMain extends StatefulWidget {
+  final int selectedIndex;
+
+  const BookSwapsMain({Key key, this.selectedIndex = 0}) : super(key: key);
+
+  @override
+  _BookSwapsMainState createState() => _BookSwapsMainState();
+}
+
+class _BookSwapsMainState extends State<BookSwapsMain> {
+  int _selectedIndex;
+
+  static List<Widget> _widgetOptions = <Widget>[
+    BookSwapsAvailablePosts(),
+    BookSwapsMyPosts(),
+    BookSwapsMyRequests(),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.selectedIndex;
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      drawer: NavDrawer(),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Book Swaps'),
+        backgroundColor: Utils.header,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Utils.secondaryColor,
+                Utils.primaryColor,
+              ],
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+            ),
+          ),
+        ),
+      ),
+      body: Center(
+        child: _widgetOptions.elementAt(_selectedIndex),
+      ),
+      bottomNavigationBar: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        child: BottomNavigationBar(
+          backgroundColor: Color(0xFFE0E0E0),
+          selectedItemColor: Utils.secondaryColor,
+          unselectedItemColor: Colors.black,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.menu_book),
+              label: 'Available Books',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.post_add),
+              label: 'My Posts',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.question_answer),
+              label: 'My Requests',
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

@@ -88,7 +88,7 @@ class BookSwapServices {
   }
 
   Future<void> deleteBookRequest({String requestId}) async {
-    await _fs.collection('book-posts').doc(requestId).delete();
+    await _fs.collection('book-requests').doc(requestId).delete();
   }
 
   Future<void> addBookRequest({BookRequest request}) async {

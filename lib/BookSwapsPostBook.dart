@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:connect_plus/BookSwapsMain.dart';
+import 'package:connect_plus/BookSwapsMyPosts.dart';
 import 'package:connect_plus/models/BookPost.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
 import 'package:connect_plus/services/storage_services.dart';
@@ -11,19 +13,19 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'BookSwapsHome.dart';
+import 'BookSwapsAvailablePosts.dart';
 import 'models/user.dart';
 
-class PostBookScreen extends StatefulWidget {
+class BookSwapsPostBook extends StatefulWidget {
   final User currentUser;
 
-  const PostBookScreen({Key key, @required this.currentUser}) : super(key: key);
+  const BookSwapsPostBook({Key key, @required this.currentUser}) : super(key: key);
 
   @override
-  _PostBookScreenState createState() => _PostBookScreenState(this.currentUser);
+  _BookSwapsPostBookState createState() => _BookSwapsPostBookState(this.currentUser);
 }
 
-class _PostBookScreenState extends State<PostBookScreen> {
+class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
   final _formKey = GlobalKey<FormState>();
   String _bookTitle = '';
   String _bookCategory;
@@ -34,27 +36,27 @@ class _PostBookScreenState extends State<PostBookScreen> {
   bool _bookImageNotSubmitted = false;
   final User currentUser;
 
-  _PostBookScreenState(this.currentUser);
+  _BookSwapsPostBookState(this.currentUser);
 
   Future<void> _pickImage() async {
     final pickedImage =
         await ImagePicker().getImage(source: ImageSource.gallery);
 
     setState(() {
-       _bookImageNotSubmitted = false;
+      _bookImageNotSubmitted = false;
       _bookImage = File(pickedImage.path);
     });
   }
-  void _showMessage(String message){
+
+  void _showMessage(String message) {
     Fluttertoast.showToast(
         msg: message,
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 7,
+        timeInSecForIosWeb: 3,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        fontSize: 16.0
-    );
+        fontSize: 16.0);
   }
 
   _addBookPost() async {
@@ -65,35 +67,38 @@ class _PostBookScreenState extends State<PostBookScreen> {
     }
     if (_formKey.currentState.validate()) {
       _formKey.currentState.save();
-      if (!_bookImageNotSubmitted) {
+      if (_bookImageNotSubmitted) {
+        _showMessage("Please upload a book cover");
+      } else {
         showAfterLoadingPopUp(
-            context: context,
-            loadingFunction: () async {
-              String bookCoverUrl =
-                  await uploadImageToFirebase('book-posts', _bookImage);
-              BookPost bookPost = new BookPost(
-                  postedByFullName: currentUser.username,
-                  postedByEmail: currentUser.email,
-                  postedById: currentUser.id,
-                  postedByBU: currentUser.businessUnit,
-                  bookName: _bookTitle,
-                  bookPagesRange: _bookPagesRange,
-                  bookCategory: _bookCategory,
-                  bookDescription: _bookDescription,
-                  postStatus: BookPostStatus.pendingAdminApproval,
-                  bookCoverUrl: bookCoverUrl,
-                  borrowerId: "",
-                  borrowerEmail: "",
-                  borrowerFullName: "",
-                  borrowerBU: "");
-              await _bookSwapServices.addBookPost(post: bookPost);
-            },
+          context: context,
+          loadingFunction: () async {
+            String bookCoverUrl =
+                await uploadImageToFirebase('book-posts', _bookImage);
+            BookPost bookPost = new BookPost(
+                postedByFullName: currentUser.username,
+                postedByEmail: currentUser.email,
+                postedById: currentUser.id,
+                postedByBU: currentUser.businessUnit,
+                bookName: _bookTitle,
+                bookPagesRange: _bookPagesRange,
+                bookCategory: _bookCategory,
+                bookDescription: _bookDescription,
+                postStatus: BookPostStatus.pendingAdminApproval,
+                bookCoverUrl: bookCoverUrl,
+                borrowerId: "",
+                borrowerEmail: "",
+                borrowerFullName: "",
+                borrowerBU: "");
+            await _bookSwapServices.addBookPost(post: bookPost);
+          },
           successMessageTitle: "Book Posted Successfully",
-          successMessage: "Your book has been uploaded successfully. You will be notified once the admin approves your post.",
-          afterSuccess: (){
+          successMessage:
+              "Your book has been uploaded successfully. You will be notified once the admin approves your post.",
+          afterSuccess: () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (context) => BookSwapsHome()),
+              MaterialPageRoute(builder: (context) => BookSwapsMain(selectedIndex: 1)),
             );
           },
         );
