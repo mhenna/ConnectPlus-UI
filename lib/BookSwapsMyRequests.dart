@@ -66,7 +66,7 @@ class _BookSwapsMyRequestsState extends State<BookSwapsMyRequests> {
                   return BookCard(
                       bookCoverUrl: bookRequest.bookCoverUrl,
                       bookInfoText:
-                          'Status: ${bookRequestStatusValues[bookRequest.requestStatus]}',
+                          'Status: ${bookRequest.getRequestStatusString()}',
                       bookName: bookRequest.bookName,
                       onTap: () => _navigateToRequestInfo(bookRequest));
                 }),

@@ -1,25 +1,39 @@
 import "dart:ui";
+import 'package:connect_plus/models/BookPost.dart';
+import 'package:connect_plus/utils/enums.dart';
+import 'package:connect_plus/widgets/app_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
+import '../BookSwapsViewRequests.dart';
 
 class BookCard extends StatelessWidget {
   final String bookCoverUrl;
   final VoidCallback onTap;
   final String bookInfoText;
   final String bookName;
+  final BookPost bookPost;
 
   const BookCard({
     Key key,
     @required this.bookCoverUrl,
     @required this.bookInfoText,
     @required this.bookName,
-    this.onTap,
+    @required this.onTap,
+    this.bookPost,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
+    _viewRequests() {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => BookSwapsViewRequests(bookPost: bookPost)),
+      );
+    }
 
     return GestureDetector(
       onTap: onTap,
@@ -40,7 +54,7 @@ class BookCard extends StatelessWidget {
           ),
           child: Padding(
             padding:
-            const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15.0),
+                const EdgeInsets.symmetric(horizontal: 8.0, vertical: 15.0),
             child: Column(
               children: [
                 Expanded(
@@ -66,7 +80,6 @@ class BookCard extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-
                   ),
                 ),
                 SizedBox(height: 8.0),
@@ -75,6 +88,14 @@ class BookCard extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
+                if (bookPost != null &&
+                    bookPost.postStatus != BookPostStatus.rejectedByAdmin &&
+                    bookPost.postStatus != BookPostStatus.pendingAdminApproval)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0, bottom: 5.0),
+                    child: AppButton(
+                        title: 'View Requests', onPress: _viewRequests),
+                  )
               ],
             ),
           ),

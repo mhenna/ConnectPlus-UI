@@ -15,10 +15,7 @@ class BookPost {
   String bookDescription;
   BookPostStatus postStatus;
   String bookCoverUrl;
-  String borrowerId;
   String borrowerFullName;
-  String borrowerEmail;
-  String borrowerBU;
   String postId;
 
   // Constructor
@@ -34,17 +31,15 @@ class BookPost {
     @required this.bookDescription,
     @required this.postStatus,
     @required this.bookCoverUrl,
-    @required this.borrowerId,
-    @required this.borrowerEmail,
     @required this.borrowerFullName,
-    @required this.borrowerBU,
     this.postId,
   });
 
   // Deserialize JSON data into BookPost object
   factory BookPost.fromJson(Map<String, dynamic> json) {
     return BookPost(
-        postedAt: DateFormat('dd MMMM yyyy, hh:mm a').format(json['postedAt'].toDate()),
+        postedAt: DateFormat('dd MMMM yyyy, hh:mm a')
+            .format(json['postedAt'].toDate()),
         postedByFullName: json['postedByFullName'],
         postedByEmail: json['postedByEmail'],
         postedById: json['postedById'],
@@ -57,10 +52,7 @@ class BookPost {
             .firstWhere((entry) => entry.value == json['postStatus'])
             .key,
         bookCoverUrl: json['bookCoverUrl'],
-        borrowerId: json['borrowerId'],
-        borrowerEmail: json['borrowerEmail'],
         borrowerFullName: json['borrowerFullName'],
-        borrowerBU: json['borrowerBU'],
         postId: json['postId']);
   }
 
@@ -79,10 +71,7 @@ class BookPost {
         'bookDescription': bookDescription,
         'postStatus': bookPostStatusValues[postStatus],
         'bookCoverUrl': bookCoverUrl,
-        'borrowerId': borrowerId,
         'borrowerFullName': borrowerFullName,
-        'borrowerEmail': borrowerEmail,
-        'borrowerBU': borrowerBU,
         'postId': postId
       };
     else {
@@ -98,11 +87,17 @@ class BookPost {
         'bookDescription': bookDescription,
         'postStatus': bookPostStatusValues[postStatus],
         'bookCoverUrl': bookCoverUrl,
-        'borrowerId': borrowerId,
         'borrowerFullName': borrowerFullName,
-        'borrowerEmail': borrowerEmail,
-        'borrowerBU': borrowerBU,
       };
     }
+  }
+
+  String getPostStatusString() {
+    if (this.postStatus == BookPostStatus.requestAccepted)
+      return bookPostStatusValues[this.postStatus]
+          .replaceAll("User", "${this.borrowerFullName}'s");
+    else
+      return bookPostStatusValues[this.postStatus]
+          .replaceAll("User", this.borrowerFullName);
   }
 }

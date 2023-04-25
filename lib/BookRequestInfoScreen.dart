@@ -41,6 +41,29 @@ class BookRequestInfoScreen extends StatelessWidget {
           });
     }
 
+    _confirmReceived() {
+      showConfirmationPopUp(
+          context: context,
+          message:
+              "Are you sure you want to confirm that you have received this book from ${bookRequest.postedByFullName}?",
+          successMessage:
+              "Thank you for confirming that you've received this book. Enjoy!",
+          successMessageTitle: "Book Marked as Received Successfully",
+          onConfirmed: () async {
+            await _bookSwapServices.updateRequestStatus(
+                requestId: bookRequest.requestId,
+                status: BookRequestStatus.received);
+            await _bookSwapServices.updatePostStatus(postId: bookRequest.postId,status: BookPostStatus.handedOver);
+          },
+          afterSuccess: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BookSwapsMain(selectedIndex: 2)),
+            );
+          });
+    }
+
     return Scaffold(
         appBar: AppBar(
           title: Text('Book Request Information'),
@@ -79,7 +102,7 @@ class BookRequestInfoScreen extends StatelessWidget {
               ),
               SizedBox(height: 8.0),
               Text(
-                '${bookRequestStatusValues[bookRequest.requestStatus]}',
+                bookRequest.getRequestStatusString(),
                 style: TextStyle(fontSize: 18.0),
               ),
               SizedBox(height: 16.0),
@@ -186,6 +209,16 @@ class BookRequestInfoScreen extends StatelessWidget {
                 '${bookRequest.requestDuration}',
                 style: TextStyle(fontSize: 18.0),
               ),
+              if (bookRequest.requestStatus == BookRequestStatus.acceptedByUser)
+                Padding(
+                  padding: const EdgeInsets.only(top:15.0),
+                  child: Center(
+                    child: AppButton(
+                      onPress: _confirmReceived,
+                      title: 'Mark Book as Received',
+                    ),
+                  ),
+                ),
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Center(

@@ -62,8 +62,9 @@ class _BookSwapsMyPostsState extends State<BookSwapsMyPosts> {
             BookPost bookPost = _bookPosts[index];
             return BookCard(
                 bookCoverUrl: bookPost.bookCoverUrl,
-                bookInfoText: 'Status: ${bookPostStatusValues[bookPost.postStatus]}',
+                bookInfoText: 'Status: ${bookPost.getPostStatusString()}',
                 bookName: bookPost.bookName,
+                bookPost: bookPost,
                 onTap: () => _navigateToPostInfo(bookPost));
           }),
         ),

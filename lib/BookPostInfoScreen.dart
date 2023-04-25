@@ -1,4 +1,5 @@
 import 'package:connect_plus/BookSwapsMain.dart';
+import 'package:connect_plus/BookSwapsViewRequests.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
 import 'package:connect_plus/utils/enums.dart';
 import 'package:connect_plus/utils/lists.dart';
@@ -53,7 +54,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
     _viewRequests() {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => BookSwapsAvailablePosts()),
+        MaterialPageRoute(builder: (context) => BookSwapsViewRequests(bookPost: widget.bookPost)),
       );
     }
 
@@ -216,7 +217,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  bookPostStatusValues[widget.bookPost.postStatus],
+                 widget.bookPost.getPostStatusString(),
                   style: TextStyle(fontSize: 16.0),
                 ),
                 SizedBox(height: 16.0),
@@ -326,7 +327,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                      AppButton(title: "Delete Post", onPress: _deletePost)
+                        AppButton(title: "Delete Post", onPress: _deletePost)
                     ],
                   ),
                 ),

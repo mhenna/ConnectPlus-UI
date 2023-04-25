@@ -86,10 +86,8 @@ class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
                 bookDescription: _bookDescription,
                 postStatus: BookPostStatus.pendingAdminApproval,
                 bookCoverUrl: bookCoverUrl,
-                borrowerId: "",
-                borrowerEmail: "",
                 borrowerFullName: "",
-                borrowerBU: "");
+               );
             await _bookSwapServices.addBookPost(post: bookPost);
           },
           successMessageTitle: "Book Posted Successfully",

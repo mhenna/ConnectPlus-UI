@@ -1,4 +1,5 @@
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +9,9 @@ import 'BookSwapsMyPosts.dart';
 import 'BookSwapsMyRequests.dart';
 
 import 'package:flutter/material.dart';
+
+import 'injection_container.dart';
+import 'models/user.dart';
 
 class BookSwapsMain extends StatefulWidget {
   final int selectedIndex;
@@ -61,7 +65,50 @@ class _BookSwapsMainState extends State<BookSwapsMain> {
         ),
       ),
       body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 1,
+              child: FutureBuilder(
+                future: sl<AuthService>().getUser(),
+                builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Center(child: CircularProgressIndicator()),
+                        ],
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else {
+                    int points = snapshot.data.bookSwapPoints;
+                    return Container(
+                      color: Colors.transparent,
+                      child: Padding(
+                        padding: EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text('My Points: $points',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            Expanded(flex: 12, child: _widgetOptions.elementAt(_selectedIndex)),
+          ],
+        ),
       ),
       bottomNavigationBar: ClipRRect(
         borderRadius: BorderRadius.only(

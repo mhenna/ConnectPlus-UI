@@ -9,21 +9,24 @@ class BookSwapServices {
   Future<List<BookPost>> getAvailablePosts({currentUserId}) async {
     QuerySnapshot snapshot = await _fs
         .collection('book-posts')
-        .where('postStatus',
-            isEqualTo: bookPostStatusValues[BookPostStatus.approvedByAdmin])
+        .where('postStatus', whereIn: [
+          bookPostStatusValues[BookPostStatus.approvedByAdmin],
+          bookPostStatusValues[BookPostStatus.returned]
+        ])
         .orderBy("postedAt", descending: true)
         .get();
-    List<BookRequest> currentUserRequests= await getUserRequests(userId: currentUserId);
-    Set<String> requestedBookIds=currentUserRequests.map((request) =>request.postId).toSet();
-    List<BookPost> allPosts= snapshot.docs
+    List<BookRequest> currentUserRequests =
+        await getUserRequests(userId: currentUserId);
+    Set<String> requestedBookIds =
+        currentUserRequests.map((request) => request.postId).toSet();
+    List<BookPost> allPosts = snapshot.docs
         .map((doc) => BookPost.fromJson({...doc.data(), 'postId': doc.id}))
         .toList();
-    List<BookPost> availablePosts=[];
-    for(BookPost post in allPosts)
-      {
-       if(!requestedBookIds.contains(post.postId) && post.postedById!=currentUserId)
-         availablePosts.add(post);
-      }
+    List<BookPost> availablePosts = [];
+    for (BookPost post in allPosts) {
+      if (!requestedBookIds.contains(post.postId) &&
+          post.postedById != currentUserId) availablePosts.add(post);
+    }
     return availablePosts;
   }
 
@@ -55,15 +58,19 @@ class BookSwapServices {
     QuerySnapshot snapshot = await _fs
         .collection('book-requests')
         .where('postId', isEqualTo: postId)
-        .where('requestStatus',
-            isNotEqualTo:
-                bookRequestStatusValues[BookRequestStatus.rejectedByUser])
         .orderBy('requestedAt', descending: true)
         .get();
-    return snapshot.docs
+    List<BookRequest> allRequests=snapshot.docs
         .map(
             (doc) => BookRequest.fromJson({...doc.data(), 'requestId': doc.id}))
         .toList();
+    List<BookRequest> nonExpiredRequests=[];
+    for (BookRequest request in allRequests) {
+      if (request.requestStatus!= BookRequestStatus.returned)
+          nonExpiredRequests.add(request);
+    }
+    return nonExpiredRequests;
+
   }
 
   Future<List<BookRequest>> getUserRequests({String userId}) async {
@@ -82,6 +89,12 @@ class BookSwapServices {
     await _fs.collection('book-posts').add(post.toJson());
   }
 
+  Future<void> updateBookBorrowerName({postId, borrowerFullName}) async {
+    await _fs
+        .collection('book-posts')
+        .doc(postId)
+        .update({"borrowerFullName": borrowerFullName});
+  }
 
   Future<void> deleteBookPost({String postId}) async {
     await _fs.collection('book-posts').doc(postId).delete();

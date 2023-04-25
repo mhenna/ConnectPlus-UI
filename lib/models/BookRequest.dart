@@ -43,7 +43,8 @@ class BookRequest {
 
   factory BookRequest.fromJson(Map<String, dynamic> json) {
     return BookRequest(
-        requestedAt: DateFormat('dd MMMM yyyy, hh:mm a').format(json['requestedAt'].toDate()),
+        requestedAt: DateFormat('dd MMMM yyyy, hh:mm a')
+            .format(json['requestedAt'].toDate()),
         requestedByFullName: json['requestedByFullName'],
         requestedByEmail: json['requestedByEmail'],
         requestedById: json['requestedById'],
@@ -105,5 +106,14 @@ class BookRequest {
         'requestDuration': requestDuration,
       };
     }
+  }
+
+  String getRequestStatusString() {
+    if (this.requestStatus == BookRequestStatus.pendingUserApproval)
+      return bookRequestStatusValues[this.requestStatus]
+          .replaceAll("User", "${this.postedByFullName}'s");
+    else
+      return bookRequestStatusValues[this.requestStatus]
+          .replaceAll("User", this.postedByFullName);
   }
 }
