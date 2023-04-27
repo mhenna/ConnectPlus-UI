@@ -162,7 +162,7 @@ class BookSwapsViewRequests extends StatelessWidget {
                             Text(
                                 "Rent Duration: ${bookRequest.requestDuration}"),
                             SizedBox(height: 3),
-                            Text(bookRequest.postedByEmail),
+                            Text(bookRequest.requestedByEmail),
                           ],
                         ),
                         trailing: isBookAvailable
