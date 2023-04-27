@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:connect_plus/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirestoreServices {
@@ -30,10 +31,17 @@ class FirestoreServices {
     return false;
   }
 
+
   Future<String> getUsername(String uid) async {
     var collectionRef = _fs.collection('users');
     var doc = await collectionRef.doc(uid).get();
     return doc.data()['username'];
+  }
+
+  Future<String> getFcmToken(String uid) async {
+    var collectionRef = _fs.collection('users');
+    var doc = await collectionRef.doc(uid).get();
+    return doc.data()['pushNotificationToken'];
   }
 
   Future<String> getCurrentUserEmail() async {

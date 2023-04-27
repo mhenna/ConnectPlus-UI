@@ -1,5 +1,7 @@
 import 'package:connect_plus/Navbar.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/services/firebase_functions_services.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +26,6 @@ class BookSwapsMain extends StatefulWidget {
 
 class _BookSwapsMainState extends State<BookSwapsMain> {
   int _selectedIndex;
-
   static List<Widget> _widgetOptions = <Widget>[
     BookSwapsAvailablePosts(),
     BookSwapsMyPosts(),
@@ -36,7 +37,6 @@ class _BookSwapsMainState extends State<BookSwapsMain> {
     super.initState();
     _selectedIndex = widget.selectedIndex;
   }
-
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;

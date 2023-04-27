@@ -20,4 +20,18 @@ class FirebaseFunctionsServices {
     }
     return true;
   }
+
+  Future<bool> sendEmail(
+      {String receiverId, String subject, String body}) async {
+    final HttpsCallable callable =
+    _fbFunctions.httpsCallable('sendEmail');
+    try {
+      callable
+          .call({'uid': receiverId, 'subject': subject, 'body': body});
+    } catch (e) {
+      return false;
+    }
+    return true;
+  }
+
 }

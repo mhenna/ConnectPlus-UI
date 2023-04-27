@@ -38,7 +38,23 @@ class Utils {
   static const Color midPoint = Color(0xffF12B4E);
   static String description =
       "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.";
+  static String emailTemplate = '''Hello FULL_NAME,
+
+This is a message sent from the connect+ app,
+
+EMAIL_BODY.
+
+Have a great day,
+
+Your Connect + team
+''';
+
+  static String getComposedEmail({fullName,emailBody}){
+    String email= emailTemplate.replaceAll("FULL_NAME", fullName);
+    return email.replaceAll("EMAIL_BODY", emailBody);
+  }
 }
+
 
 extension OnPressed on Widget {
   Widget ripple(Function onPressed,

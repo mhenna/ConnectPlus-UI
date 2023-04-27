@@ -1,6 +1,8 @@
 import 'package:connect_plus/BookSwapsMain.dart';
 import 'package:connect_plus/BookSwapsViewRequests.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
+import 'package:connect_plus/services/firebase_functions_services.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/utils/enums.dart';
 import 'package:connect_plus/utils/lists.dart';
 import 'package:connect_plus/utils/pop_ups.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'BookSwapsAdminHome.dart';
 import 'BookSwapsAvailablePosts.dart';
+import 'injection_container.dart';
 import 'models/BookPost.dart';
 import 'models/BookRequest.dart';
 import 'models/user.dart';
@@ -29,6 +32,8 @@ class BookPostInfoScreen extends StatefulWidget {
 class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
   final BookSwapServices _bookSwapServices = new BookSwapServices();
   String _requestDuration = bookRentDurations[0]; // default value
+  final FirebaseFunctionsServices _firebaseFunctionsServices =
+      new FirebaseFunctionsServices();
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +59,9 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
     _viewRequests() {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => BookSwapsViewRequests(bookPost: widget.bookPost)),
+        MaterialPageRoute(
+            builder: (context) =>
+                BookSwapsViewRequests(bookPost: widget.bookPost)),
       );
     }
 
@@ -69,6 +76,19 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
             await _bookSwapServices.updatePostStatus(
                 postId: widget.bookPost.postId,
                 status: BookPostStatus.approvedByAdmin);
+            _firebaseFunctionsServices.sendEmail(
+                receiverId: widget.bookPost.postedById,
+                subject: "Connect+ Book Swaps | Book Post Approved By Admin",
+                body: Utils.getComposedEmail(
+                    fullName: widget.bookPost.postedByFullName,
+                    emailBody:
+                        'Your book "${widget.bookPost.bookName} has been approved successfully by the admin. It is now available for users to request.'));
+            sl<PushNotificationsService>().sendNotification(
+                recipientId: widget.bookPost.postedById,
+                notificationTitle: "Book Swaps | Book Post Approved By Admin",
+                notificationBody:
+                    'Your book "${widget.bookPost.bookName} has been approved successfully by the admin.',
+                view: "book-swaps");
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -89,6 +109,19 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
             await _bookSwapServices.updatePostStatus(
                 postId: widget.bookPost.postId,
                 status: BookPostStatus.approvedByAdmin);
+            _firebaseFunctionsServices.sendEmail(
+                receiverId: widget.bookPost.postedById,
+                subject: "Connect+ Book Swaps | Book Post Rejected By Admin",
+                body: Utils.getComposedEmail(
+                    fullName: widget.bookPost.postedByFullName,
+                    emailBody:
+                        'Your book "${widget.bookPost.bookName} has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.'));
+            sl<PushNotificationsService>().sendNotification(
+                recipientId: widget.bookPost.postedById,
+                notificationTitle: "Book Swaps | Book Post Rejected By Admin",
+                notificationBody:
+                    'Your book "${widget.bookPost.bookName} has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.',
+                view: "book-swaps");
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -122,6 +155,19 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                     bookCoverUrl: widget.bookPost.bookCoverUrl,
                     postedByFullName: widget.bookPost.postedByFullName,
                     postedByEmail: widget.bookPost.postedByEmail));
+            _firebaseFunctionsServices.sendEmail(
+                receiverId: widget.bookPost.postedById,
+                subject: "Connect+ Book Swaps | New Book Request",
+                body: Utils.getComposedEmail(
+                    fullName: widget.bookPost.postedByFullName,
+                    emailBody:
+                        '${widget.currentUser.username} has requested your book "${widget.bookPost.bookName}". Please open the Book Swaps section in Connect+ and navigate to "My Posted Books -> View Requests" to be able to view the request.'));
+            sl<PushNotificationsService>().sendNotification(
+                recipientId: widget.bookPost.postedById,
+                notificationTitle: "Book Swaps | New Book Request",
+                notificationBody:
+                    '${widget.currentUser.username} has requested your book "${widget.bookPost.bookName}".',
+                view: "book-swaps");
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -217,7 +263,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                 widget.bookPost.getPostStatusString(),
+                  widget.bookPost.getPostStatusString(),
                   style: TextStyle(fontSize: 16.0),
                 ),
                 SizedBox(height: 16.0),
@@ -327,7 +373,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                        AppButton(title: "Delete Post", onPress: _deletePost)
+                      AppButton(title: "Delete Post", onPress: _deletePost)
                     ],
                   ),
                 ),

@@ -1,5 +1,7 @@
 import 'package:connect_plus/models/BookPost.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
+import 'package:connect_plus/services/firebase_functions_services.dart';
+import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
 import 'package:connect_plus/utils/enums.dart';
 import 'package:connect_plus/utils/pop_ups.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
@@ -9,13 +11,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'BookSwapsMain.dart';
+import 'injection_container.dart';
 import 'models/BookRequest.dart';
 
 class BookSwapsViewRequests extends StatelessWidget {
   final BookPost bookPost;
 
   BookSwapsViewRequests({@required this.bookPost});
-
+  final FirebaseFunctionsServices _firebaseFunctionsServices =
+  new FirebaseFunctionsServices();
   final BookSwapServices _bookSwapServices = new BookSwapServices();
 
   @override
@@ -62,6 +66,19 @@ class BookSwapsViewRequests extends StatelessWidget {
             await _bookSwapServices.updateBookBorrowerName(
                 postId: bookRequest.postId,
                 borrowerFullName: bookRequest.requestedByFullName);
+            _firebaseFunctionsServices.sendEmail(
+                receiverId: bookRequest.requestedById,
+                subject: "Connect+ Book Swaps | Book Request Accepted",
+                body: Utils.getComposedEmail(
+                    fullName: bookRequest.requestedByFullName,
+                    emailBody:
+                    '${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
+            sl<PushNotificationsService>().sendNotification(
+                recipientId:  bookRequest.requestedById,
+                notificationTitle: "Book Swaps | Book Request Accepted",
+                notificationBody:
+                '${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}".',
+                view: "book-swaps");
           },
           afterSuccess: () {
             Navigator.pushReplacement(
