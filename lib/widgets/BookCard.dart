@@ -38,7 +38,7 @@ class BookCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(10.0),
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white,

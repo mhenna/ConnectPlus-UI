@@ -76,18 +76,20 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
             await _bookSwapServices.updatePostStatus(
                 postId: widget.bookPost.postId,
                 status: BookPostStatus.approvedByAdmin);
+            await _bookSwapServices.addBookSwapPoints(
+                userId: widget.bookPost.postedById, points: 100);
             _firebaseFunctionsServices.sendEmail(
                 receiverId: widget.bookPost.postedById,
                 subject: "Connect+ Book Swaps | Book Post Approved By Admin",
                 body: Utils.getComposedEmail(
                     fullName: widget.bookPost.postedByFullName,
                     emailBody:
-                        'Your book "${widget.bookPost.bookName} has been approved successfully by the admin. It is now available for users to request.'));
+                        """Congratulations! Your book "${widget.bookPost.bookName}" has been approved by the admin and is now available for users to request. As a reward, we have credited 100 Book Swaps Points to your account."""));
             sl<PushNotificationsService>().sendNotification(
                 recipientId: widget.bookPost.postedById,
                 notificationTitle: "Book Swaps | Book Post Approved By Admin",
                 notificationBody:
-                    'Your book "${widget.bookPost.bookName} has been approved successfully by the admin.',
+                    """Your book "${widget.bookPost.bookName}" has been approved successfully by the admin.""",
                 view: "book-swaps");
           },
           afterSuccess: () {
@@ -179,47 +181,52 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
     }
 
     _askForDuration() {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Preferred Rental Duration:'),
-            content: DropdownButtonFormField<String>(
-              value: _requestDuration,
-              icon: Icon(Icons.arrow_drop_down),
-              onSaved: (String newValue) {
-                setState(() {
-                  _requestDuration = newValue;
-                });
-              },
-              onChanged: (String newValue) {
-                setState(() {
-                  _requestDuration = newValue;
-                });
-              },
-              items: bookRentDurations
-                  .map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: Text('Cancel'),
-                onPressed: () {
-                  Navigator.of(context).pop();
+      if (widget.currentUser.bookSwapPoints >= 50) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Preferred Rental Duration:'),
+              content: DropdownButtonFormField<String>(
+                value: _requestDuration,
+                icon: Icon(Icons.arrow_drop_down),
+                onSaved: (String newValue) {
+                  setState(() {
+                    _requestDuration = newValue;
+                  });
                 },
+                onChanged: (String newValue) {
+                  setState(() {
+                    _requestDuration = newValue;
+                  });
+                },
+                items: bookRentDurations
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
-              TextButton(
-                child: Text('Confirm'),
-                onPressed: _requestBook,
-              ),
-            ],
-          );
-        },
-      );
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Cancel'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Confirm'),
+                  onPressed: _requestBook,
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        Utils.showMessage(
+            "You must have a minimum of 50 points to be able to request a book. Please post more books to gain points.");
+      }
     }
 
     return Scaffold(

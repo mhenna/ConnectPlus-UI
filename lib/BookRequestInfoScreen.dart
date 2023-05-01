@@ -120,19 +120,6 @@ class BookRequestInfoScreen extends StatelessWidget {
               ),
               SizedBox(height: 16.0),
               Text(
-                'Requested At:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20.0,
-                ),
-              ),
-              SizedBox(height: 8.0),
-              Text(
-                '${bookRequest.requestedAt}',
-                style: TextStyle(fontSize: 18.0),
-              ),
-              SizedBox(height: 16.0),
-              Text(
                 'Book Name:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,

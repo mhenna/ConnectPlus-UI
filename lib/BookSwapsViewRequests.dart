@@ -52,7 +52,7 @@ class BookSwapsViewRequests extends StatelessWidget {
       showConfirmationPopUp(
           context: context,
           message:
-              "Are you sure that you want to accept ${bookRequest.postedByFullName}'s request?",
+              "Are you sure that you want to accept ${bookRequest.requestedByFullName}'s request?",
           successMessage:
               "Request Accepted Successfully. You can contact ${bookRequest.postedByFullName} via email (${bookRequest.requestedByEmail}) to discuss the hand over details.",
           successMessageTitle: "Request Accepted Successfully",
@@ -66,13 +66,14 @@ class BookSwapsViewRequests extends StatelessWidget {
             await _bookSwapServices.updateBookBorrowerName(
                 postId: bookRequest.postId,
                 borrowerFullName: bookRequest.requestedByFullName);
+            await _bookSwapServices.removeBookSwapPoints(userId: bookRequest.requestedById,points:50);
             _firebaseFunctionsServices.sendEmail(
                 receiverId: bookRequest.requestedById,
                 subject: "Connect+ Book Swaps | Book Request Accepted",
                 body: Utils.getComposedEmail(
                     fullName: bookRequest.requestedByFullName,
                     emailBody:
-                    '${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
+                    'Congratulations! ${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
             sl<PushNotificationsService>().sendNotification(
                 recipientId:  bookRequest.requestedById,
                 notificationTitle: "Book Swaps | Book Request Accepted",

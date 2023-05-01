@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Utils {
@@ -52,6 +53,16 @@ Your Connect + team
   static String getComposedEmail({fullName,emailBody}){
     String email= emailTemplate.replaceAll("FULL_NAME", fullName);
     return email.replaceAll("EMAIL_BODY", emailBody);
+  }
+  static void showMessage(String message) {
+    Fluttertoast.showToast(
+        msg: message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
   }
 }
 

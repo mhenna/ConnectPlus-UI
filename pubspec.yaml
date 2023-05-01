@@ -73,6 +73,7 @@ dependencies:
   add_2_calendar: ^1.4.0
   image_picker: ^0.6.7
   firebase_storage: ^5.2.0
+  flutter_image_compress: ^0.7.0
 
 dev_dependencies:
   flutter_test:

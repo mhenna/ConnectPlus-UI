@@ -135,8 +135,8 @@ class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
                   onTap: _pickImage,
                   child: Center(
                     child: Container(
-                      width: _bookImage == null ? double.infinity : 200,
-                      height: _bookImage == null ? 200.0 : 400,
+                      width: 250,
+                      height: _bookImage == null ? 250.0 : 400,
                       decoration: BoxDecoration(
                         color: Colors.grey[200],
                         border: Border.all(
@@ -146,8 +146,6 @@ class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
                       child: _bookImage != null
                           ? Image.file(
                               _bookImage,
-                              height: 400,
-                              width: 100,
                               fit: BoxFit.cover,
                             )
                           : Icon(
