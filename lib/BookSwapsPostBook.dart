@@ -187,6 +187,9 @@ class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
                 ),
                 SizedBox(height: 16.0),
                 DropdownButtonFormField<String>(
+                  onTap: (){
+                    FocusManager.instance.primaryFocus.unfocus();
+                  },
                   decoration: InputDecoration(
                     labelText: 'Book Pages Range',
                     border: OutlineInputBorder(),
@@ -221,6 +224,9 @@ class _BookSwapsPostBookState extends State<BookSwapsPostBook> {
                     labelText: 'Book Category',
                     border: OutlineInputBorder(),
                   ),
+                  onTap: (){
+                    FocusManager.instance.primaryFocus.unfocus();
+                  },
                   value: _bookCategory != null
                       ? bookCategories.firstWhere(
                           (category) => category.toString() == _bookCategory)

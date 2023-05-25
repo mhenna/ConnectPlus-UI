@@ -28,7 +28,7 @@ class BookSwapsViewRequests extends StatelessWidget {
       showConfirmationPopUp(
           context: context,
           message:
-          "Are you sure you want to confirm that ${bookRequest.postedByFullName} has returned this book?",
+          "Are you sure you want to confirm that ${bookRequest.requestedByFullName} has returned this book?",
           successMessage:
           "Book Marked as Returned Successfully. Please let us know if anything went wrong with your book's rental.",
           successMessageTitle: "Book Marked as Returned Successfully",
@@ -54,7 +54,7 @@ class BookSwapsViewRequests extends StatelessWidget {
           message:
               "Are you sure that you want to accept ${bookRequest.requestedByFullName}'s request?",
           successMessage:
-              "Request Accepted Successfully. You can contact ${bookRequest.postedByFullName} via email (${bookRequest.requestedByEmail}) to discuss the hand over details.",
+              "Request Accepted Successfully. You can contact ${bookRequest.requestedByFullName} via email (${bookRequest.requestedByEmail}) to discuss the hand over details.",
           successMessageTitle: "Request Accepted Successfully",
           onConfirmed: () async {
             await _bookSwapServices.updateRequestStatus(

@@ -1,3 +1,4 @@
+import 'package:connect_plus/BookSwapsAdminHome.dart';
 import 'package:connect_plus/qr_code_scanner_home_screen.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
@@ -16,7 +17,7 @@ import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/ResetPassword.dart';
 import 'package:connect_plus/missingInformation.dart';
 
-import 'BookSwapsAdminHome.dart';
+import 'BookSwapsAdminViewPosts.dart';
 import 'gender_select_screen.dart';
 
 class Login extends StatefulWidget {
@@ -164,8 +165,10 @@ class _LoginState extends State<Login> {
                   );
                 }
                 else if(user.customClaim=='bookSwapsAdmin')
-                  return BookSwapsAdminHome();
-                else
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BookSwapsAdminHome()),
+                  );                else
                   {
                     if(user.gender==null || user.gender==""){
                      Navigator.push(

@@ -7,7 +7,7 @@ import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 
-import 'BookSwapsAdminHome.dart';
+import 'BookSwapsAdminViewPosts.dart';
 import 'BookSwapsAvailablePosts.dart';
 import 'models/BookRequest.dart';
 import 'models/user.dart';

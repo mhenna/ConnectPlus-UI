@@ -1,5 +1,6 @@
 import 'package:connect_plus/BookSwapsMain.dart';
 import 'package:connect_plus/BookSwapsViewRequests.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/services/book_swap_services.dart';
 import 'package:connect_plus/services/firebase_functions_services.dart';
 import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
@@ -11,6 +12,7 @@ import 'package:connect_plus/widgets/app_button.dart';
 import 'package:flutter/material.dart';
 
 import 'BookSwapsAdminHome.dart';
+import 'BookSwapsAdminViewPosts.dart';
 import 'BookSwapsAvailablePosts.dart';
 import 'injection_container.dart';
 import 'models/BookPost.dart';
@@ -69,7 +71,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
       showConfirmationPopUp(
           context: context,
           message:
-              "Are you sure you approve ${widget.bookPost.postedByFullName}'s book?",
+              "Are you sure you want to approve ${widget.bookPost.postedByFullName}'s book?",
           successMessage: "${widget.bookPost.bookName} Approved Successfully.",
           successMessageTitle: "Book Approved Successfully",
           onConfirmed: () async {
@@ -105,24 +107,24 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
           successMessageTitle: "Book Rejected Successfully",
           context: context,
           message:
-              "Are you sure you reject ${widget.bookPost.postedByFullName}'s book?",
+              "Are you sure you want to reject ${widget.bookPost.postedByFullName}'s book?",
           successMessage: "${widget.bookPost.bookName} Rejected Successfully.",
           onConfirmed: () async {
             await _bookSwapServices.updatePostStatus(
                 postId: widget.bookPost.postId,
-                status: BookPostStatus.approvedByAdmin);
+                status: BookPostStatus.rejectedByAdmin);
             _firebaseFunctionsServices.sendEmail(
                 receiverId: widget.bookPost.postedById,
                 subject: "Connect+ Book Swaps | Book Post Rejected By Admin",
                 body: Utils.getComposedEmail(
                     fullName: widget.bookPost.postedByFullName,
                     emailBody:
-                        'Your book "${widget.bookPost.bookName} has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.'));
+                        'Your book "${widget.bookPost.bookName}" has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.'));
             sl<PushNotificationsService>().sendNotification(
                 recipientId: widget.bookPost.postedById,
                 notificationTitle: "Book Swaps | Book Post Rejected By Admin",
                 notificationBody:
-                    'Your book "${widget.bookPost.bookName} has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.',
+                    'Your book "${widget.bookPost.bookName}" has been rejected by the admin. Please upload a book which is in compliance with our guidelines and policies.',
                 view: "book-swaps");
           },
           afterSuccess: () {
@@ -180,8 +182,17 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
           });
     }
 
-    _askForDuration() {
-      if (widget.currentUser.bookSwapPoints >= 50) {
+    _askForDuration() async {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(child: CircularProgressIndicator());
+        },
+      );
+      User user=await sl<AuthService>().getUser();
+      Navigator.of(context).pop();
+      if (user.bookSwapPoints >= 50) {
         showDialog(
           context: context,
           builder: (BuildContext context) {

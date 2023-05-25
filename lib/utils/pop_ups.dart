@@ -41,6 +41,7 @@ Future<void> showConfirmationPopUp(
   if (confirmed == true) {
     await showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(successMessageTitle),
@@ -77,6 +78,7 @@ Future<void> showAfterLoadingPopUp(
   await loadingFunction();
   Navigator.of(context).pop();
   await showDialog(
+    barrierDismissible: false,
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(

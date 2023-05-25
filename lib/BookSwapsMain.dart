@@ -1,4 +1,6 @@
+import 'package:connect_plus/AdminComplaintsScreen.dart';
 import 'package:connect_plus/Navbar.dart';
+import 'package:connect_plus/UserComplaintsScreen.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/services/firebase_functions_services.dart';
 import 'package:connect_plus/services/push_notifications_service/push_notifications_service.dart';
@@ -13,6 +15,7 @@ import 'BookSwapsMyRequests.dart';
 import 'package:flutter/material.dart';
 
 import 'injection_container.dart';
+import 'login.dart';
 import 'models/user.dart';
 
 class BookSwapsMain extends StatefulWidget {
@@ -51,6 +54,21 @@ class _BookSwapsMainState extends State<BookSwapsMain> {
         centerTitle: true,
         title: Text('Book Swaps'),
         backgroundColor: Utils.header,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.support_agent),
+              tooltip: 'Send a Complaint',
+              onPressed: () async {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        UserComplaintsScreen(),
+                  ),
+                );
+              },
+            ),
+          ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(

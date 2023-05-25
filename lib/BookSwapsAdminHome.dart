@@ -1,103 +1,106 @@
-import 'package:connect_plus/models/user.dart';
+import 'package:connect_plus/AdminComplaintsScreen.dart';
+import 'package:connect_plus/BookSwapsAdminViewPosts.dart';
 import 'package:connect_plus/services/auth_service/auth_service.dart';
-import 'package:connect_plus/services/book_swap_services.dart';
-import 'package:connect_plus/widgets/BookCard.dart';
-import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
-import 'package:flutter/material.dart';
-import 'BookPostInfoScreen.dart';
-import 'login.dart';
-import 'models/BookPost.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:connect_plus/injection_container.dart';
+import 'package:flutter/material.dart';
+import 'injection_container.dart';
+import 'login.dart';
 
 class BookSwapsAdminHome extends StatefulWidget {
+  final int selectedIndex;
+
+  const BookSwapsAdminHome({Key key, this.selectedIndex = 0}) : super(key: key);
+
   @override
   _BookSwapsAdminHomeState createState() => _BookSwapsAdminHomeState();
 }
 
 class _BookSwapsAdminHomeState extends State<BookSwapsAdminHome> {
-  List<BookPost> _bookPosts;
-  User currentUser;
+  int _selectedIndex;
+  static List<Widget> _widgetOptions = <Widget>[
+    BookSwapsAdminViewPosts(),
+    AdminComplaintsScreen(),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    _selectedIndex = widget.selectedIndex;
   }
 
-  Future<void> _loadData() async {
-    currentUser = await sl<AuthService>().user;
-    List<BookPost> bookPosts =
-        await BookSwapServices().getPendingAdminApprovalPosts();
+  void _onItemTapped(int index) {
     setState(() {
-      _bookPosts = bookPosts;
+      _selectedIndex = index;
     });
-  }
-
-  void _navigateToPostInfo(BookPost bookPost) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            BookPostInfoScreen(bookPost: bookPost, currentUser: currentUser),
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_bookPosts == null) {
-      return Scaffold(
-        body: ImageRotate(),
-      );
-    } else {
-      return Scaffold(
+    return WillPopScope(
+      onWillPop: () async => false,
+      child: Scaffold(
         appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: Text("Pending Approval Posts"),
-            centerTitle: true,
-            backgroundColor: Utils.header,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    Utils.secondaryColor,
-                    Utils.primaryColor,
-                  ],
-                  begin: Alignment.topRight,
-                  end: Alignment.bottomLeft,
-                ),
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: Text('Book Swaps Admin'),
+          backgroundColor: Utils.header,
+          actions: <Widget>[
+            IconButton(
+              icon: const Icon(Icons.logout),
+              tooltip: 'Log out',
+              onPressed: () async {
+                await sl<AuthService>().logout();
+                Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => Login()),
+                        (Route<dynamic> route) => false);
+              },
+            ),
+          ],
+          flexibleSpace: Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Utils.secondaryColor,
+                  Utils.primaryColor,
+                ],
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
               ),
             ),
-            actions: <Widget>[
-              IconButton(
-                icon: const Icon(Icons.logout),
-                tooltip: 'Log out',
-                onPressed: () async {
-                  await sl<AuthService>().logout();
-                  Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => Login()),
-                      (Route<dynamic> route) => false);
-                },
+          ),
+        ),
+        body: Center(
+          child: Container(
+            child: _widgetOptions.elementAt(_selectedIndex),
+          ),
+        ),
+        bottomNavigationBar: ClipRRect(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          child: BottomNavigationBar(
+            backgroundColor: Color(0xFFE0E0E0),
+            selectedItemColor: Utils.secondaryColor,
+            unselectedItemColor: Colors.black,
+            showSelectedLabels: true,
+            showUnselectedLabels: true,
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.menu_book),
+                label: 'Posts',
               ),
-            ]),
-        body: _bookPosts.isEmpty
-            ? Center(
-                child: Text('No Pending Approval Posts'),
-              )
-            : GridView.count(
-                crossAxisCount: 1,
-                children: List.generate(_bookPosts.length, (index) {
-                  BookPost bookPost = _bookPosts[index];
-                  return BookCard(
-                      bookCoverUrl: bookPost.bookCoverUrl,
-                      bookInfoText: 'Posted By: ${bookPost.postedByFullName}',
-                      bookName: bookPost.bookName,
-                      onTap: () => _navigateToPostInfo(bookPost));
-                }),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.support_agent),
+                label: 'Complaints',
               ),
-      );
-    }
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

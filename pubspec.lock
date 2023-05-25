@@ -228,9 +228,9 @@ packages:
   firebase_messaging:
     dependency: "direct main"
     description:
-      name: firebase_messaging
-      url: "https://pub.dartlang.org"
-    source: hosted
+      path: "C:\\Users\\Ali_Mohamed\\Downloads\\firebase_messaging-7.0.3"
+      relative: false
+    source: path
     version: "7.0.3"
   firebase_remote_config:
     dependency: "direct main"

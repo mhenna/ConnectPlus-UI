@@ -43,7 +43,7 @@ class Utils {
 
 This is a message sent from the connect+ app,
 
-EMAIL_BODY.
+EMAIL_BODY
 
 Have a great day,
 
