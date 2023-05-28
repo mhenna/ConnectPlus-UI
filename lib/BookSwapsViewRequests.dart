@@ -16,11 +16,13 @@ import 'models/BookRequest.dart';
 
 class BookSwapsViewRequests extends StatelessWidget {
   final BookPost bookPost;
-
+  final _formKey = GlobalKey<FormState>();
   BookSwapsViewRequests({@required this.bookPost});
+
   final FirebaseFunctionsServices _firebaseFunctionsServices =
-  new FirebaseFunctionsServices();
+      new FirebaseFunctionsServices();
   final BookSwapServices _bookSwapServices = new BookSwapServices();
+  String _rejectionText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -28,17 +30,16 @@ class BookSwapsViewRequests extends StatelessWidget {
       showConfirmationPopUp(
           context: context,
           message:
-          "Are you sure you want to confirm that ${bookRequest.requestedByFullName} has returned this book?",
+              "Are you sure you want to confirm that ${bookRequest.requestedByFullName} has returned this book?",
           successMessage:
-          "Book Marked as Returned Successfully. Please let us know if anything went wrong with your book's rental.",
+              "Book Marked as Returned Successfully. Please let us know if anything went wrong with your book's rental.",
           successMessageTitle: "Book Marked as Returned Successfully",
           onConfirmed: () async {
             await _bookSwapServices.updateRequestStatus(
                 requestId: bookRequest.requestId,
                 status: BookRequestStatus.returned);
             await _bookSwapServices.updatePostStatus(
-                postId: bookRequest.postId,
-                status: BookPostStatus.returned);
+                postId: bookRequest.postId, status: BookPostStatus.returned);
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -48,11 +49,12 @@ class BookSwapsViewRequests extends StatelessWidget {
             );
           });
     }
+
     _acceptRequest(BookRequest bookRequest) {
       showConfirmationPopUp(
           context: context,
           message:
-              "Are you sure that you want to accept ${bookRequest.requestedByFullName}'s request?",
+              "Are you sure you want to accept ${bookRequest.requestedByFullName}'s request?",
           successMessage:
               "Request Accepted Successfully. You can contact ${bookRequest.requestedByFullName} via email (${bookRequest.requestedByEmail}) to discuss the hand over details.",
           successMessageTitle: "Request Accepted Successfully",
@@ -66,19 +68,20 @@ class BookSwapsViewRequests extends StatelessWidget {
             await _bookSwapServices.updateBookBorrowerName(
                 postId: bookRequest.postId,
                 borrowerFullName: bookRequest.requestedByFullName);
-            await _bookSwapServices.removeBookSwapPoints(userId: bookRequest.requestedById,points:50);
+            await _bookSwapServices.removeBookSwapPoints(
+                userId: bookRequest.requestedById, points: 50);
             _firebaseFunctionsServices.sendEmail(
                 receiverId: bookRequest.requestedById,
                 subject: "Connect+ Book Swaps | Book Request Accepted",
                 body: Utils.getComposedEmail(
                     fullName: bookRequest.requestedByFullName,
                     emailBody:
-                    'Congratulations! ${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
+                        'Congratulations! ${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
             sl<PushNotificationsService>().sendNotification(
-                recipientId:  bookRequest.requestedById,
+                recipientId: bookRequest.requestedById,
                 notificationTitle: "Book Swaps | Book Request Accepted",
                 notificationBody:
-                '${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}".',
+                    '${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}".',
                 view: "book-swaps");
           },
           afterSuccess: () {
@@ -88,6 +91,87 @@ class BookSwapsViewRequests extends StatelessWidget {
                   builder: (context) => BookSwapsMain(selectedIndex: 1)),
             );
           });
+    }
+
+    _rejectRequest(BookRequest bookRequest) {
+      if (_formKey.currentState.validate()) {
+        showAfterLoadingPopUp(
+          context: context,
+          successMessage:
+              "${bookRequest.requestedByFullName}'s Request Rejected Successfully.",
+          successMessageTitle: "Request Rejected Successfully",
+          loadingFunction: () async {
+            await _bookSwapServices.updateRequestStatus(
+                requestId: bookRequest.requestId,
+                status: BookRequestStatus.rejectedByUser);
+            _firebaseFunctionsServices.sendEmail(
+                receiverId: bookRequest.requestedById,
+                subject: "Connect+ Book Swaps | Book Request Rejected",
+                body: Utils.getComposedEmail(
+                    fullName: bookRequest.requestedByFullName,
+                    emailBody:
+                        '${bookPost.postedByFullName} has rejected your request for the book "${bookPost.bookName}". Rejection Reason: $_rejectionText.'));
+            sl<PushNotificationsService>().sendNotification(
+                recipientId: bookRequest.requestedById,
+                notificationTitle: "Book Swaps | Book Request Rejected",
+                notificationBody:
+                    '${bookPost.postedByFullName} has rejected your request for the book "${bookPost.bookName}".',
+                view: "book-swaps");
+          },
+          afterSuccess: () {
+            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BookSwapsViewRequests(bookPost:bookPost)),
+            );
+          });
+      }
+    }
+
+    _askForRejectionReason(BookRequest bookRequest) async {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Rejection Reason'),
+            content: Form(
+              key:_formKey,
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Reason',
+                  border: OutlineInputBorder(),
+                ),
+                minLines: 2,
+                maxLines: 10,
+                validator: (value) {
+                  if (value.isEmpty) {
+                    return 'Please enter the rejection reason';
+                  }
+                  return null;
+                },
+                onChanged: (value){
+                  _rejectionText=value;
+                },
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text('Cancel'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              TextButton(
+                child: Text('Confirm'),
+                onPressed: () {
+                  _rejectRequest(bookRequest);
+                },
+              ),
+            ],
+          );
+        },
+      );
     }
 
     return Scaffold(
@@ -134,56 +218,75 @@ class BookSwapsViewRequests extends StatelessWidget {
                     bookRequest.requestStatus == BookRequestStatus.received ||
                         bookRequest.requestStatus ==
                             BookRequestStatus.acceptedByUser;
-
                 return Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 5.0, vertical: 15),
-                      child: ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${bookRequest.requestedByFullName}",
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                      padding: const EdgeInsets.all(15),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${bookRequest.requestedByFullName}",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 17),
+                                ),
+                                SizedBox(height: 5),
+                                Text("${bookRequest.requestedByBU} BU",
+                                    style: TextStyle(fontSize: 17)),
+                                SizedBox(height: 5),
+                                Text("${bookRequest.requestedAt}",
+                                    style: TextStyle(color: Colors.grey[600])),
+                                SizedBox(height: 3),
+                                Text(
+                                    "Rent Duration: ${bookRequest.requestDuration}",
+                                    style: TextStyle(color: Colors.grey[600])),
+                                SizedBox(height: 3),
+                                Text(bookRequest.requestedByEmail,
+                                    style: TextStyle(color: Colors.grey[600])),
+                              ],
                             ),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
-                              child: Text("${bookRequest.requestedByBU} BU"),
-                            )
-                          ],
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("${bookRequest.requestedAt}"),
-                            SizedBox(height: 3),
-                            Text(
-                                "Rent Duration: ${bookRequest.requestDuration}"),
-                            SizedBox(height: 3),
-                            Text(bookRequest.requestedByEmail),
-                          ],
-                        ),
-                        trailing: isBookAvailable
-                            ? AppButton(
-                                onPress: () {
-                                  _acceptRequest(bookRequest);
-                                },
-                                title: 'Accept',
-                              )
-                            : isNotReturned
-                                ? AppButton(
-                                    onPress: () {
-                                      _confirmReturn(bookRequest);
-                                    },
-                                    title: "Returned",
-                                  )
-                                : null,
+                          ),
+                          SizedBox(width: 8),
+                          if (isBookAvailable)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                AppButton(
+                                  onPress: () {
+                                    _acceptRequest(bookRequest);
+                                  },
+                                  title: 'Accept',
+                                ),
+                                SizedBox(height: 8),
+                                AppButton(
+                                  onPress: () {
+                                    _askForRejectionReason(bookRequest);
+                                  },
+                                  title: 'Reject',
+                                ),
+                              ],
+                            ),
+                          if (!isBookAvailable && isNotReturned)
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                AppButton(
+                                  onPress: () {
+                                    _confirmReturn(bookRequest);
+                                  },
+                                  title: "Confirm Return",
+                                ),
+                              ],
+                            ),
+                        ],
                       ),
                     ),
-                    Divider(thickness: 1)
+                    Divider(thickness: 1),
                   ],
                 );
               },
