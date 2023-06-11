@@ -14,6 +14,8 @@ class AuthService {
     final claims = idTokenResult.claims;
     if(claims['qrCodeScanner']==true)
       return 'qrCodeScanner';
+    else if (claims['bookSwapsAdmin']==true)
+      return 'bookSwapsAdmin';
     else return '';
   }
 
@@ -142,7 +144,8 @@ class AuthService {
 
   Future<user_model.User> get user async {
     if (_user == null) {
-      return await getUser();
+      _user = await getUser();
+      return _user;
     } else {
       return _user;
     }
@@ -158,6 +161,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    _user=null;
     return await _fbAuth.signOut();
   }
 

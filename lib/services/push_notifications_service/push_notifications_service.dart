@@ -1,3 +1,8 @@
+import 'dart:convert';
+
+import 'package:connect_plus/BookSwapsMain.dart';
+import 'package:connect_plus/services/auth_service/auth_service.dart';
+import 'package:connect_plus/services/firestore_services.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
@@ -24,12 +29,16 @@ import 'package:get/get.dart';
 import 'package:flutter/material.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:connect_plus/models/user.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 
 class PushNotificationsService {
   final FirebaseMessaging _fcm = FirebaseMessaging();
+  final FirestoreServices _fsServices = FirestoreServices();
   final FirebaseFunctions _fbFunctions = FirebaseFunctions.instance;
   Future<String> get token => _fcm.getToken();
   final NavigationService navService = NavigationService();
+
   Future initialize() async {
     if (Platform.isIOS) {
       _fcm.requestNotificationPermissions(IosNotificationSettings());
@@ -72,6 +81,7 @@ class PushNotificationsService {
   void serializeAndNavigate(Map<String, dynamic> message) async {
     var notificationData = message['data'];
     var view = notificationData['view'];
+    print("serialize and navigate: $view");
 
     Event event;
     Offer offer;
@@ -131,7 +141,44 @@ class PushNotificationsService {
         } else
           Get.to(Events());
       }
+      else if(view=='book-swaps')
+        {
+          print("serialize and navigate 2: $view");
+          Get.to(BookSwapsMain());
+        }
     }
+  }
+  Future<void> sendNotification({String recipientId, String notificationTitle, String notificationBody,String view}) async {
+    final fcmToken = await _fsServices.getFcmToken(recipientId);
+    final serverKey = DotEnv().env['SERVER_KEY'];
+    final data={};
+    if(view!=null)
+      data['view']=view;
+    final message = <String, dynamic>{
+        'token': fcmToken,
+        'to': fcmToken,
+        'notification': <String, dynamic>{
+          'title': notificationTitle,
+          'body': notificationBody,
+          'mutable_content': true,
+          'data':data
+        },
+      };
+      final options = <String, dynamic>{
+        'method': 'POST',
+        'body': json.encode(message),
+        'headers': <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'key=$serverKey',
+        }
+      };
+      final url = Uri.parse('https://fcm.googleapis.com/fcm/send');
+      try {
+        await http.post(url, headers: options['headers'], body: options['body']);
+        print('Notification sent successfully');
+      } catch (e) {
+        print('Failed to send notification: $e');
+      }
   }
 
   Future<List<dynamic>> sendNotificationToCarOwner({
