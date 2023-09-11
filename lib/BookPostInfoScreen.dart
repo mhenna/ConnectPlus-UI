@@ -165,7 +165,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                 body: Utils.getComposedEmail(
                     fullName: widget.bookPost.postedByFullName,
                     emailBody:
-                        '${widget.currentUser.username} has requested your book "${widget.bookPost.bookName}". Please open the Book Swaps section in Connect+ and navigate to "My Posted Books -> View Requests" to be able to view the request.'));
+                        '${widget.currentUser.username} has requested your book "${widget.bookPost.bookName}". <span style="color:red;font-weight:bold;">Please open the Book Swaps section in Connect+ and navigate to "My Posted Books -> View Requests" to be able to view the request.</span>'),);
             sl<PushNotificationsService>().sendNotification(
                 recipientId: widget.bookPost.postedById,
                 notificationTitle: "Book Swaps | New Book Request",
@@ -190,7 +190,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
           return Center(child: CircularProgressIndicator());
         },
       );
-      User user=await sl<AuthService>().getUser();
+      User user = await sl<AuthService>().getUser();
       Navigator.of(context).pop();
       if (user.bookSwapPoints >= 50) {
         showDialog(
@@ -198,26 +198,36 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('Preferred Rental Duration:'),
-              content: DropdownButtonFormField<String>(
-                value: _requestDuration,
-                icon: Icon(Icons.arrow_drop_down),
-                onSaved: (String newValue) {
-                  setState(() {
-                    _requestDuration = newValue;
-                  });
-                },
-                onChanged: (String newValue) {
-                  setState(() {
-                    _requestDuration = newValue;
-                  });
-                },
-                items: bookRentDurations
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  SizedBox(height: 20),
+                  DropdownButtonFormField<String>(
+                    value: _requestDuration,
+                    icon: Icon(Icons.arrow_drop_down),
+                    onSaved: (String newValue) {
+                      setState(() {
+                        _requestDuration = newValue;
+                      });
+                    },
+                    onChanged: (String newValue) {
+                      setState(() {
+                        _requestDuration = newValue;
+                      });
+                    },
+                    items: bookRentDurations.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 40),
+                  Text('* Please note that in case the book is returned in a bad condition, you will have to buy another one for the lender.'),
+
+                ],
               ),
               actions: <Widget>[
                 TextButton(
@@ -228,7 +238,9 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
                 ),
                 TextButton(
                   child: Text('Confirm'),
-                  onPressed: _requestBook,
+                  onPressed: () {
+                      _requestBook();
+                  },
                 ),
               ],
             );
@@ -239,6 +251,7 @@ class _BookPostInfoScreenState extends State<BookPostInfoScreen> {
             "You must have a minimum of 50 points to be able to request a book. Please post more books to gain points.");
       }
     }
+
 
     return Scaffold(
       appBar: AppBar(

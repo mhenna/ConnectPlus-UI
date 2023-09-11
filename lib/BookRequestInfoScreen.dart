@@ -31,6 +31,11 @@ class BookRequestInfoScreen extends StatelessWidget {
           onConfirmed: () async {
             await _bookSwapServices.deleteBookRequest(
                 requestId: bookRequest.requestId);
+            if (bookRequest.requestStatus == BookRequestStatus.acceptedByUser ||
+                bookRequest.requestStatus == BookRequestStatus.received)
+              _bookSwapServices.updatePostStatus(
+                  postId: bookRequest.postId,
+                  status: BookPostStatus.approvedByAdmin);
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -53,7 +58,10 @@ class BookRequestInfoScreen extends StatelessWidget {
             await _bookSwapServices.updateRequestStatus(
                 requestId: bookRequest.requestId,
                 status: BookRequestStatus.received);
-            await _bookSwapServices.updatePostStatus(postId: bookRequest.postId,status: BookPostStatus.handedOver);
+            await _bookSwapServices.updatePostStatus(
+                postId: bookRequest.postId, status: BookPostStatus.handedOver);
+            _bookSwapServices.addHandOverTime(
+                requestId: bookRequest.requestId);
           },
           afterSuccess: () {
             Navigator.pushReplacement(
@@ -198,7 +206,7 @@ class BookRequestInfoScreen extends StatelessWidget {
               ),
               if (bookRequest.requestStatus == BookRequestStatus.acceptedByUser)
                 Padding(
-                  padding: const EdgeInsets.only(top:15.0),
+                  padding: const EdgeInsets.only(top: 15.0),
                   child: Center(
                     child: AppButton(
                       onPress: _confirmReceived,

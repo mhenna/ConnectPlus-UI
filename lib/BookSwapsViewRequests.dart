@@ -76,7 +76,7 @@ class BookSwapsViewRequests extends StatelessWidget {
                 body: Utils.getComposedEmail(
                     fullName: bookRequest.requestedByFullName,
                     emailBody:
-                        'Congratulations! ${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. Please update the status of the book to handed over once you receive the book.'));
+                        'Congratulations! ${bookPost.postedByFullName} has accepted your request for the book "${bookPost.bookName}". Feel free to discuss the hand over details with them. <span style="color:red;font-weight:bold;">Please update the status of the book to handed over from "My Requests -> Mark Book as Received" in the Book Swaps section of Connect+ once you receive the book.</span>'));
             sl<PushNotificationsService>().sendNotification(
                 recipientId: bookRequest.requestedById,
                 notificationTitle: "Book Swaps | Book Request Accepted",
