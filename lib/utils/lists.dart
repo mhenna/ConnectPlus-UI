@@ -61,8 +61,4 @@ List<String> bookRentDurations = [
   '15-30 days',
   '1-2 months',
   '2-3 months',
-  '3-4 months',
-  '4-5 months',
-  '5-6 months',
-  '6+ months',
 ];

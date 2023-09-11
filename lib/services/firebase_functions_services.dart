@@ -27,11 +27,10 @@ class FirebaseFunctionsServices {
     _fbFunctions.httpsCallable('sendEmail');
     try {
       callable
-          .call({'uid': receiverId, 'subject': subject, 'body': body});
+          .call({'uid': receiverId, 'subject': subject, 'body': body,});
     } catch (e) {
       return false;
     }
     return true;
   }
-
 }

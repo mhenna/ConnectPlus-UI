@@ -129,6 +129,16 @@ class BookSwapServices {
     await ref.update(data);
   }
 
+  Future<void> addHandOverTime(
+      {String requestId}) async {
+    DocumentReference ref = _fs.collection('book-requests').doc(requestId);
+
+    Map<String, dynamic> data = {
+      'handOverTime': Timestamp.fromDate(DateTime.now()),
+    };
+    await ref.update(data);
+  }
+
   Future<void> addBookSwapPoints({String userId, int points}) async {
     DocumentReference ref = _fs.collection('users').doc(userId);
 

@@ -26,7 +26,6 @@ class _SubmitComplaintState extends State<SubmitComplaint> {
   final BookSwapServices _bookSwapServices = new BookSwapServices();
   Future<void> _pickImage() async {
     final pickedImage = await ImagePicker().getImage(source: ImageSource.gallery);
-
     setState(() {
       _complaintImage = File(pickedImage.path);
     });
@@ -47,6 +46,7 @@ class _SubmitComplaintState extends State<SubmitComplaint> {
             complaint= new Complaint(userId: widget.user.id, fullName: widget.user.username,
                 email: widget.user.email, image: imageUrl, text: _complaintText);
           }
+          else
           complaint= new Complaint(userId: widget.user.id, fullName: widget.user.username,
               email: widget.user.email, image: "", text: _complaintText);
           await _bookSwapServices.addComplaint(complaint:complaint );
