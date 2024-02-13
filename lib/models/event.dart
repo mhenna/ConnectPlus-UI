@@ -17,7 +17,7 @@ class Event extends Occurrence {
   final int _iV;
   final String _onBehalfOf;
   final AdminUser _createdBy;
-  final ImageFile _poster;
+  final String _poster;
   final AdminUser _updatedBy;
   final ERG _erg;
   final String _id;
@@ -31,7 +31,7 @@ class Event extends Occurrence {
   String get name => this._name;
 
   @override
-  ImageFile get poster => this._poster;
+  String get poster => this._poster;
 
   @override
   String get sId => this._sId;
@@ -65,7 +65,7 @@ class Event extends Occurrence {
       @required int iV,
       @required String onBehalfOf,
       @required AdminUser createdBy,
-      @required ImageFile poster,
+      @required String poster,
       @required AdminUser updatedBy,
       @required ERG erg,
       @required String id,
@@ -103,10 +103,10 @@ class Event extends Occurrence {
       slider: json['slider'] ?? false,
       trivia: json['trivia'],
       endDate: json['endDate'] != null
-          ? DateTime.parse((json['endDate'])).toLocal()
+          ? json['endDate'].toDate()
           : null,
       startDate: json['startDate'] != null
-          ? DateTime.parse((json['startDate'])).toLocal()
+          ? json['startDate'].toDate()
           : null,
       createdAt: json['createdAt'] != null
           ? DateTime.parse((json['createdAt']))
@@ -119,7 +119,7 @@ class Event extends Occurrence {
           ? new AdminUser.fromJson(json['created_by'])
           : null,
       poster:
-          json['poster'] != null ? ImageFile.fromJson(json['poster']) : null,
+          json['poster'] != null ? json['poster'] : null,
       updatedBy: json['updated_by'] != null
           ? AdminUser.fromJson(json['updated_by'])
           : null,
@@ -144,7 +144,7 @@ class Event extends Occurrence {
       data['created_by'] = this._createdBy.toJson();
     }
     if (this._poster != null) {
-      data['poster'] = this._poster.toJson();
+      data['poster'] = this._poster;
     }
     if (this._updatedBy != null) {
       data['updated_by'] = this._updatedBy.toJson();

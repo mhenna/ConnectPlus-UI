@@ -1,7 +1,7 @@
 import 'package:connect_plus/models/image_file.dart';
 
 class OfferHighlight {
-  List<ImageFile> highlight;
+  List<String> highlight;
   String sId;
   DateTime createdAt;
   DateTime updatedAt;
@@ -18,9 +18,9 @@ class OfferHighlight {
 
   OfferHighlight.fromJson(Map<String, dynamic> json) {
     if (json['highlight'] != null) {
-      highlight = new List<ImageFile>();
+      highlight = new List<String>();
       json['highlight'].forEach((v) {
-        highlight.add(new ImageFile.fromJson(v));
+        highlight.add(v);
       });
     }
     sId = json['_id'];
@@ -35,7 +35,7 @@ class OfferHighlight {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     if (this.highlight != null) {
-      data['highlight'] = this.highlight.map((v) => v.toJson()).toList();
+      data['highlight'] = this.highlight.map((v) => v).toList();
     }
     data['_id'] = this.sId;
     data['createdAt'] = this.createdAt;

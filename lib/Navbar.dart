@@ -89,7 +89,7 @@ class NavDrawerState extends State<NavDrawer>
               )
             },
           ),
-          ListTile(
+/*          ListTile(
             leading: Icon(Icons.library_books),
             title: Text('Book Swaps'),
             onTap: () => {
@@ -98,7 +98,7 @@ class NavDrawerState extends State<NavDrawer>
                 MaterialPageRoute(builder: (context) => BookSwapsMain()),
               )
             },
-          ),
+          ),*/
           ListTile(
             leading: Icon(Icons.event),
             title: Text('Events & Webinars'),

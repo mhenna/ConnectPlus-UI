@@ -13,7 +13,7 @@ class Announcement extends Occurrence {
   final DateTime _updatedAt;
   final String _onBehalfOf;
   final AdminUser _createdBy;
-  final ImageFile _poster;
+  final String _poster;
   final AdminUser _updatedBy;
   final String _id;
   final String _trivia;
@@ -27,7 +27,7 @@ class Announcement extends Occurrence {
   @override
   String get name => _name;
   @override
-  ImageFile get poster => _poster;
+  String get poster => _poster;
   @override
   bool get slider => _slider;
   @override
@@ -57,7 +57,7 @@ class Announcement extends Occurrence {
     @required String onBehalfOf,
     @required DateTime updatedAt,
     @required AdminUser createdBy,
-    @required ImageFile poster,
+    @required String poster,
     @required AdminUser updatedBy,
     @required String id,
     @required bool slider,
@@ -92,7 +92,7 @@ class Announcement extends Occurrence {
           ? DateTime.parse((json['createdAt']))
           : null,
       deadline: json['deadline'] != null
-          ? DateTime.parse((json['deadline'])).toLocal()
+          ? json['deadline'].toDate()
           : null,
       updatedAt: json['updatedAt'] != null
           ? DateTime.parse((json['updatedAt']))
@@ -101,7 +101,7 @@ class Announcement extends Occurrence {
           ? new AdminUser.fromJson(json['created_by'])
           : null,
       poster: json['poster'] != null
-          ? new ImageFile.fromJson(json['poster'])
+          ? json['poster']
           : null,
       updatedBy: json['updated_by'] != null
           ? new AdminUser.fromJson(json['updated_by'])
@@ -132,7 +132,7 @@ class Announcement extends Occurrence {
       data['created_by'] = this._createdBy.toJson();
     }
     if (this._poster != null) {
-      data['poster'] = this._poster.toJson();
+      data['poster'] = this._poster;
     }
     if (this._updatedBy != null) {
       data['updated_by'] = this._updatedBy.toJson();

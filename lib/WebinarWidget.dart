@@ -76,7 +76,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              urlToImage(WebAPI.baseURL + ergwebinar.poster.url),
+              urlToImage(ergwebinar.poster),
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -169,7 +169,7 @@ class _WebinarState extends State<WebinarWidget> with TickerProviderStateMixin {
         SizedBox(
           width: MediaQuery.of(context).size.width,
           child: CachedImageBox(
-            imageurl: WebAPI.baseURL + webinar.poster.url,
+            imageurl:webinar.poster,
           ),
         )
       ],

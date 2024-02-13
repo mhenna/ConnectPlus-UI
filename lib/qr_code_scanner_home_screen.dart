@@ -66,7 +66,7 @@ class _QrCodeScannerHomeScreenState extends State<QrCodeScannerHomeScreen>
   }
 
   void getEvents() async {
-    final allEvents = await WebAPI.getEventsByERGs(scannerErgs);
+    final allEvents = await WebAPI.getEventsByERG(scannerErgs[0]);
     if (this.mounted) {
       eventsLoaded = true;
 
@@ -198,7 +198,7 @@ class _QrCodeScannerHomeScreenState extends State<QrCodeScannerHomeScreen>
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.all(Radius.circular(10.0))),
                     child: InkWell(
-                      child: urlToImage(WebAPI.baseURL + event.poster.url),
+                      child: urlToImage(event.poster),
                       onTap: () {
                           Navigator.push(
                             context,

@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 
 class Activity extends Occurrence {
   final String _recurrence;
-  final ImageFile _poster;
+  final String _poster;
   final String _sId;
   final String _name;
   final DateTime _startDate;
@@ -31,7 +31,7 @@ class Activity extends Occurrence {
   @override
   String get name => _name;
   @override
-  ImageFile get poster => _poster;
+  String get poster => _poster;
   @override
   DateTime get date => _createdAt;
   @override
@@ -56,7 +56,7 @@ class Activity extends Occurrence {
 
   Activity(
       {@required String recurrence,
-      @required ImageFile poster,
+      @required String poster,
       @required String sId,
       @required String name,
       @required String onBehalfOf,
@@ -101,7 +101,7 @@ class Activity extends Occurrence {
     return Activity(
         recurrence: json['recurrence'],
         poster:
-            json['poster'] != null ? ImageFile.fromJson(json['poster']) : null,
+            json['poster'] != null ? json['poster'] : null,
         sId: json['_id'],
         name: json['name'],
         onBehalfOf: json['onBehalfOf'],
@@ -111,10 +111,10 @@ class Activity extends Occurrence {
             ? json['recurrenceDates'].cast<DateTime>()
             : null,
         endDate: json['endDate'] != null
-            ? DateTime.parse((json['endDate'])).toLocal()
+            ? json['endDate'].toDate()
             : null,
         startDate: json['startDate'] != null
-            ? DateTime.parse((json['startDate'])).toLocal()
+            ? json['startDate'].toDate()
             : null,
         createdAt: json['createdAt'] != null
             ? DateTime.parse((json['createdAt']))
@@ -143,7 +143,7 @@ class Activity extends Occurrence {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['recurrence'] = this._recurrence;
     if (this._poster != null) {
-      data['poster'] = this._poster.toJson();
+      data['poster'] = this._poster;
     }
     data['onBehalfOf'] = this._onBehalfOf;
     data['_id'] = this._sId;

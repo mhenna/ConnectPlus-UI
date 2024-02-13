@@ -4,15 +4,15 @@ import 'image_file.dart';
 class WireMagazine {
    String sId;
    num edition;
-   Attachment pdf;
-   ImageFile cover;
+   String pdf;
+   String cover;
 
   WireMagazine({this.sId, this.edition, this.cover, this.pdf});
 
   WireMagazine.fromJson(Map<String, dynamic> json){
     sId=json['_id'];
     edition=json['magazineEdition'];
-    cover=json['magazineCover']!= null ? new ImageFile.fromJson(json['magazineCover']) : null;
-    pdf=json['magazinePDF']!= null ? new Attachment.fromJson(json['magazinePDF']) : null;
+    cover=json['magazineCover']!= null ? json['magazineCover'] : null;
+    pdf=json['magazinePDF']!= null ? json['magazinePDF'] : null;
   }
 }

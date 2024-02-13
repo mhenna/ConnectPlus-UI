@@ -61,7 +61,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
   }
 
   Future getERGEvents() async {
-    final events = await WebAPI.getEventsByERG(event.erg);
+    final events = await WebAPI.getEventsByERG(event.erg.id);
     if (this.mounted)
       setState(() {
         ergEvents = events.where((ev) => ev.id != event.id).toList();
@@ -88,7 +88,7 @@ class _EventState extends State<QrCodeScannerEventWidget>
         SizedBox(
           width: MediaQuery.of(context).size.width,
           child: CachedImageBox(
-            imageurl: WebAPI.baseURL + event.poster.url,
+            imageurl: event.poster,
           ),
         )
       ],

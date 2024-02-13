@@ -183,7 +183,7 @@ class AnnouncementImage extends StatelessWidget {
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.width * 0.5,
         child: CachedImageBox(
-          imageurl: WebAPI.baseURL + announcement.poster.url,
+          imageurl: announcement.poster,
         ));
   }
 }

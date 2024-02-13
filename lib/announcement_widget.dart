@@ -72,7 +72,7 @@ class AnnouncementImage extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.fromLTRB(25, 7, 25, 7),
       child: CachedImageBox(
-        imageurl: WebAPI.baseURL + announcement.poster.url,
+        imageurl: announcement.poster,
       ),
     );
   }
@@ -183,7 +183,7 @@ class _InfoSheetState extends State<InfoSheet> {
   }
 
   _launchAttachment(String url) async {
-    String pathPDF = WebAPI.baseURL + url;
+    String pathPDF = url;
     print(pathPDF);
     if (url != null)
       Navigator.push(

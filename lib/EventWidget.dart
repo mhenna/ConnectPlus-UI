@@ -51,7 +51,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
   }
 
   Future getERGEvents() async {
-    final events = await WebAPI.getEventsByERG(event.erg);
+    final events = await WebAPI.getEventsByERG(event.erg.id);
     if (this.mounted)
       setState(() {
         ergEvents = events.where((ev) => ev.id != event.id).toList();
@@ -82,7 +82,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              urlToImage(WebAPI.baseURL + ergEvent.poster.url),
+              urlToImage(ergEvent.poster),
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -120,7 +120,7 @@ class _EventState extends State<EventWidget> with TickerProviderStateMixin {
         SizedBox(
           width: MediaQuery.of(context).size.width,
           child: CachedImageBox(
-            imageurl: WebAPI.baseURL + event.poster.url,
+            imageurl: event.poster,
           ),
         )
       ],

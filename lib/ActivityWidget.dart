@@ -76,7 +76,7 @@ class _ActivityState extends State<ActivityWidget>
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
-              urlToImage(WebAPI.baseURL + ergActivity.poster.url),
+              urlToImage(ergActivity.poster),
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
@@ -108,7 +108,7 @@ class _ActivityState extends State<ActivityWidget>
   }
 
   Widget _activityPoster() {
-    String imageUrl = WebAPI.baseURL + activity.poster.url;
+    String imageUrl =  activity.poster;
     return Stack(
       alignment: Alignment.bottomCenter,
       children: <Widget>[

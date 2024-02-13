@@ -70,10 +70,10 @@ class _WireMagazineCardState extends State<WireMagazineCard> {
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(Radius.circular(10.0))),
             child: InkWell(
-                child: urlToImage(WebAPI.baseURL + wireMagazine.cover.url),
+                child: urlToImage(wireMagazine.cover),
                 onTap: () async {
-                  if (wireMagazine.pdf.url != null) {
-                    String pathPDF = WebAPI.baseURL + wireMagazine.pdf.url;
+                  if (wireMagazine.pdf != null) {
+                    String pathPDF =  wireMagazine.pdf;
                     Navigator.push(
                       context,
                       MaterialPageRoute<dynamic>(

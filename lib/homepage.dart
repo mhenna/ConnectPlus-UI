@@ -116,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (this.mounted) {
       recent.forEach((element) {
         element.highlight.forEach((h) {
-          sliderPosters.add(CachedImageBox(imageurl: WebAPI.baseURL + h.url));
+          sliderPosters.add(CachedImageBox(imageurl: h));
         });
       });
       highlightsLoaded = true;
@@ -182,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ergItems.forEach((erg, items) {
       for (int i = 0; i < ergPosterLimit; i++) {
         posters.add(
-          CachedImageBox(imageurl: WebAPI.baseURL + items[i].poster.url),
+          CachedImageBox(imageurl:items[i].poster),
         );
       }
     });
@@ -206,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<CachedImageBox> posters = sliderAnnouncements
         .map(
           (announcement) => CachedImageBox(
-            imageurl: WebAPI.baseURL + announcement.poster.url,
+            imageurl: announcement.poster,
           ),
         )
         .toList();

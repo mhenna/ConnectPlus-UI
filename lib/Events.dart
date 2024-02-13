@@ -272,7 +272,7 @@ class MyEventsPageState extends State<Events>
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(10.0))),
                 child: InkWell(
-                  child: urlToImage(WebAPI.baseURL + event.poster.url),
+                  child: urlToImage(event.poster),
                   onTap: () {
                     if (event.runtimeType == Event) {
                       Navigator.push(
