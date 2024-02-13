@@ -87,7 +87,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
     var width = MediaQuery.of(context).size.width;
     var size = MediaQuery.of(context).size.aspectRatio;
 
-    relatedOffers.sort((b, a) => b.createdAt.compareTo(a.createdAt));
+    relatedOffers.sort((b, a) => b.expiration.compareTo(a.expiration));
 
     for (var offer in relatedOffers) {
       if (offer.id != widget.offer.id) {
@@ -112,7 +112,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: <Widget>[
-                        urlToImage(WebAPI.baseURL + offer.logo.url),
+                        urlToImage(offer.logo),
                         ButtonBar(
                           alignment: MainAxisAlignment.center,
                           children: <Widget>[
@@ -154,7 +154,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         SizedBox(
           width: MediaQuery.of(context).size.width,
           child: CachedImageBox(
-            imageurl: WebAPI.baseURL + widget.offer.logo.url,
+            imageurl:  widget.offer.logo,
           ),
         )
       ],
@@ -170,15 +170,15 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
           ),
           InkWell(
             child: Text(
-              "More Details",
+              "Offer Attachment",
               style: TextStyle(
                 color: Colors.blue,
                 fontSize: 16.0,
               ),
             ),
             onTap: () async {
-              String pathPDF = WebAPI.baseURL + widget.offer.attachment.url;
-              if (widget.offer.attachment.url != null)
+              String pathPDF = widget.offer.attachment;
+              if (widget.offer.attachment != null)
                 Navigator.push(
                   context,
                   MaterialPageRoute<dynamic>(
@@ -339,7 +339,7 @@ class _OfferState extends State<OfferWidget> with TickerProviderStateMixin {
         ),
         ClickableButton(
             link: widget.offer.link,
-            text: 'More Details',
+            text: 'Offer Link',
             launchURL: _launchURL)
       ],
     );

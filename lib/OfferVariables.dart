@@ -34,7 +34,7 @@ class _OfferVariables extends State<OfferVariables>
     if (offers.isEmpty)
       emptyList = true;
     else
-      this.mostRecentOfferLogoURL = WebAPI.baseURL + offers.first.logo.url;
+      this.mostRecentOfferLogoURL =  offers.first.logo;
   }
 
   Widget _mostRecentOfferLogo() {
@@ -156,7 +156,7 @@ class Single_Offer extends StatelessWidget {
                   ),
                 ),
                 child: CachedImageBox(
-                  imageurl: WebAPI.baseURL + offer.logo.url,
+                  imageurl:  offer.logo,
                 ),
               ),
             ),

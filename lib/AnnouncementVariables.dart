@@ -135,7 +135,7 @@ class Single_Announcement extends StatelessWidget {
                     ),
                   ),
                   child: CachedImageBox(
-                    imageurl: WebAPI.baseURL + announcement.poster.url,
+                    imageurl: announcement.poster,
                   )),
             ),
           ),

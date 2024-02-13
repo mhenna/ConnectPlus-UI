@@ -9,7 +9,7 @@ class ERG {
   String name;
   String description;
   int iV;
-  ImageFile poster;
+  String poster;
 
   String id;
 
@@ -30,7 +30,7 @@ class ERG {
     iV = json['__v'];
 
     if (json['poster'] != null) {
-      poster = new ImageFile.fromJson(json['poster']);
+      poster = json['poster'];
     }
 
     id = json['id'];
@@ -45,7 +45,7 @@ class ERG {
     data['__v'] = this.iV;
 
     if (this.poster != null) {
-      data['poster'] = this.poster.toJson();
+      data['poster'] = this.poster;
     }
 
     data['id'] = this.id;

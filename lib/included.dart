@@ -118,7 +118,7 @@ class _IncludedState extends State<Included> {
                       child: FittedBox(
                           fit: BoxFit.contain,
                           child: CachedImageBox(
-                        imageurl: WebAPI.baseURL + ergsList[index].poster.url,
+                        imageurl: ergsList[index].poster,
                       )),
                     ),
                   ),

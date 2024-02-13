@@ -35,6 +35,9 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 android {
     compileSdkVersion 30
 
+    compileOptions {
+        incremental true
+    }
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
@@ -46,10 +49,10 @@ android {
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.techdev.connect_plus"
-        minSdkVersion 16
-        targetSdkVersion 30
-        versionCode 10
-        versionName "3.0"
+        minSdkVersion 20
+        targetSdkVersion 31
+        versionCode 24
+        versionName "5.0"
         multiDexEnabled true
     }
 signingConfigs {

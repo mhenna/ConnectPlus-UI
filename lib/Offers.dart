@@ -84,21 +84,17 @@ class _OffersState extends State<Offers> {
   }
 
   Future<void> getRecentOffersPosters() async {
-    var recent = await WebAPI.getOfferHighlights();
+    var recents = await WebAPI.getRecentOffers();
     if (this.mounted) {
+      for (var recent in recents){
+        recentOffers.add(CachedImageBox(imageurl: recent.poster));
+      }
       setState(() {
-        recent.forEach((element) {
-          element.highlight.forEach((h) {
-            recentOffers.add(CachedImageBox(
-              imageurl: WebAPI.baseURL + h.url,
-            ));
-          });
-        });
-        loadedHighlights = true;
+
       });
+      loadedHighlights = true;
     }
   }
-
   Future getOffers() async {
     final allOffers = await WebAPI.getOffers();
     if (this.mounted)
@@ -138,7 +134,7 @@ class _OffersState extends State<Offers> {
 
   Widget base64ToImageFeatured() {
     try {
-      final url = WebAPI.baseURL + offers[randIndexOffer].logo.url;
+      final url = offers[randIndexOffer].logo;
       return FittedBox(
         fit: BoxFit.contain,
         child: CachedImageBox(
@@ -367,8 +363,8 @@ class _OffersState extends State<Offers> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: <Widget>[
-                                              urlToImage(WebAPI.baseURL +
-                                                  offer.logo.url),
+                                              urlToImage
+                                                (offer.logo),
                                               ButtonBar(
                                                 alignment:
                                                     MainAxisAlignment.center,

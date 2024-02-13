@@ -18,10 +18,10 @@ class Offer extends Occurrence {
   final DateTime _updatedAt;
   final int _iV;
   final AdminUser _createdBy;
-  final ImageFile _logo;
+  final String _logo;
   final AdminUser _updatedBy;
   final String _location;
-  final Attachment _attachment;
+  final String _attachment;
   final String _id;
   final ERG _erg;
   final String _link;
@@ -33,7 +33,7 @@ class Offer extends Occurrence {
   @override
   DateTime get date => _createdAt;
   @override
-  ImageFile get poster => _logo;
+  String get poster => _logo;
   @override
   bool get slider => false;
   @override
@@ -47,10 +47,10 @@ class Offer extends Occurrence {
   DateTime get updatedAt => _updatedAt;
   int get iV => _iV;
   AdminUser get createdBy => _createdBy;
-  ImageFile get logo => _logo;
+  String get logo => _logo;
   AdminUser get updatedBy => _updatedBy;
   String get location => _location;
-  Attachment get attachment => _attachment;
+  String get attachment => _attachment;
   String get id => _id;
   String get link => _link;
   Offer({
@@ -65,10 +65,10 @@ class Offer extends Occurrence {
     @required DateTime updatedAt,
     @required int iV,
     @required AdminUser createdBy,
-    @required ImageFile logo,
+    @required String logo,
     @required AdminUser updatedBy,
     @required String location,
-    @required Attachment attachment,
+    @required String attachment,
     @required String id,
     @required ERG erg,
     String link,
@@ -101,7 +101,7 @@ class Offer extends Occurrence {
       details: json['details'],
       discount: json['discount'],
       expiration: json['expiration'] != null
-          ? DateTime.parse((json['expiration']))
+          ? json['expiration'].toDate()
           : null,
       contact: json['contact'],
       createdAt: json['createdAt'] != null
@@ -114,13 +114,13 @@ class Offer extends Occurrence {
       createdBy: json['created_by'] != null
           ? new AdminUser.fromJson(json['created_by'])
           : null,
-      logo: json['logo'] != null ? new ImageFile.fromJson(json['logo']) : null,
+      logo: json['logo'] != null ? json['logo'] : null,
       updatedBy: json['updated_by'] != null
           ? new AdminUser.fromJson(json['updated_by'])
           : null,
       location: json['location'],
       attachment: json['attachment'] != null
-          ? new Attachment.fromJson(json['attachment'])
+          ? json['attachment']
           : null,
       id: json['id'],
       erg: json['erg'] != null ? ERG.fromJson(json['erg']) : null,
@@ -143,14 +143,14 @@ class Offer extends Occurrence {
       data['created_by'] = this._createdBy.toJson();
     }
     if (this._logo != null) {
-      data['logo'] = this._logo.toJson();
+      data['logo'] = this._logo;
     }
     if (this._updatedBy != null) {
       data['updated_by'] = this._updatedBy.toJson();
     }
     data['location'] = this._location;
     if (this._attachment != null) {
-      data['attachment'] = this._attachment.toJson();
+      data['attachment'] = this._attachment;
     }
     if (this._category != null) {
       data['category'] = this._category.toJson();

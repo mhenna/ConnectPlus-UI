@@ -14,6 +14,7 @@ import 'package:connect_plus/services/auth_service/auth_service.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/BusinessUnit.dart';
 import 'package:connect_plus/widgets/terms_and_conditions_popup.dart';
+import 'package:connect_plus/models/registration_status.dart';
 
 class Registration extends StatefulWidget {
   Registration({Key key, this.title}) : super(key: key);
@@ -30,7 +31,7 @@ class _RegistrationState extends State<Registration> {
   final emController = TextEditingController();
   final pwController = TextEditingController();
   final phoneController = TextEditingController();
-
+  String genderSelectedVal='Male';
   final algorithm = PBKDF2();
   var asyncCall = false;
   var ip;
@@ -59,9 +60,12 @@ class _RegistrationState extends State<Registration> {
     super.dispose();
   }
 
-  void _displayCarPlate(bool _haveCar) {
+  void _displayRadioOption(dynamic _option) {
     setState(() {
-      haveCar = _haveCar;
+      if(_option is bool)
+      haveCar = _option;
+      else
+      genderSelectedVal = _option;
     });
   }
 
@@ -83,6 +87,13 @@ class _RegistrationState extends State<Registration> {
         _termsConditionsError = false;
       }
     });
+  }
+  String _tokenizeRegistrationError(String error)
+  {
+    if (error.contains("] ")){
+      return error.split("] ")[1];
+    }
+    else return error;
   }
 
   @override
@@ -240,16 +251,18 @@ class _RegistrationState extends State<Registration> {
               asyncCall = true;
             });
             final pnToken = await sl<PushNotificationsService>().token;
-            bool registered = await sl<AuthService>().register(
-              email: emController.text,
+            print("REGISTERING WITH GENDER:$genderSelectedVal, CAR:$haveCar");
+            RegistrationStatus registered = await sl<AuthService>().register(
+              email: emController.text.toLowerCase(),
               password: pwController.text,
               username: fnController.text,
               phoneNumber: phoneController.text,
               carPlates: haveCar ? carPlates : null,
               businessUnit: businessUnit,
               pushNotificationToken: pnToken,
+              gender: genderSelectedVal
             );
-            if (registered) {
+            if (registered.success) {
               await successDialog();
               Navigator.push(
                 context,
@@ -257,7 +270,8 @@ class _RegistrationState extends State<Registration> {
               );
             } else {
               //TODO: change dialog logic
-              _showDialog('Could not register');
+              String error=_tokenizeRegistrationError(registered.error);
+              _showDialog(error);
             }
             setState(() {
               asyncCall = false;
@@ -341,8 +355,8 @@ class _RegistrationState extends State<Registration> {
                                   SizedBox(height: 20.0),
                                   Container(
                                     width: width * 0.85,
-                                    child: CarPlateRadioButton(
-                                      displayCarPlate: _displayCarPlate,
+                                    child: RadioButtonRow(
+                                      displayRadioOption: _displayRadioOption,
                                     ),
                                   ),
                                   haveCar == true
@@ -474,38 +488,13 @@ class _RegistrationState extends State<Registration> {
       context: context,
       builder: (BuildContext context) {
         // return object of type Dialog
-        if (err == '400') {
-          return CupertinoAlertDialog(
-            title: new Text(
-              "Oops!",
-              textAlign: TextAlign.center,
-            ),
-            content: new Text('Full Name/Email Address is Already Taken!'),
-            actions: <Widget>[
-              // usually buttons at the bottom of the dialog
-              new FlatButton(
-                child: new Text(
-                  "Close",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: Utils.header,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17),
-                ),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        } else {
           return CupertinoAlertDialog(
             title: new Text(
               "Oops!",
               textAlign: TextAlign.center,
             ),
             content: new Text(
-                'Connection timed out! Please check your internet connection and try again.'),
+                err),
             actions: <Widget>[
               // usually buttons at the bottom of the dialog
               new FlatButton(
@@ -523,7 +512,6 @@ class _RegistrationState extends State<Registration> {
               ),
             ],
           );
-        }
       },
     );
   }
@@ -566,11 +554,11 @@ class CarPlateInputTitle extends StatelessWidget {
   }
 }
 
-class CarPlateRadioButton extends StatefulWidget {
-  final void Function(bool value) displayCarPlate;
-  CarPlateRadioButton({
+class RadioButtonRow extends StatefulWidget {
+  final void Function(dynamic value) displayRadioOption;
+  RadioButtonRow({
     Key key,
-    this.displayCarPlate,
+    this.displayRadioOption,
   }) : super(key: key);
   @override
   _State createState() => _State();
@@ -582,7 +570,7 @@ class QuestionsOptions {
   QuestionsOptions({this.name, this.index});
 }
 
-class _State extends State<CarPlateRadioButton> {
+class _State extends State<RadioButtonRow> {
   String radioItem = 'Yes';
   int id = 1;
   List<QuestionsOptions> optionsList = [
@@ -595,39 +583,57 @@ class _State extends State<CarPlateRadioButton> {
       name: "No",
     ),
   ];
-
+  String genderSelectedVal='Male';
+  List<String> genderOptions=["Male","Female"];
   Widget build(BuildContext context) {
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
+            "Gender",
+            style: TextStyle(fontSize: 20.0),
+          ),
+          Row(
+            children: genderOptions
+                .map((data) => Expanded(
+                child: RadioListTile(
+                  title: Text("$data"),
+                  groupValue: genderSelectedVal,
+                  value: data,
+                  onChanged: (val) {
+                    widget.displayRadioOption(data);
+                    setState(() {
+                      genderSelectedVal = data;
+                    });
+                  },
+                )))
+                .toList(),
+          ),
+          Text(
             "Have a car ?",
             style: TextStyle(fontSize: 20.0),
           ),
-          Column(
-            children: <Widget>[
-              Row(
-                children: optionsList
-                    .map((data) => Expanded(
-                            child: RadioListTile(
-                          title: Text("${data.name}"),
-                          groupValue: id,
-                          value: data.index,
-                          onChanged: (val) {
-                            widget.displayCarPlate(data.index == 1);
-                            setState(() {
-                              radioItem = data.name;
-                              id = data.index;
-                            });
-                          },
-                        )))
-                    .toList(),
-              )
-            ],
-          )
+          Row(
+            children: optionsList
+                .map((data) => Expanded(
+                        child: RadioListTile(
+                      title: Text("${data.name}"),
+                      groupValue: id,
+                      value: data.index,
+                      onChanged: (val) {
+                        widget.displayRadioOption(data.index == 1);
+                        setState(() {
+                          radioItem = data.name;
+                          id = data.index;
+                        });
+                      },
+                    )))
+                .toList(),
+          ),
         ],
       ),
+
     );
   }
 }

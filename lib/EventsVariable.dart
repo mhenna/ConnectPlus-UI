@@ -49,7 +49,7 @@ class _EventsVariablesState extends State<EventsVariables>
         events = allEvents;
         _all.addAll(events);
         if (allEvents.isNotEmpty)
-          mostRecentEventPosterUrl = WebAPI.baseURL + events.first.poster.url;
+          mostRecentEventPosterUrl =events.first.poster;
       });
 
       getWebinars();
@@ -72,14 +72,14 @@ class _EventsVariablesState extends State<EventsVariables>
     _all.addAll(webinars);
     _all.sort((b, a) => a.startDate.compareTo(b.startDate));
     if (webinars.isNotEmpty && events.isEmpty) {
-      mostRecentEventPosterUrl = WebAPI.baseURL + webinars.first.poster.url;
+      mostRecentEventPosterUrl =webinars.first.poster;
     } else if (webinars.isEmpty && events.isNotEmpty) {
-      mostRecentEventPosterUrl = WebAPI.baseURL + events.first.poster.url;
+      mostRecentEventPosterUrl =events.first.poster;
     } else if (webinars.isNotEmpty && events.isNotEmpty) {
       webinars.first.startDate.isAfter(events.first.startDate)
           ? mostRecentEventPosterUrl =
-              WebAPI.baseURL + webinars.first.poster.url
-          : mostRecentEventPosterUrl = WebAPI.baseURL + events.first.poster.url;
+              webinars.first.poster
+          : mostRecentEventPosterUrl =events.first.poster;
     }
   }
 
@@ -221,7 +221,7 @@ class Single_Event extends StatelessWidget {
                     ),
                   ),
                   child: CachedImageBox(
-                      imageurl: WebAPI.baseURL + event.poster.url),
+                      imageurl: event.poster),
                 ),
               ),
             ),

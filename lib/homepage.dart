@@ -23,6 +23,8 @@ import 'package:connect_plus/models/announcement.dart';
 import 'AnnouncementVariables.dart';
 import 'package:connect_plus/widgets/CachedImageBox.dart';
 import 'package:connect_plus/widgets/version_check.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -34,7 +36,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   TextStyle style = TextStyle(fontFamily: 'Roboto', fontSize: 16.0);
-
   List<CachedImageBox> sliderPosters = [];
   List<Event> events = [];
   List<Offer> offers = [];
@@ -48,6 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
   DateTime YESTERDAY_DATE = new DateTime.now().subtract(Duration(days: 1));
   List<Announcement> announcements = [];
   final String INTERNAL_COMMS = 'internal comms';
+  final String qrCode = FirebaseAuth.instance.currentUser.uid;
+
   void initState() {
     events = [];
     offers = [];
@@ -113,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (this.mounted) {
       recent.forEach((element) {
         element.highlight.forEach((h) {
-          sliderPosters.add(CachedImageBox(imageurl: WebAPI.baseURL + h.url));
+          sliderPosters.add(CachedImageBox(imageurl: h));
         });
       });
       highlightsLoaded = true;
@@ -179,7 +182,7 @@ class _MyHomePageState extends State<MyHomePage> {
     ergItems.forEach((erg, items) {
       for (int i = 0; i < ergPosterLimit; i++) {
         posters.add(
-          CachedImageBox(imageurl: WebAPI.baseURL + items[i].poster.url),
+          CachedImageBox(imageurl:items[i].poster),
         );
       }
     });
@@ -203,7 +206,7 @@ class _MyHomePageState extends State<MyHomePage> {
     List<CachedImageBox> posters = sliderAnnouncements
         .map(
           (announcement) => CachedImageBox(
-            imageurl: WebAPI.baseURL + announcement.poster.url,
+            imageurl: announcement.poster,
           ),
         )
         .toList();
@@ -224,6 +227,42 @@ class _MyHomePageState extends State<MyHomePage> {
       announcements = allAnnouncements;
       announcementsLoaded = true;
     }
+  }
+  void showQrCodePopUp(){
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+     showDialog(
+        context: context,
+        builder: (BuildContext
+        context) =>
+        AlertDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius:
+              BorderRadius.all(Radius.circular(32))),
+          title: Text(
+              "My QR Code:"),
+          content:
+          Container(
+            width:width*0.8,
+            height:height*0.5,
+            alignment: Alignment.center,
+            child:
+            Column(
+              mainAxisSize:
+              MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top:25.0),
+                  child: QrImage(
+                      data:qrCode,
+                    size: height*0.45,
+                  ),
+                )
+              ],
+            ),
+          ),
+        ));
   }
 
   Future<void> _refreshData() async {
@@ -472,7 +511,15 @@ class _MyHomePageState extends State<MyHomePage> {
                         ),
                       ),
                     ),
-                  ),
+                      actions: <Widget>[
+                  IconButton(
+                  icon: const Icon(Icons.qr_code_scanner),
+                  tooltip: 'Show QR Code',
+                  onPressed: () async {
+                    showQrCodePopUp();
+                  },
+                ),
+                  ]),
                   drawer: NavDrawer(),
                   backgroundColor: Utils.background,
                   body: Stack(children: <Widget>[

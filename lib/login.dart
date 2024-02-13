@@ -1,3 +1,5 @@
+import 'package:connect_plus/BookSwapsAdminHome.dart';
+import 'package:connect_plus/qr_code_scanner_home_screen.dart';
 import 'package:connect_plus/widgets/ImageRotate.dart';
 import 'package:connect_plus/widgets/Utils.dart';
 import 'package:connect_plus/models/user.dart';
@@ -14,6 +16,9 @@ import 'package:flutter/foundation.dart';
 import 'package:connect_plus/injection_container.dart';
 import 'package:connect_plus/ResetPassword.dart';
 import 'package:connect_plus/missingInformation.dart';
+
+import 'BookSwapsAdminViewPosts.dart';
+import 'gender_select_screen.dart';
 
 class Login extends StatefulWidget {
   Login({Key key, this.title}) : super(key: key);
@@ -153,10 +158,29 @@ class _LoginState extends State<Login> {
                           )),
                 );
               } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyHomePage()),
-                );
+                if(user.customClaim=='qrCodeScanner'){
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => QrCodeScannerHomeScreen(scannerErgs: user.scannerErgs,)),
+                  );
+                }
+                else if(user.customClaim=='bookSwapsAdmin')
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => BookSwapsAdminHome()),
+                  );                else
+                  {
+                    if(user.gender==null || user.gender==""){
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => GenderSelectScreen()),
+                    );
+                  }
+                    else Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => MyHomePage()),
+                    );
+                  }
               }
             } else {
               setState(() {

@@ -22,7 +22,7 @@ class PDFViewerCachedFromUrl extends StatelessWidget {
         url,
         placeholder: (double progress) => Center(child: Text('$progress %')),
         errorWidget: (dynamic error) => Center(child: Text(error.toString())),
-        headers: WebAPI.generateHeaders(WebAPI.currentToken),
+        //headers: WebAPI.generateHeaders(WebAPI.currentToken),
       ),
     );
   }

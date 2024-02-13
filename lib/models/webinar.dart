@@ -16,7 +16,7 @@ class Webinar extends Occurrence {
   final int _iV;
   final AdminUser _createdBy;
   final ERG _erg;
-  final ImageFile _poster;
+  final String _poster;
   final AdminUser _updatedBy;
   final String _id;
   final bool _isRecorded;
@@ -28,7 +28,7 @@ class Webinar extends Occurrence {
   @override
   String get name => _name;
   @override
-  ImageFile get poster => _poster;
+  String get poster => _poster;
   @override
   bool get slider => _slider;
   @override
@@ -60,7 +60,7 @@ class Webinar extends Occurrence {
     @required int iV,
     @required AdminUser createdBy,
     @required ERG erg,
-    @required ImageFile poster,
+    @required String poster,
     @required AdminUser updatedBy,
     @required bool isRecorded,
     @required String id,
@@ -91,9 +91,9 @@ class Webinar extends Occurrence {
       url: json['url'],
       onBehalfOf: json['onBehalfOf'],
       isRecorded: json['isRecorded'],
-      duration: double.parse(json['Duration'].toString()),
+      duration: json['Duration']!=null?double.parse(json['Duration'].toString()):0,
       startDate: json['startDate'] != null
-          ? DateTime.parse((json['startDate'])).toLocal()
+          ? json['startDate'].toDate()
           : null,
       createdAt: json['createdAt'] != null
           ? DateTime.parse((json['createdAt']))
@@ -106,7 +106,7 @@ class Webinar extends Occurrence {
           ? new AdminUser.fromJson(json['created_by'])
           : null,
       poster: json['poster'] != null
-          ? new ImageFile.fromJson(json['poster'])
+          ? json['poster']
           : null,
       updatedBy: json['updated_by'] != null
           ? new AdminUser.fromJson(json['updated_by'])
@@ -138,7 +138,7 @@ class Webinar extends Occurrence {
       data['erg'] = this._erg.toJson();
     }
     if (this._poster != null) {
-      data['poster'] = this._poster.toJson();
+      data['poster'] = this._poster;
     }
     if (this._updatedBy != null) {
       data['updated_by'] = this._updatedBy.toJson();

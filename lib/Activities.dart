@@ -108,7 +108,7 @@ class MyActivitiesPageState extends State<Activities>
   Widget featuredImage() {
     try {
       final featuruedActivity = activities[randIndex];
-      final imageURL = WebAPI.baseURL + featuruedActivity.poster.url;
+      final imageURL = featuruedActivity.poster;
       return FittedBox(
         fit: BoxFit.fill,
         child: CachedImageBox(imageurl: imageURL),
@@ -285,8 +285,8 @@ class MyActivitiesPageState extends State<Activities>
                                           borderRadius: BorderRadius.all(
                                               Radius.circular(10.0))),
                                       child: InkWell(
-                                        child: urlToImage(WebAPI.baseURL +
-                                            activity.poster.url),
+                                        child: urlToImage(
+                                            activity.poster),
                                         onTap: () {
                                           Navigator.push(
                                             context,

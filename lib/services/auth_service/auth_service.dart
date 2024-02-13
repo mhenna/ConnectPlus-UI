@@ -3,17 +3,31 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:connect_plus/models/user.dart' as user_model;
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:connect_plus/models/registration_status.dart';
 
 class AuthService {
   final FirebaseAuth _fbAuth = FirebaseAuth.instance;
   final FirebaseFirestore _fs = FirebaseFirestore.instance;
   user_model.User _user;
+  Future<String> getCustomClaim(fbUser) async{
+    final idTokenResult=await fbUser.getIdTokenResult(true);
+    final claims = idTokenResult.claims;
+    if(claims['qrCodeScanner']==true)
+      return 'qrCodeScanner';
+    else if (claims['bookSwapsAdmin']==true)
+      return 'bookSwapsAdmin';
+    else return '';
+  }
 
   Future<user_model.User> getUser() async {
     final fbUser = _fbAuth.currentUser;
     if (fbUser != null) {
       final userDoc = await _fs.collection('users').doc(fbUser.uid).get();
-      _user = user_model.User.fromJson(userDoc.data());
+      final userData=userDoc.data();
+      userData['customClaim']=await getCustomClaim(fbUser);
+      _user = user_model.User.fromJson(userData);
+      print("claims: ${_user.customClaim}");
+      print("gender: ${_user.gender}");
       _user.setEmailVerified(fbUser.emailVerified);
       return _user;
     }
@@ -21,12 +35,13 @@ class AuthService {
   }
 
   /// Registration
-  Future<bool> register({
+  Future<RegistrationStatus> register({
     @required String email,
     @required String password,
     @required String username,
     @required String phoneNumber,
     @required String pushNotificationToken,
+    @required String gender,
     List<String> carPlates,
     String businessUnit,
   }) async {
@@ -49,17 +64,30 @@ class AuthService {
           'id': cred.user.uid,
           'businessUnit': businessUnit,
           'pushNotificationToken': pushNotificationToken,
+          'gender':gender
         });
         String response = await sendVerificationEmail();
         if (response != "") {
-          return false;
+          logRegistrationError(typedEmail: email, error: response);
+          return RegistrationStatus(success: false, error: response);
         }
-        return true;
+        return RegistrationStatus(success: true);
       }
-      return false;
+      return RegistrationStatus(success: false, error: "Unknown error");
     } catch (e) {
-      return false;
+      String error = e.toString();
+      logRegistrationError(typedEmail: email, error: error);
+      return RegistrationStatus(success: false, error: error);
     }
+  }
+
+  Future<void> logRegistrationError(
+      {@required String typedEmail, @required String error}) async {
+    await _fs.collection('registration-error-logs').add({
+      'typedEmail': typedEmail,
+      'error': error,
+      'timestamp': DateTime.now().toString()
+    });
   }
 
   Future<AuthState> login({
@@ -116,7 +144,8 @@ class AuthService {
 
   Future<user_model.User> get user async {
     if (_user == null) {
-      return await getUser();
+      _user = await getUser();
+      return _user;
     } else {
       return _user;
     }
@@ -132,6 +161,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    _user=null;
     return await _fbAuth.signOut();
   }
 
